@@ -66,21 +66,25 @@ async function loadData() {
   try {
     const res = await fetch(API_URL);
     const data = await res.json();
-    allData = data.map(row => {
-      const { kelas, nama, ...rest } = row;
-      return { kelas, nama, ...rest };
-    });
     
-    // Filter hanya ambil data dari row 2 dan seterusnya (skip header)
-    allData = allData.filter(row => row._row >= 2);
+    // Cek struktur data
+    console.log("Data dari API:", data);
     
-    populateKelasFilter(allData);
+    // Header ada di row 1 (index 0 di array), data mulai row 2 (index 1)
+    // Data yang diterima dari API sudah termasuk _row
+    allData = data;
+    
+    // Pastikan kita filter out row 1 (header) untuk display di tabel
+    const dataForTable = allData.filter(row => row._row >= 2);
+    
+    // Ambil semua kelas yang unik dari data (row 2 dan seterusnya)
+    populateKelasFilter(dataForTable);
     populateKolomFilter();
     
-    // Tampilkan semua data di tabel awalnya
-    renderTable(allData);
+    // Tampilkan semua data di tabel awalnya (tanpa header row)
+    renderTable(dataForTable);
   } catch(e) {
-    console.error(e);
+    console.error("Error loading data:", e);
   }
 }
 
@@ -94,7 +98,7 @@ function renderTable(data) {
     return;
   }
 
-  // Header
+  // Header - ambil dari properti pertama yang bukan "_row"
   const headers = Object.keys(data[0]).filter(k => k !== "_row");
   const trHead = table.insertRow();
   trHead.className = "bg-gray-200";
@@ -121,7 +125,17 @@ function populateKelasFilter(data) {
   const kelasSet = new Set(data.map(d => d.kelas).filter(k => k));
   const select = document.getElementById("kelasFilter");
   
-  kelasSet.forEach(k => {
+  console.log("Kelas yang ditemukan:", Array.from(kelasSet));
+  
+  // Clear existing options kecuali yang pertama
+  while (select.options.length > 1) {
+    select.remove(1);
+  }
+  
+  // Sort kelas secara alfabetis
+  const sortedKelas = Array.from(kelasSet).sort();
+  
+  sortedKelas.forEach(k => {
     const opt = document.createElement("option");
     opt.value = k;
     opt.innerText = k;
@@ -137,7 +151,7 @@ function populateKolomFilter() {
   for(let i = 3; i <= 33; i++) {
     const opt = document.createElement("option");
     opt.value = i;
-    opt.innerText = `Kolom ${i} (${i-2})`;
+    opt.innerText = `Kolom ${i} (Tanggal ${i-2})`;
     select.appendChild(opt);
   }
 }
@@ -151,22 +165,25 @@ document.getElementById("kelasFilter").onchange = function() {
   // Update display kelas
   document.getElementById("kelasDisplay").innerText = currentKelas || "Semua";
   
+  // Filter data untuk tabel (exclude row 1/header)
+  const dataForTable = allData.filter(row => row._row >= 2);
+  
   if(currentKelas) {
-    // Filter siswa berdasarkan kelas
-    const filteredSiswa = allData.filter(d => d.kelas === currentKelas);
+    // Filter siswa berdasarkan kelas dari data yang sudah difilter
+    const filteredSiswa = dataForTable.filter(d => d.kelas === currentKelas);
     filteredSiswa.forEach(s => {
       const opt = document.createElement("option");
-      opt.value = s._row;
+      opt.value = s._row; // ini row number asli dari spreadsheet
       opt.innerText = s.nama;
       siswaSelect.appendChild(opt);
     });
     
     // Filter dan tampilkan data tabel untuk kelas yang dipilih
-    const filteredData = allData.filter(d => d.kelas === currentKelas);
+    const filteredData = dataForTable.filter(d => d.kelas === currentKelas);
     renderTable(filteredData);
   } else {
     // Tampilkan semua data jika tidak ada kelas yang dipilih
-    renderTable(allData);
+    renderTable(dataForTable);
   }
 };
 
@@ -184,6 +201,12 @@ async function updateCell() {
 
   if(!_row || !col || !value) {
     alert("Lengkapi semua field!");
+    return;
+  }
+
+  // Validasi kolom harus antara 3-33
+  if(col < 3 || col > 33) {
+    alert("Kolom harus antara 3-33!");
     return;
   }
 
@@ -211,9 +234,6 @@ async function updateCell() {
     console.error(e);
   }
 }
-
-// Load data saat awal
-loadData();
 </script>
 
 </body>
