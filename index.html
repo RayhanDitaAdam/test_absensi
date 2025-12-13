@@ -2,61 +2,104 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Write & Read Google Sheet</title>
+  <title>Spreadsheet Dashboard</title>
   <style>
-    body { font-family: sans-serif; width: 400px; margin: 30px auto; }
-    input, textarea { width: 100%; padding: 8px; margin: 5px 0; }
-    button { padding: 10px 15px; margin-top: 10px; cursor: pointer; }
-    pre { background: #eee; padding: 10px; }
+    body { font-family: sans-serif; margin: 30px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 5px 10px; text-align: center; }
+    td.editable { cursor: pointer; background: #f9f9f9; }
+    input { width: 80px; }
+    button { padding: 5px 10px; margin-top: 10px; }
   </style>
 </head>
 <body>
 
-<h2>Tulis ke Spreadsheet</h2>
-
+<h2>Tambah Catatan</h2>
 <input id="name" placeholder="Nama">
 <input id="email" placeholder="Email">
 <textarea id="note" placeholder="Catatan"></textarea>
-
 <button onclick="writeData()">Submit</button>
-
 <p id="result"></p>
 
 <hr>
 
-<h2>Cek Data Spreadsheet</h2>
+<h2>Data Siswa</h2>
 <button onclick="loadData()">Load Data</button>
-
-<pre id="output"></pre>
+<table id="sheetTable"></table>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbwQNTrhhBF19foVy_NhBNOINxTymdorrvVUMRZ383fyalwqEkcbQyvNLXGoMJnuYv5U/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwQNTrhhBF19foVy_NhBNOINxTymdorrvVUMRZ383fyalwqEkcbQyvNLXGoMJnuYv5U/exec";
 
-  async function writeData() {
-    const payload = {
-      name: document.getElementById("name").value,
-      email: document.getElementById("email").value,
-      note: document.getElementById("note").value
-    };
+async function writeData() {
+  const payload = {
+    name: document.getElementById("name").value,
+    email: document.getElementById("email").value,
+    note: document.getElementById("note").value
+  };
 
-    const res = await fetch(API_URL, {
-      method: "POST",
-      body: JSON.stringify(payload),
+  const res = await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" }
+  });
+
+  const json = await res.json();
+  document.getElementById("result").innerText = json.success ? "Berhasil menulis!" : "Gagal!";
+  loadData();
+}
+
+async function loadData() {
+  const res = await fetch(API_URL);
+  const data = await res.json();
+
+  const table = document.getElementById("sheetTable");
+  table.innerHTML = "";
+
+  if(data.length === 0) return;
+
+  // buat header
+  const headers = Object.keys(data[0]).filter(k => k !== "_row");
+  const thead = table.insertRow();
+  headers.forEach(h => {
+    const th = document.createElement("th");
+    th.innerText = h;
+    thead.appendChild(th);
+  });
+
+  // buat body
+  data.forEach(row => {
+    const tr = table.insertRow();
+    headers.forEach(col => {
+      const td = tr.insertCell();
+      td.innerText = row[col];
+      td.className = "editable";
+      td.onclick = () => editCell(td, row._row, col);
+    });
+  });
+}
+
+function editCell(td, row, col) {
+  const oldValue = td.innerText;
+  td.innerHTML = `<input type="text" value="${oldValue}">`;
+  const input = td.firstChild;
+  input.focus();
+
+  input.onblur = async () => {
+    const newValue = input.value;
+    td.innerText = newValue;
+
+    await fetch(API_URL, {
+      method: "PUT",
+      body: JSON.stringify({ _row: row, col: col, value: newValue }),
       headers: { "Content-Type": "application/json" }
     });
+  };
 
-    const json = await res.json();
-    document.getElementById("result").innerText =
-      json.success ? "Berhasil menulis!" : "Gagal!";
-  }
+  input.onkeydown = e => {
+    if(e.key === "Enter") input.blur();
+  };
+}
 
-  async function loadData() {
-    const res = await fetch(API_URL);
-    const json = await res.json();
-    document.getElementById("output").innerText =
-      JSON.stringify(json, null, 2);
-  }
 </script>
-
 </body>
 </html>
