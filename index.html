@@ -631,8 +631,6 @@ function nextPage() {
     renderFilteredTable();
   }
 }
-
-// Render tabel
 function renderTable(data, totalLength) {
   const table = document.getElementById("sheetTable");
   const emptyState = document.getElementById("emptyState");
@@ -648,62 +646,86 @@ function renderTable(data, totalLength) {
   document.getElementById("tablePagination").classList.remove("hidden");
   table.innerHTML = "";
 
-  // Header
-  const sampleRow = data[0];
-  const headers = Object.keys(sampleRow);
-  const orderedHeaders = ['nama', 'kelas', ...headers.filter(h => h !== 'nama' && h !== 'kelas')];
-  
-  // Create header
+  // Header - Urutannya: Nama, Kelas, Tanggal 1-31
   const thead = document.createElement("thead");
   thead.className = "bg-gray-50";
   const trHead = document.createElement("tr");
   
-  orderedHeaders.forEach((h, index) => {
+  // Kolom Nama
+  const thNama = document.createElement("th");
+  thNama.textContent = "Nama";
+  thNama.className = "px-4 py-3 text-left text-sm font-medium text-gray-700 border-b border-gray-200 sticky left-0 bg-gray-50 z-10 min-w-[150px]";
+  trHead.appendChild(thNama);
+  
+  // Kolom Kelas
+  const thKelas = document.createElement("th");
+  thKelas.textContent = "Kelas";
+  thKelas.className = "px-4 py-3 text-left text-sm font-medium text-gray-700 border-b border-gray-200 sticky left-[150px] bg-gray-50 z-10 min-w-[100px]";
+  trHead.appendChild(thKelas);
+  
+  // Kolom Tanggal 1-31
+  // PERBAIKAN: Mapping yang benar
+  // Di JSON: "3" = Tanggal 1, "4" = Tanggal 2, dst
+  for(let day = 1; day <= 31; day++) {
+    const excelColumn = day + 2; // Karena tanggal 1 di kolom C (3), tanggal 2 di D (4), dst
     const th = document.createElement("th");
-    th.innerText = formatHeader(h);
-    th.className = "px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 whitespace-nowrap";
-    
-    // Kolom nama dan kelas lebih lebar
-    if (h === 'nama') th.className += " w-1/4";
-    if (h === 'kelas') th.className += " w-1/6";
-    
+    th.textContent = day;
+    th.className = "px-3 py-3 text-center text-xs font-medium text-gray-500 border-b border-gray-200 min-w-[60px]";
+    th.title = `Tanggal ${day} (Kolom ${excelColumn})`;
+    th.dataset.excelCol = excelColumn; // Simpan mapping
     trHead.appendChild(th);
-  });
+  }
   
   thead.appendChild(trHead);
   table.appendChild(thead);
 
   // Body
   const tbody = document.createElement("tbody");
-  tbody.className = "bg-white divide-y divide-gray-200";
   
-  data.forEach((row, index) => {
+  data.forEach((row, rowIndex) => {
     const tr = document.createElement("tr");
-    tr.className = index % 2 === 0 ? "bg-white hover:bg-gray-50" : "bg-gray-50 hover:bg-gray-100";
+    tr.className = rowIndex % 2 === 0 ? "bg-white hover:bg-gray-50" : "bg-gray-50 hover:bg-gray-100";
     
-    orderedHeaders.forEach(col => {
+    // Cell Nama (sticky)
+    const tdNama = document.createElement("td");
+    tdNama.textContent = row.nama || "";
+    tdNama.className = "px-4 py-3 text-sm font-semibold text-gray-900 border-b border-gray-200 sticky left-0 bg-inherit z-5";
+    tr.appendChild(tdNama);
+    
+    // Cell Kelas (sticky)
+    const tdKelas = document.createElement("td");
+    tdKelas.textContent = row.kelas || "";
+    tdKelas.className = "px-4 py-3 text-sm text-gray-700 border-b border-gray-200 sticky left-[150px] bg-inherit z-5";
+    tr.appendChild(tdKelas);
+    
+    // Cell Tanggal 1-31
+    // PERBAIKAN: Mapping yang benar
+    for(let day = 1; day <= 31; day++) {
+      const excelColumn = day + 2; // Tanggal 1 = kolom 3, tanggal 2 = kolom 4, dst
       const td = document.createElement("td");
-      const value = row[col] || "";
-      td.innerText = value;
       
-      if (col === 'nama' || col === 'kelas') {
-        td.className = "px-3 py-3 text-sm font-medium text-gray-900 whitespace-nowrap";
-        if (col === 'nama') td.classList.add("font-semibold");
+      // Ambil nilai dari properti yang sesuai
+      // Di JSON, tanggal 1 ada di properti "3", tanggal 2 di "4", dst
+      const value = row[excelColumn.toString()] || "";
+      td.textContent = value;
+      
+      // Styling berdasarkan value
+      let cellClass = "px-3 py-3 text-center text-sm border-b border-gray-200 ";
+      
+      if(value === "MASUK") {
+        cellClass += "bg-green-50 text-green-700";
+      } else if(value && value !== "" && value !== "MASUK") {
+        cellClass += "bg-yellow-50 text-yellow-700 font-medium";
       } else {
-        td.className = "px-3 py-3 text-sm text-center whitespace-nowrap";
-        
-        // Warna untuk status
-        if (value === "MASUK") {
-          td.className += " bg-green-50 text-green-800";
-        } else if (value && value !== "" && value !== "MASUK") {
-          td.className += " bg-yellow-50 text-yellow-800";
-        } else {
-          td.className += " bg-gray-50 text-gray-500";
-        }
+        cellClass += "bg-gray-50 text-gray-400";
       }
       
+      td.className = cellClass;
+      td.dataset.day = day;
+      td.dataset.excelCol = excelColumn;
+      
       tr.appendChild(td);
-    });
+    }
     
     tbody.appendChild(tr);
   });
