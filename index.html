@@ -1,31 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <title>Spreadsheet Dashboard</title>
-  <style>
-    body { font-family: sans-serif; margin: 30px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 5px 10px; text-align: center; }
-    td.editable { cursor: pointer; background: #f9f9f9; }
-    input { width: 80px; }
-    button { padding: 5px 10px; margin-top: 10px; }
-  </style>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 p-8">
 
-<h2>Tambah Catatan</h2>
-<input id="name" placeholder="Nama">
-<input id="email" placeholder="Email">
-<textarea id="note" placeholder="Catatan"></textarea>
-<button onclick="writeData()">Submit</button>
-<p id="result"></p>
+<div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+  <h2 class="text-2xl font-bold mb-4">Tambah Catatan</h2>
+  <div class="space-y-2">
+    <input id="name" placeholder="Nama" class="w-full p-2 border rounded">
+    <input id="email" placeholder="Email" class="w-full p-2 border rounded">
+    <textarea id="note" placeholder="Catatan" class="w-full p-2 border rounded"></textarea>
+    <button onclick="writeData()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Submit</button>
+    <p id="result" class="text-green-600 font-semibold"></p>
+  </div>
+</div>
 
-<hr>
-
-<h2>Data Siswa</h2>
-<button onclick="loadData()">Load Data</button>
-<table id="sheetTable"></table>
+<div class="max-w-6xl mx-auto bg-white p-6 mt-8 rounded shadow">
+  <h2 class="text-2xl font-bold mb-4">Data Siswa</h2>
+  <button onclick="loadData()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4">Load Data</button>
+  
+  <div class="overflow-x-auto">
+    <table id="sheetTable" class="min-w-full border border-gray-300"></table>
+  </div>
+</div>
 
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbwQNTrhhBF19foVy_NhBNOINxTymdorrvVUMRZ383fyalwqEkcbQyvNLXGoMJnuYv5U/exec";
@@ -60,9 +60,11 @@ async function loadData() {
   // buat header
   const headers = Object.keys(data[0]).filter(k => k !== "_row");
   const thead = table.insertRow();
+  thead.className = "bg-gray-200";
   headers.forEach(h => {
     const th = document.createElement("th");
     th.innerText = h;
+    th.className = "border px-2 py-1";
     thead.appendChild(th);
   });
 
@@ -72,7 +74,7 @@ async function loadData() {
     headers.forEach(col => {
       const td = tr.insertCell();
       td.innerText = row[col];
-      td.className = "editable";
+      td.className = "border px-2 py-1 editable cursor-pointer hover:bg-gray-100";
       td.onclick = () => editCell(td, row._row, col);
     });
   });
@@ -80,7 +82,7 @@ async function loadData() {
 
 function editCell(td, row, col) {
   const oldValue = td.innerText;
-  td.innerHTML = `<input type="text" value="${oldValue}">`;
+  td.innerHTML = `<input type="text" value="${oldValue}" class="w-full border p-1 rounded">`;
   const input = td.firstChild;
   input.focus();
 
@@ -99,7 +101,7 @@ function editCell(td, row, col) {
     if(e.key === "Enter") input.blur();
   };
 }
-
 </script>
+
 </body>
 </html>
