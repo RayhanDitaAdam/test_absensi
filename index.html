@@ -67,6 +67,16 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    
+    /* Optional: styling untuk select */
+    select:focus {
+      outline: none;
+      ring: 2px;
+    }
+    
+    option {
+      padding: 8px;
+    }
   </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -148,13 +158,43 @@
           </select>
         </div>
 
-        <!-- Alasan -->
+        <!-- Alasan - DIUBAH MENJADI SELECT -->
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
             <i class="fas fa-sticky-note text-blue-500 mr-1"></i>
             Alasan Tidak Masuk
           </label>
-          <input id="value" placeholder="Sakit, Izin, dll" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-base">
+          <select id="value" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-base">
+            <option value="">-- Pilih Alasan --</option>
+            <option value="P">P (Izin)</option>
+            <option value="S">S (Sakit)</option>
+            <option value="I">I (Izin Kegiatan)</option>
+            <option value="A">A (Alpha/Tanpa Keterangan)</option>
+          </select>
+        </div>
+
+        <!-- Legenda Keterangan -->
+        <div class="text-xs text-gray-500 mt-1 space-y-1 p-2 bg-gray-50 rounded">
+          <div class="flex items-center">
+            <div class="w-3 h-3 bg-green-100 rounded mr-2"></div>
+            <span>MASUK = Hadir</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-3 h-3 bg-yellow-100 rounded mr-2"></div>
+            <span>P = Izin</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-3 h-3 bg-red-100 rounded mr-2"></div>
+            <span>S = Sakit</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-3 h-3 bg-blue-100 rounded mr-2"></div>
+            <span>I = Izin Kegiatan</span>
+          </div>
+          <div class="flex items-center">
+            <div class="w-3 h-3 bg-gray-200 rounded mr-2"></div>
+            <span>A = Alpha</span>
+          </div>
         </div>
 
         <!-- Buttons -->
@@ -458,16 +498,16 @@ function updateSiswaFilter() {
     }
   }
 }
+
 function updateKolomFilter() {
   const select = document.getElementById("col");
   const currentValue = select.value;
   
   select.innerHTML = '<option value="">-- Pilih Tanggal --</option>';
   
-  // PERBAIKAN: Pilih dari 1-31 (bukan 3-33)
   for(let day = 1; day <= 31; day++) {
     const opt = document.createElement("option");
-    opt.value = day;  // Langsung day number, bukan kolom Excel
+    opt.value = day;
     opt.innerText = `Tanggal ${day}`;
     select.appendChild(opt);
   }
@@ -630,7 +670,8 @@ function nextPage() {
     renderFilteredTable();
   }
 }
-  function renderTable(data, totalLength) {
+
+function renderTable(data, totalLength) {
   const table = document.getElementById("sheetTable");
   const emptyState = document.getElementById("emptyState");
   
@@ -663,13 +704,12 @@ function nextPage() {
   trHead.appendChild(thKelas);
   
   // Kolom Tanggal 1-31
-  // PERBAIKAN: JSON menggunakan "1", "2", "3" langsung untuk tanggal
   for(let day = 1; day <= 31; day++) {
     const th = document.createElement("th");
     th.textContent = `Tgl ${day}`;
     th.className = "px-3 py-3 text-center text-xs font-medium text-gray-500 border-b border-gray-200 min-w-[60px]";
     th.title = `Tanggal ${day}`;
-    th.dataset.day = day; // Simpan hari ke-
+    th.dataset.day = day;
     trHead.appendChild(th);
   }
   
@@ -696,7 +736,6 @@ function nextPage() {
     tr.appendChild(tdKelas);
     
     // Cell Tanggal 1-31
-    // PERBAIKAN: Ambil langsung dari properti "1", "2", "3", dst
     for(let day = 1; day <= 31; day++) {
       const td = document.createElement("td");
       
@@ -707,15 +746,27 @@ function nextPage() {
       const displayValue = value === "" ? "MASUK" : value;
       td.textContent = displayValue;
       
-      // Styling berdasarkan value
-      let cellClass = "px-3 py-3 text-center text-sm border-b border-gray-200 ";
+      // Styling berdasarkan value - DIUBAH UNTUK P, S, I, A
+      let cellClass = "px-3 py-3 text-center text-sm border-b border-gray-200 font-medium ";
       
       if(displayValue === "MASUK") {
         cellClass += "bg-green-50 text-green-700";
+      } else if(displayValue === "P") {
+        cellClass += "bg-yellow-50 text-yellow-700";
+        td.title = "Izin";
+      } else if(displayValue === "S") {
+        cellClass += "bg-red-50 text-red-700";
+        td.title = "Sakit";
+      } else if(displayValue === "I") {
+        cellClass += "bg-blue-50 text-blue-700";
+        td.title = "Izin Kegiatan";
+      } else if(displayValue === "A") {
+        cellClass += "bg-gray-100 text-gray-700";
+        td.title = "Alpha/Tanpa Keterangan";
       } else if(displayValue && displayValue !== "" && displayValue !== "MASUK") {
-        // Untuk izin, sakit, dll
-        cellClass += "bg-yellow-50 text-yellow-700 font-medium";
-        td.title = `Alasan: ${displayValue}`; // Tambah tooltip
+        // Untuk nilai lainnya (backward compatibility)
+        cellClass += "bg-yellow-50 text-yellow-700";
+        td.title = `Alasan: ${displayValue}`;
       } else {
         cellClass += "bg-gray-50 text-gray-400";
       }
@@ -731,13 +782,6 @@ function nextPage() {
   
   table.appendChild(tbody);
 }
-// Format header
-function formatHeader(header) {
-  if (header === 'nama') return 'Nama';
-  if (header === 'kelas') return 'Kelas';
-  if (/^\d+$/.test(header)) return header;
-  return header;
-}
 
 // Reset form
 function resetForm() {
@@ -746,6 +790,7 @@ function resetForm() {
   document.getElementById("result").innerHTML = "";
   showToast('Form berhasil direset', 'info');
 }
+
 async function updateCell() {
   const siswaSelect = document.getElementById("siswaFilter");
   const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
@@ -753,7 +798,7 @@ async function updateCell() {
   const tanggal = Number(document.getElementById("col").value); // Tanggal ke- (1, 2, 3, ...)
   const value = document.getElementById("value").value.trim();
   const siswaName = selectedOption?.dataset.nama || "";
-  const alasanInput = document.getElementById("value");
+  const alasanSelect = document.getElementById("value");
 
   // Validasi
   if(!_row || !siswaName) {
@@ -767,12 +812,12 @@ async function updateCell() {
   }
   
   if(!value) {
-    showToast('Harap isi alasan terlebih dahulu', 'error');
-    alasanInput.focus();
+    showToast('Harap pilih alasan terlebih dahulu', 'error');
+    alasanSelect.focus();
     return;
   }
 
-  // PERBAIKAN PENTING: Hitung kolom spreadsheet yang benar
+  // Hitung kolom spreadsheet yang benar
   // col 1 = kelas, col 2 = nama, col 3 = tanggal 1
   // Jadi: tanggal ke-1 -> col 3, tanggal ke-2 -> col 4, dst
   const col = tanggal + 2; // Konversi: tanggal 1 = col 3, tanggal 2 = col 4, dst
@@ -801,11 +846,11 @@ async function updateCell() {
     const text = await res.text();
     console.log("Update response:", text);
     
-    // Update data lokal (simulasi)
+    // Update data lokal
     updateLocalData(siswaName, tanggal, value);
     
     // Reset hanya input alasan, biar pilihan tetap
-    alasanInput.value = "";
+    alasanSelect.value = "";
     
     // Tampilkan notifikasi
     showToast(`Data ${siswaName} (Tanggal ${tanggal}) berhasil diperbarui`, 'success');
@@ -824,7 +869,6 @@ async function updateCell() {
   }
 }
 
-// Juga perbaiki updateLocalData untuk menggunakan tanggal bukan col
 function updateLocalData(siswaName, tanggal, value) {
   // Cari data siswa
   const index = allData.findIndex(d => d.nama === siswaName);
@@ -836,17 +880,7 @@ function updateLocalData(siswaName, tanggal, value) {
     renderFilteredTable();
   }
 }
-function updateLocalData(siswaName, col, value) {
-  // Cari data siswa
-  const index = allData.findIndex(d => d.nama === siswaName);
-  if (index !== -1) {
-    // Update properti sesuai dengan nomor kolom (day number)
-    allData[index][col.toString()] = value;
-    
-    // Refresh tampilan
-    renderFilteredTable();
-  }
-  }
+
 // Export data
 function exportData() {
   let dataToExport = allData;
