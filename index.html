@@ -29,6 +29,7 @@
           <button onclick="resetForm()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Reset</button>
         </div>
         <p id="result" class="text-green-600 font-semibold"></p>
+        <p class="text-sm text-gray-500">Row 1 = Header, Row 2 = Data pertama</p>
       </div>
     </div>
     
@@ -52,30 +53,54 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyqQOikUdA_eg8KsEGsU5Hw
 
 let allData = [];
 let currentKelas = "";
+let rowMapping = {}; // Mapping nama siswa ke row number
 
 // Load data saat awal
 window.onload = async function() {
   await loadData();
 };
 
-// Load data GET
+// Load data GET dengan JSONP atau alternative
 async function loadData() {
   try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
+    // Coba pake JSONP atau fetch biasa
+    const res = await fetch(API_URL + "?callback=processData");
     
-    console.log("Data dari API:", data);
-    console.log("Item pertama:", data[0]);
-    console.log("Properti item pertama:", Object.keys(data[0]));
+    if (!res.ok) {
+      throw new Error(`HTTP error! status: ${res.status}`);
+    }
+    
+    const text = await res.text();
+    console.log("Raw response:", text);
+    
+    // Coba parse JSON
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch(e) {
+      // Mungkin response JSONP, coba extract
+      if (text.includes("processData(")) {
+        const jsonText = text.replace("processData(", "").replace(");", "");
+        data = JSON.parse(jsonText);
+      } else {
+        throw new Error("Failed to parse response");
+      }
+    }
+    
+    console.log("Parsed data:", data);
     
     // Simpan data asli
-    allData = data;
+    allData = Array.isArray(data) ? data : (data.data || []);
     
-    // Cek apakah ada _row
-    if (data[0] && data[0]._row === undefined) {
-      console.warn("PERHATIAN: Data tidak memiliki properti _row!");
-      console.warn("API POST mungkin butuh _row untuk update cell");
-    }
+    // Generate row mapping - asumsi row number = index + 2
+    rowMapping = {};
+    allData.forEach((item, index) => {
+      if (item.nama) {
+        rowMapping[item.nama] = index + 2; // Row 1 header, row 2 data pertama
+      }
+    });
+    
+    console.log("Row mapping:", rowMapping);
     
     // Tampilkan semua kelas yang ada
     populateKelasFilter(allData);
@@ -86,20 +111,47 @@ async function loadData() {
     
   } catch(e) {
     console.error("Error loading data:", e);
+    // Fallback: Try JSONP
+    loadDataWithJSONP();
   }
 }
 
-// Render tabel read-only
+// JSONP fallback
+function loadDataWithJSONP() {
+  const script = document.createElement('script');
+  script.src = API_URL + "?callback=processData";
+  document.head.appendChild(script);
+}
+
+// Callback untuk JSONP
+function processData(data) {
+  console.log("JSONP data received:", data);
+  allData = Array.isArray(data) ? data : (data.data || []);
+  
+  // Generate row mapping
+  rowMapping = {};
+  allData.forEach((item, index) => {
+    if (item.nama) {
+      rowMapping[item.nama] = index + 2;
+    }
+  });
+  
+  populateKelasFilter(allData);
+  populateKolomFilter();
+  renderTable(allData);
+}
+
+// Render tabel
 function renderTable(data) {
   const table = document.getElementById("sheetTable");
   table.innerHTML = "";
 
-  if(data.length === 0) {
+  if(!data || data.length === 0) {
     table.innerHTML = '<tr><td class="p-4 text-center text-gray-500">Tidak ada data</td></tr>';
     return;
   }
 
-  // Header - ambil semua properti kecuali yang kosong
+  // Header
   const sampleRow = data[0];
   const headers = Object.keys(sampleRow);
   
@@ -127,7 +179,6 @@ function renderTable(data) {
 function populateKelasFilter(data) {
   const kelasSet = new Set();
   
-  // Loop semua data untuk ambil kelas yang unik
   data.forEach(item => {
     if (item.kelas && item.kelas !== "-" && item.kelas !== "") {
       kelasSet.add(item.kelas);
@@ -135,14 +186,10 @@ function populateKelasFilter(data) {
   });
   
   const select = document.getElementById("kelasFilter");
+  select.innerHTML = '<option value="">-- Pilih Kelas --</option>';
   
-  console.log("Kelas yang ditemukan:", Array.from(kelasSet));
-  
-  // Sort kelas secara alfabetis
-  const sortedKelas = Array.from(kelasSet).sort();
-  
-  // Tambah option
-  sortedKelas.forEach(k => {
+  // Sort dan tambah
+  Array.from(kelasSet).sort().forEach(k => {
     const opt = document.createElement("option");
     opt.value = k;
     opt.innerText = k;
@@ -169,31 +216,25 @@ document.getElementById("kelasFilter").onchange = function() {
   const siswaSelect = document.getElementById("siswaFilter");
   siswaSelect.innerHTML = '<option value="">-- Pilih Siswa --</option>';
   
-  // Update display kelas
   document.getElementById("kelasDisplay").innerText = currentKelas || "Semua";
   
   if(currentKelas) {
     // Filter siswa berdasarkan kelas
     const filteredSiswa = allData.filter(d => d.kelas === currentKelas);
     
-    console.log(`Siswa di kelas ${currentKelas}:`, filteredSiswa);
-    
-    filteredSiswa.forEach((s, index) => {
+    filteredSiswa.forEach(s => {
       const opt = document.createElement("option");
-      // Catatan: Kita gak punya _row, jadi kita simpan index array + 2 (karena row 1 header, row 2 data pertama)
-      // TAPI ini asumsi aja, bisa jadi salah!
-      const assumedRowNumber = index + 2; // Karena row 1 header, row 2 data pertama
-      opt.value = assumedRowNumber;
+      // Gunakan row mapping yang sudah dibuat
+      const rowNum = rowMapping[s.nama] || 0;
+      opt.value = rowNum;
       opt.innerText = s.nama;
-      opt.dataset.index = index; // Simpan index array asli
       siswaSelect.appendChild(opt);
     });
     
-    // Filter dan tampilkan data tabel untuk kelas yang dipilih
+    // Tampilkan data kelas yang dipilih
     const filteredData = allData.filter(d => d.kelas === currentKelas);
     renderTable(filteredData);
   } else {
-    // Tampilkan semua data jika tidak ada kelas yang dipilih
     renderTable(allData);
   }
 };
@@ -204,56 +245,107 @@ function resetForm() {
   document.getElementById("result").innerText = "";
 }
 
-// Update via POST
+// Update via POST - pake FormData untuk avoid CORS
 async function updateCell() {
   const siswaSelect = document.getElementById("siswaFilter");
-  const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
-  
-  // Ini asumsi! Row number = index array + 2
   const _row = Number(siswaSelect.value);
   const col = Number(document.getElementById("col").value);
   const value = document.getElementById("value").value;
-
-  console.log("Mengirim data:", { _row, col, value });
 
   if(!_row || !col || !value) {
     alert("Lengkapi semua field!");
     return;
   }
 
-  // Validasi kolom harus antara 3-33
   if(col < 3 || col > 33) {
     alert("Kolom harus antara 3-33!");
     return;
   }
 
   try {
+    // Coba pake FormData untuk POST
+    const formData = new FormData();
+    formData.append("_row", _row);
+    formData.append("col", col);
+    formData.append("value", value);
+    
+    // Atau pake URL encoded
+    const params = new URLSearchParams();
+    params.append("_row", _row);
+    params.append("col", col);
+    params.append("value", value);
+    
+    console.log("Mengirim data:", { _row, col, value });
+    
+    // Coba beberapa metode
     const res = await fetch(API_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ _row, col, value })
+      mode: "no-cors", // Coba no-cors mode
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: params.toString()
     });
-
-    const json = await res.json();
-    console.log("Response dari POST:", json);
     
-    document.getElementById("result").innerText = json.success ? "Berhasil update!" : "Gagal update!";
+    // Dengan no-cors, kita gak bisa baca response
+    // Tapi request tetap terkirim
+    document.getElementById("result").innerText = "Data dikirim (no-cors mode)...";
     
-    // Reload data dan pertahankan filter kelas yang dipilih
-    await loadData();
-    
-    // Setelah reload, otomatis pilih kelas yang sama
-    if(currentKelas) {
-      document.getElementById("kelasFilter").value = currentKelas;
-      document.getElementById("kelasFilter").onchange();
-    }
+    // Tunggu sebentar lalu reload data
+    setTimeout(async () => {
+      await loadData();
+      if(currentKelas) {
+        document.getElementById("kelasFilter").value = currentKelas;
+        document.getElementById("kelasFilter").onchange();
+      }
+      document.getElementById("result").innerText = "Data seharusnya terupdate!";
+    }, 2000);
     
   } catch(e) {
-    document.getElementById("result").innerText = "Gagal koneksi!";
     console.error("Error update:", e);
+    
+    // Fallback: Kirim via form submission tradisional
+    document.getElementById("result").innerText = "Menggunakan fallback method...";
+    
+    // Buat form tersembunyi
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = API_URL;
+    form.target = "_blank"; // Buka di tab baru
+    
+    const rowInput = document.createElement("input");
+    rowInput.type = "hidden";
+    rowInput.name = "_row";
+    rowInput.value = _row;
+    
+    const colInput = document.createElement("input");
+    colInput.type = "hidden";
+    colInput.name = "col";
+    colInput.value = col;
+    
+    const valueInput = document.createElement("input");
+    valueInput.type = "hidden";
+    valueInput.name = "value";
+    valueInput.value = value;
+    
+    form.appendChild(rowInput);
+    form.appendChild(colInput);
+    form.appendChild(valueInput);
+    
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+    
+    // Tunggu dan reload
+    setTimeout(async () => {
+      await loadData();
+      if(currentKelas) {
+        document.getElementById("kelasFilter").value = currentKelas;
+        document.getElementById("kelasFilter").onchange();
+      }
+    }, 3000);
   }
 }
 </script>
-
 </body>
 </html>
