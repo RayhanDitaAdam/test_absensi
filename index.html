@@ -7,308 +7,642 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* Custom scrollbar untuk mobile */
-    .scrollbar-thin {
+    /* Custom iOS-like styles */
+    :root {
+      --primary: #007AFF;
+      --secondary: #5856D6;
+      --success: #34C759;
+      --danger: #FF3B30;
+      --warning: #FF9500;
+      --info: #5AC8FA;
+      --light: #F2F2F7;
+      --dark: #1C1C1E;
+    }
+
+    /* Smooth scrolling and iOS-like animations */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #F5F7FA 0%, #E4EDF5 100%);
+      color: #1C1C1E;
+    }
+
+    /* Glassmorphism effect */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.05),
+        0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .glass-navbar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* iOS-like buttons */
+    .ios-btn {
+      background: linear-gradient(180deg, #007AFF 0%, #0056D6 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: -0.2px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 4px 12px rgba(0, 122, 255, 0.15),
+        0 2px 4px rgba(0, 122, 255, 0.1);
+    }
+
+    .ios-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 
+        0 6px 20px rgba(0, 122, 255, 0.2),
+        0 4px 8px rgba(0, 122, 255, 0.15);
+    }
+
+    .ios-btn:active {
+      transform: translateY(0);
+      box-shadow: 
+        0 2px 6px rgba(0, 122, 255, 0.1),
+        0 1px 2px rgba(0, 122, 255, 0.05);
+    }
+
+    .ios-btn-secondary {
+      background: linear-gradient(180deg, #F2F2F7 0%, #E5E5EA 100%);
+      color: #007AFF;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* iOS-like form elements */
+    .ios-select, .ios-input {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1.5px solid #C7C7CC;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .ios-select:focus, .ios-input:focus {
+      outline: none;
+      border-color: #007AFF;
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+    }
+
+    /* iOS-like badges */
+    .ios-badge {
+      background: rgba(0, 122, 255, 0.1);
+      color: #007AFF;
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* Custom scrollbar iOS-like */
+    .ios-scrollbar {
       scrollbar-width: thin;
-      -webkit-overflow-scrolling: touch;
+      scrollbar-color: #C7C7CC transparent;
     }
-    .scrollbar-thin::-webkit-scrollbar {
-      height: 4px;
+
+    .ios-scrollbar::-webkit-scrollbar {
       width: 4px;
+      height: 4px;
     }
-    .scrollbar-thin::-webkit-scrollbar-track {
-      background: #f1f1f1;
+
+    .ios-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
       border-radius: 2px;
     }
-    .scrollbar-thin::-webkit-scrollbar-thumb {
-      background: #c1c1c1;
+
+    .ios-scrollbar::-webkit-scrollbar-thumb {
+      background: #C7C7CC;
       border-radius: 2px;
     }
-    
-    /* Touch-friendly buttons */
-    .btn-touch {
-      min-height: 44px;
-      padding: 12px 16px;
+
+    .ios-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #8E8E93;
     }
-    
-    /* Mobile optimizations */
-    @media (max-width: 640px) {
-      .mobile-stack {
-        display: flex;
-        flex-direction: column;
-      }
-      .mobile-full {
-        width: 100% !important;
-      }
-      .mobile-text-sm {
-        font-size: 14px;
-      }
-      .mobile-p-3 {
-        padding: 12px;
-      }
-      select, input {
-        font-size: 16px !important; /* Prevent zoom on iOS */
-      }
-    }
-    
+
     /* Loading animation */
-    .loader {
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #3498db;
-      border-radius: 50%;
+    .ios-loader {
       width: 20px;
       height: 20px;
+      border: 2.5px solid rgba(0, 122, 255, 0.1);
+      border-top: 2.5px solid #007AFF;
+      border-radius: 50%;
       animation: spin 1s linear infinite;
-      display: inline-block;
-      vertical-align: middle;
-      margin-right: 8px;
     }
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
-    
-    /* Optional: styling untuk select */
-    select:focus {
-      outline: none;
-      ring: 2px;
+
+    /* iOS-like table */
+    .ios-table {
+      border-collapse: separate;
+      border-spacing: 0;
     }
-    
-    option {
-      padding: 8px;
+
+    .ios-table th {
+      background: #F2F2F7;
+      color: #8E8E93;
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .ios-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      transition: background 0.2s ease;
+    }
+
+    .ios-table tr:hover td {
+      background: rgba(0, 122, 255, 0.03);
+    }
+
+    /* Status colors iOS-like */
+    .status-masuk {
+      background: rgba(52, 199, 89, 0.1);
+      color: #34C759;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-weight: 600;
+    }
+
+    .status-p {
+      background: rgba(255, 149, 0, 0.1);
+      color: #FF9500;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-weight: 600;
+    }
+
+    .status-s {
+      background: rgba(255, 59, 48, 0.1);
+      color: #FF3B30;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-weight: 600;
+    }
+
+    .status-i {
+      background: rgba(90, 200, 250, 0.1);
+      color: #5AC8FA;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-weight: 600;
+    }
+
+    .status-a {
+      background: rgba(142, 142, 147, 0.1);
+      color: #8E8E93;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-weight: 600;
+    }
+
+    /* iOS-like toast */
+    .ios-toast {
+      background: rgba(40, 40, 40, 0.95);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      color: white;
+      border-radius: 14px;
+      padding: 16px 20px;
+      box-shadow: 
+        0 12px 32px rgba(0, 0, 0, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.1);
+      animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Mobile optimizations */
+    @media (max-width: 640px) {
+      .mobile-full {
+        width: 100% !important;
+      }
+      
+      select, input {
+        font-size: 16px !important;
+      }
+      
+      .ios-table {
+        font-size: 14px;
+      }
+      
+      .ios-table th,
+      .ios-table td {
+        padding: 10px 12px;
+      }
+    }
+
+    /* iOS-like switch */
+    .ios-switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 32px;
+    }
+
+    .ios-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .ios-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #E5E5EA;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .ios-slider:before {
+      position: absolute;
+      content: "";
+      height: 28px;
+      width: 28px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    input:checked + .ios-slider {
+      background-color: #34C759;
+    }
+
+    input:checked + .ios-slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Floating action button iOS-like */
+    .fab {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 56px;
+      height: 56px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+      color: white;
+      border: none;
+      box-shadow: 
+        0 8px 24px rgba(0, 122, 255, 0.25),
+        0 4px 12px rgba(0, 122, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+    }
+
+    .fab:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 
+        0 12px 32px rgba(0, 122, 255, 0.3),
+        0 6px 16px rgba(0, 122, 255, 0.25);
+    }
+
+    .fab:active {
+      transform: translateY(0) scale(1);
+      box-shadow: 
+        0 6px 20px rgba(0, 122, 255, 0.2),
+        0 3px 8px rgba(0, 122, 255, 0.15);
     }
   </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-<!-- Mobile Menu Button (hidden on desktop) -->
-<div class="lg:hidden fixed top-4 right-4 z-50">
-  <button id="mobileMenuBtn" class="bg-blue-600 text-white p-3 rounded-full shadow-lg">
-    <i class="fas fa-bars"></i>
-  </button>
-</div>
-
-<!-- Main Container -->
-<div class="container mx-auto px-3 py-4 max-w-7xl">
-  <!-- Header -->
-  <div class="mb-5 mobile-p-3">
-    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
-      <i class="fas fa-chart-bar text-blue-600 mr-2"></i>
-      Dashboard Absensi
-    </h1>
-    <p class="text-gray-600 mt-1 mobile-text-sm">Update alasan tidak masuk per siswa - Mobile Friendly</p>
-  </div>
-
-  <div class="flex flex-col lg:flex-row gap-4">
-    <!-- Mobile Sidebar Overlay -->
-    <div id="mobileSidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
-    
-    <!-- Sidebar Form (Mobile: Slide-in) -->
-    <div id="sidebarForm" class="lg:w-1/4 w-full bg-white rounded-xl shadow-lg p-4 lg:p-5 lg:static fixed top-0 left-0 h-full lg:h-auto z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto">
-      <!-- Close button for mobile -->
-      <div class="flex justify-between items-center mb-5 lg:hidden">
-        <h2 class="text-xl font-bold text-gray-800">
-          <i class="fas fa-edit text-blue-600 mr-2"></i>
-          Update Data
-        </h2>
-        <button id="closeSidebarBtn" class="text-gray-500 hover:text-gray-700">
-          <i class="fas fa-times text-2xl"></i>
+<body class="min-h-screen">
+<!-- iOS-like Navbar -->
+<div class="glass-navbar fixed top-0 left-0 right-0 z-50">
+  <div class="container mx-auto px-4 py-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-gradient-to-br from-[#007AFF] to-[#5856D6] rounded-lg flex items-center justify-center">
+          <i class="fas fa-calendar-check text-white text-sm"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg text-[#1C1C1E]">Absensi Siswa</h1>
+          <p class="text-xs text-[#8E8E93]">Dashboard Presensi Digital</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-3">
+        <button onclick="loadData(true)" class="w-8 h-8 flex items-center justify-center text-[#007AFF] hover:bg-[#007AFF]/10 rounded-full transition">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+        <button onclick="exportData()" class="w-8 h-8 flex items-center justify-center text-[#007AFF] hover:bg-[#007AFF]/10 rounded-full transition">
+          <i class="fas fa-download"></i>
         </button>
       </div>
-      
-      <!-- Desktop title -->
-      <div class="hidden lg:block mb-5">
-        <h2 class="text-xl font-bold text-gray-800">
-          <i class="fas fa-edit text-blue-600 mr-2"></i>
-          Update Data
-        </h2>
-        <p class="text-sm text-gray-500 mt-1">Isi form untuk update ketidakhadiran</p>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container mx-auto px-4 py-24">
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="glass-card rounded-2xl p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-[#8E8E93] mb-1">Total Siswa</p>
+          <p id="totalSiswa" class="text-2xl font-bold text-[#1C1C1E]">0</p>
+        </div>
+        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+          <i class="fas fa-users text-white text-lg"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="glass-card rounded-2xl p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-[#8E8E93] mb-1">Total Kelas</p>
+          <p id="totalKelas" class="text-2xl font-bold text-[#1C1C1E]">0</p>
+        </div>
+        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+          <i class="fas fa-graduation-cap text-white text-lg"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="glass-card rounded-2xl p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-[#8E8E93] mb-1">Hadir Hari Ini</p>
+          <p id="hadirHariIni" class="text-2xl font-bold text-[#1C1C1E]">0</p>
+        </div>
+        <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center">
+          <i class="fas fa-check-circle text-white text-lg"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="glass-card rounded-2xl p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-[#8E8E93] mb-1">Tidak Hadir</p>
+          <p id="tidakHadir" class="text-2xl font-bold text-[#1C1C1E]">0</p>
+        </div>
+        <div class="w-12 h-12 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center">
+          <i class="fas fa-user-times text-white text-lg"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Sidebar Form -->
+    <div class="lg:w-1/3 w-full">
+      <div class="glass-card rounded-2xl p-6 mb-6">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-xl font-bold text-[#1C1C1E] mb-1">
+              <i class="fas fa-edit text-[#007AFF] mr-2"></i>
+              Update Presensi
+            </h2>
+            <p class="text-sm text-[#8E8E93]">Perbarui data ketidakhadiran</p>
+          </div>
+          <label class="ios-switch">
+            <input type="checkbox" id="toggleForm" checked>
+            <span class="ios-slider"></span>
+          </label>
+        </div>
+
+        <div id="formContainer" class="space-y-4">
+          <!-- Kelas Filter -->
+          <div>
+            <label class="block text-sm font-medium text-[#1C1C1E] mb-2">
+              <i class="fas fa-graduation-cap text-[#007AFF] mr-2"></i>
+              Pilih Kelas
+            </label>
+            <select id="kelasFilter" class="ios-select w-full">
+              <option value="">-- Semua Kelas --</option>
+            </select>
+          </div>
+
+          <!-- Siswa Filter -->
+          <div>
+            <label class="block text-sm font-medium text-[#1C1C1E] mb-2">
+              <i class="fas fa-user text-[#007AFF] mr-2"></i>
+              Pilih Siswa
+            </label>
+            <select id="siswaFilter" class="ios-select w-full">
+              <option value="">-- Semua Siswa --</option>
+            </select>
+          </div>
+
+          <!-- Tanggal -->
+          <div>
+            <label class="block text-sm font-medium text-[#1C1C1E] mb-2">
+              <i class="fas fa-calendar-alt text-[#007AFF] mr-2"></i>
+              Pilih Tanggal
+            </label>
+            <select id="col" class="ios-select w-full">
+              <option value="">-- Pilih Tanggal --</option>
+            </select>
+          </div>
+
+          <!-- Alasan -->
+          <div>
+            <label class="block text-sm font-medium text-[#1C1C1E] mb-2">
+              <i class="fas fa-sticky-note text-[#007AFF] mr-2"></i>
+              Status Kehadiran
+            </label>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="setStatus('MASUK')" class="py-3 px-4 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 hover:bg-emerald-100 transition flex items-center justify-center">
+                <i class="fas fa-check mr-2"></i> Hadir
+              </button>
+              <button onclick="setStatus('P')" class="py-3 px-4 bg-amber-50 text-amber-700 rounded-xl border border-amber-100 hover:bg-amber-100 transition flex items-center justify-center">
+                <i class="fas fa-home mr-2"></i> Izin
+              </button>
+              <button onclick="setStatus('S')" class="py-3 px-4 bg-rose-50 text-rose-700 rounded-xl border border-rose-100 hover:bg-rose-100 transition flex items-center justify-center">
+                <i class="fas fa-heartbeat mr-2"></i> Sakit
+              </button>
+              <button onclick="setStatus('A')" class="py-3 px-4 bg-gray-100 text-gray-700 rounded-xl border border-gray-200 hover:bg-gray-200 transition flex items-center justify-center">
+                <i class="fas fa-times mr-2"></i> Alpha
+              </button>
+            </div>
+            <input type="hidden" id="value">
+          </div>
+
+          <!-- Status Legend -->
+          <div class="mt-4 p-4 bg-[#F2F2F7] rounded-xl">
+            <p class="text-sm font-medium text-[#1C1C1E] mb-2">Legenda Status:</p>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-emerald-500 rounded-full mr-2"></div>
+                <span class="text-xs text-[#8E8E93]">Hadir</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-amber-500 rounded-full mr-2"></div>
+                <span class="text-xs text-[#8E8E93]">Izin</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-rose-500 rounded-full mr-2"></div>
+                <span class="text-xs text-[#8E8E93]">Sakit</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-gray-400 rounded-full mr-2"></div>
+                <span class="text-xs text-[#8E8E93]">Alpha</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex space-x-3 pt-4">
+            <button onclick="updateCell()" id="updateBtn" class="flex-1 ios-btn">
+              <i class="fas fa-paper-plane mr-2"></i>
+              <span id="updateText">Update</span>
+            </button>
+            <button onclick="resetForm()" class="ios-btn-secondary px-6 rounded-xl">
+              <i class="fas fa-redo"></i>
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div class="space-y-4">
-        <!-- Kelas Filter -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            <i class="fas fa-graduation-cap text-blue-500 mr-1"></i>
-            Kelas
-          </label>
-          <select id="kelasFilter" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-base">
-            <option value="">-- Pilih Kelas --</option>
-          </select>
-        </div>
-
-        <!-- Siswa Filter -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            <i class="fas fa-user text-blue-500 mr-1"></i>
-            Siswa
-          </label>
-          <select id="siswaFilter" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-base">
-            <option value="">-- Pilih Siswa --</option>
-          </select>
-        </div>
-
-        <!-- Kolom (Tanggal) -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            <i class="fas fa-calendar-alt text-blue-500 mr-1"></i>
-            Tanggal
-          </label>
-          <select id="col" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-base">
-            <option value="">-- Pilih Tanggal --</option>
-          </select>
-        </div>
-
-        <!-- Alasan - DIUBAH MENJADI SELECT -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">
-            <i class="fas fa-sticky-note text-blue-500 mr-1"></i>
-            Alasan Tidak Masuk
-          </label>
-          <select id="value" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-base">
-            <option value="">-- Pilih Alasan --</option>
-            <option value="P">P (Pulang)</option>
-            <option value="S">S (Sakit)</option>
-            <option value="I">I (Izin Kegiatan)</option>
-            <option value="A">A (Alpha/Tanpa Keterangan)</option>
-          </select>
-        </div>
-
-        <!-- Legenda Keterangan -->
-        <div class="text-xs text-gray-500 mt-1 space-y-1 p-2 bg-gray-50 rounded">
-          <div class="flex items-center">
-            <div class="w-3 h-3 bg-green-100 rounded mr-2"></div>
-            <span>MASUK = Hadir</span>
+      <!-- Quick Stats -->
+      <div class="glass-card rounded-2xl p-6">
+        <h3 class="font-bold text-lg text-[#1C1C1E] mb-4">
+          <i class="fas fa-chart-pie text-[#007AFF] mr-2"></i>
+          Ringkasan
+        </h3>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-[#8E8E93]">Kelas Aktif</span>
+            <span id="aktifKelas" class="font-semibold text-[#1C1C1E]">-</span>
           </div>
-          <div class="flex items-center">
-            <div class="w-3 h-3 bg-yellow-100 rounded mr-2"></div>
-            <span>P = Izin</span>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-[#8E8E93]">Siswa Terpilih</span>
+            <span id="selectedSiswa" class="font-semibold text-[#1C1C1E]">-</span>
           </div>
-          <div class="flex items-center">
-            <div class="w-3 h-3 bg-red-100 rounded mr-2"></div>
-            <span>S = Sakit</span>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-[#8E8E93]">Tanggal</span>
+            <span id="selectedDate" class="font-semibold text-[#1C1C1E]">-</span>
           </div>
-          <div class="flex items-center">
-            <div class="w-3 h-3 bg-blue-100 rounded mr-2"></div>
-            <span>I = Izin Kegiatan</span>
-          </div>
-          <div class="flex items-center">
-            <div class="w-3 h-3 bg-gray-200 rounded mr-2"></div>
-            <span>A = Alpha</span>
-          </div>
-        </div>
-
-        <!-- Buttons -->
-        <div class="mobile-stack space-y-3 pt-3">
-          <button onclick="updateCell()" id="updateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center btn-touch">
-            <i class="fas fa-check mr-2"></i>
-            <span id="updateText">Update Data</span>
-          </button>
-          <div class="flex space-x-3">
-            <button onclick="resetForm()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-4 rounded-lg transition duration-200 btn-touch">
-              <i class="fas fa-redo mr-1"></i> Reset
-            </button>
-            <button onclick="loadData(true)" class="flex-1 bg-green-100 hover:bg-green-200 text-green-700 font-medium py-3 px-4 rounded-lg transition duration-200 btn-touch">
-              <i class="fas fa-sync-alt mr-1"></i> Refresh
-            </button>
-          </div>
-        </div>
-
-        <!-- Result Message -->
-        <div id="result" class="mt-3 p-3 rounded-lg hidden">
-          <!-- Message akan muncul di sini -->
-        </div>
-
-        <!-- Quick Stats -->
-        <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
-          <p class="text-sm text-blue-800 font-medium mb-2">
-            <i class="fas fa-info-circle mr-1"></i>
-            Info Cepat
-          </p>
-          <div class="grid grid-cols-2 gap-2">
-            <div class="text-center p-2 bg-white rounded">
-              <p class="text-xs text-gray-500">Total Siswa</p>
-              <p id="totalSiswa" class="font-bold text-lg">0</p>
-            </div>
-            <div class="text-center p-2 bg-white rounded">
-              <p class="text-xs text-gray-500">Total Kelas</p>
-              <p id="totalKelas" class="font-bold text-lg">0</p>
-            </div>
+          <div class="pt-3 border-t border-[#C7C7CC]/30">
+            <p class="text-xs text-[#8E8E93] text-center">
+              <i class="fas fa-history mr-1"></i>
+              Terakhir diperbarui: <span id="lastUpdated">-</span>
+            </p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Main Content / Tabel -->
-    <div class="lg:w-3/4 w-full">
-      <div class="bg-white rounded-xl shadow-lg p-4 md:p-5 h-full">
-        <!-- Tabel Header -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5">
-          <div class="mb-3 sm:mb-0">
-            <h2 class="text-xl font-bold text-gray-800 mb-1">
-              <i class="fas fa-table text-green-600 mr-2"></i>
-              Data Absensi
+    <!-- Main Table -->
+    <div class="lg:w-2/3 w-full">
+      <div class="glass-card rounded-2xl p-6">
+        <!-- Table Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+          <div>
+            <h2 class="text-xl font-bold text-[#1C1C1E] mb-1">
+              <i class="fas fa-table text-[#34C759] mr-2"></i>
+              Data Presensi
             </h2>
-            <div class="text-sm text-gray-600">
-              <span id="kelasDisplay" class="font-bold text-blue-600">Semua Kelas</span>
-              <span id="siswaDisplay" class="ml-2 text-gray-500"></span>
-              <span id="dataCount" class="ml-2 text-gray-400">(0 data)</span>
+            <div class="text-sm text-[#8E8E93]">
+              <span id="kelasDisplay" class="font-semibold text-[#007AFF]">Semua Kelas</span>
+              <span id="dataCount" class="ml-2">• 0 data</span>
             </div>
           </div>
-          <div class="flex space-x-2 mobile-full">
-            <button onclick="toggleView()" id="toggleViewBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium py-2 px-3 rounded-lg transition btn-touch">
-              <i class="fas fa-eye mr-1"></i>
+          <div class="flex items-center space-x-2 mt-3 sm:mt-0">
+            <button onclick="toggleView()" id="toggleViewBtn" class="ios-btn-secondary px-4 py-2 rounded-xl">
+              <i class="fas fa-eye mr-2"></i>
               <span class="hidden sm:inline">Tampilkan Semua</span>
-              <span class="sm:hidden">Semua</span>
             </button>
-            <button onclick="exportData()" class="bg-purple-100 hover:bg-purple-200 text-purple-700 text-sm font-medium py-2 px-3 rounded-lg transition btn-touch">
-              <i class="fas fa-download"></i>
-              <span class="hidden sm:inline ml-1">Export</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Filter Badges (Mobile friendly) -->
-        <div id="filterBadges" class="mb-4 flex flex-wrap gap-2">
-          <!-- Badges akan muncul di sini -->
-        </div>
-
-        <!-- Tabel Container -->
-        <div class="border border-gray-200 rounded-lg overflow-hidden">
-          <div class="overflow-x-auto scrollbar-thin max-h-[60vh]">
-            <table id="sheetTable" class="min-w-full divide-y divide-gray-200">
-              <!-- Tabel akan diisi otomatis -->
-            </table>
-          </div>
-          
-          <!-- Empty State -->
-          <div id="emptyState" class="hidden p-6 text-center">
-            <div class="text-gray-300 text-5xl mb-3">
-              <i class="fas fa-clipboard-list"></i>
+            <div class="relative">
+              <input type="text" id="searchInput" placeholder="Cari siswa..." 
+                     class="ios-input pl-10 pr-4 w-full sm:w-64" 
+                     onkeyup="filterTable()">
+              <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8E8E93]"></i>
             </div>
-            <p class="text-gray-500 font-medium">Tidak ada data untuk ditampilkan</p>
-            <p class="text-gray-400 text-sm mt-1">Pilih kelas atau siswa untuk melihat data</p>
-            <button onclick="loadData(true)" class="mt-4 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium py-2 px-4 rounded-lg transition">
-              <i class="fas fa-sync-alt mr-1"></i> Muat Ulang Data
-            </button>
           </div>
         </div>
 
-        <!-- Table Pagination (Mobile) -->
-        <div id="tablePagination" class="mt-4 flex justify-between items-center text-sm text-gray-600">
-          <div class="flex items-center">
-            <button onclick="prevPage()" class="p-2 rounded-lg hover:bg-gray-100">
+        <!-- Filter Badges -->
+        <div id="filterBadges" class="flex flex-wrap gap-2 mb-4">
+          <!-- Badges will appear here -->
+        </div>
+
+        <!-- Table Container -->
+        <div class="border border-[#C7C7CC]/30 rounded-xl overflow-hidden">
+          <div class="overflow-x-auto ios-scrollbar max-h-[500px]">
+            <table id="sheetTable" class="ios-table w-full">
+              <!-- Table will be populated automatically -->
+            </table>
+            
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden p-12 text-center">
+              <div class="w-20 h-20 bg-gradient-to-br from-[#F2F2F7] to-[#E5E5EA] rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-clipboard-list text-3xl text-[#C7C7CC]"></i>
+              </div>
+              <p class="text-lg font-medium text-[#8E8E93] mb-2">Tidak ada data</p>
+              <p class="text-sm text-[#C7C7CC] mb-6">Pilih kelas atau siswa untuk melihat data presensi</p>
+              <button onclick="loadData(true)" class="ios-btn px-6">
+                <i class="fas fa-sync-alt mr-2"></i> Muat Ulang Data
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table Footer -->
+        <div class="flex justify-between items-center mt-6 text-sm text-[#8E8E93]">
+          <div class="flex items-center space-x-4">
+            <button onclick="prevPage()" class="w-10 h-10 flex items-center justify-center hover:bg-[#F2F2F7] rounded-xl transition">
               <i class="fas fa-chevron-left"></i>
             </button>
-            <span class="mx-3">
-              Halaman <span id="currentPage">1</span> dari <span id="totalPages">1</span>
+            <span>
+              Halaman <span id="currentPage" class="font-semibold text-[#1C1C1E]">1</span>
+              dari <span id="totalPages" class="font-semibold text-[#1C1C1E]">1</span>
             </span>
-            <button onclick="nextPage()" class="p-2 rounded-lg hover:bg-gray-100">
+            <button onclick="nextPage()" class="w-10 h-10 flex items-center justify-center hover:bg-[#F2F2F7] rounded-xl transition">
               <i class="fas fa-chevron-right"></i>
             </button>
           </div>
           <div class="text-xs">
-            <i class="fas fa-history mr-1"></i>
-            <span id="lastUpdated">Baru saja dimuat</span>
+            <i class="fas fa-info-circle mr-1"></i>
+            Klik pada sel untuk mengedit
           </div>
         </div>
       </div>
@@ -316,13 +650,44 @@
   </div>
 </div>
 
-<!-- Success Toast Notification -->
-<div id="successToast" class="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg transform translate-y-full transition-transform duration-300 z-50 max-w-sm">
+<!-- iOS Toast -->
+<div id="iosToast" class="ios-toast fixed bottom-6 left-1/2 transform -translate-x-1/2 translate-y-full transition-transform duration-300 z-50 max-w-sm">
   <div class="flex items-center">
-    <i class="fas fa-check-circle text-2xl mr-3"></i>
+    <i class="fas fa-check-circle text-xl mr-3 text-[#34C759]"></i>
     <div>
-      <p class="font-bold">Berhasil!</p>
-      <p id="toastMessage" class="text-sm">Data berhasil diperbarui</p>
+      <p class="font-semibold text-white mb-0.5">Berhasil!</p>
+      <p id="toastMessage" class="text-sm text-white/90">Data berhasil diperbarui</p>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Action Button -->
+<button id="fabMenu" class="fab lg:hidden">
+  <i class="fas fa-bars"></i>
+</button>
+
+<!-- Mobile Menu -->
+<div id="mobileMenu" class="fixed inset-0 bg-black/50 z-40 hidden">
+  <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 transform translate-y-full transition-transform duration-300">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-lg font-bold text-[#1C1C1E]">Menu</h3>
+      <button onclick="closeMobileMenu()" class="w-10 h-10 flex items-center justify-center hover:bg-[#F2F2F7] rounded-xl">
+        <i class="fas fa-times text-lg"></i>
+      </button>
+    </div>
+    <div class="space-y-4">
+      <button onclick="loadData(true)" class="w-full text-left p-4 hover:bg-[#F2F2F7] rounded-xl transition">
+        <i class="fas fa-sync-alt text-[#007AFF] mr-3"></i>
+        Refresh Data
+      </button>
+      <button onclick="exportData()" class="w-full text-left p-4 hover:bg-[#F2F2F7] rounded-xl transition">
+        <i class="fas fa-download text-[#007AFF] mr-3"></i>
+        Export Data
+      </button>
+      <button onclick="resetForm()" class="w-full text-left p-4 hover:bg-[#F2F2F7] rounded-xl transition">
+        <i class="fas fa-redo text-[#007AFF] mr-3"></i>
+        Reset Form
+      </button>
     </div>
   </div>
 </div>
@@ -336,33 +701,66 @@ let currentSiswa = "";
 let showAllData = false;
 let rowMapping = {};
 let currentPage = 1;
-const itemsPerPage = 10;
+const itemsPerPage = 8;
 
-// Mobile menu handlers
-document.getElementById('mobileMenuBtn').addEventListener('click', function() {
-  document.getElementById('sidebarForm').classList.remove('-translate-x-full');
-  document.getElementById('mobileSidebarOverlay').classList.remove('hidden');
+// Toggle form visibility
+document.getElementById('toggleForm').addEventListener('change', function(e) {
+  const formContainer = document.getElementById('formContainer');
+  if (e.target.checked) {
+    formContainer.style.display = 'block';
+    setTimeout(() => formContainer.style.opacity = '1', 10);
+  } else {
+    formContainer.style.opacity = '0';
+    setTimeout(() => formContainer.style.display = 'none', 200);
+  }
 });
 
-document.getElementById('closeSidebarBtn').addEventListener('click', closeMobileSidebar);
-document.getElementById('mobileSidebarOverlay').addEventListener('click', closeMobileSidebar);
+// Mobile menu handlers
+document.getElementById('fabMenu').addEventListener('click', openMobileMenu);
 
-function closeMobileSidebar() {
-  document.getElementById('sidebarForm').classList.add('-translate-x-full');
-  document.getElementById('mobileSidebarOverlay').classList.add('hidden');
+function openMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const menuContent = menu.querySelector('div');
+  menu.classList.remove('hidden');
+  setTimeout(() => {
+    menuContent.classList.remove('translate-y-full');
+  }, 10);
 }
 
-// Load data saat awal
+function closeMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const menuContent = menu.querySelector('div');
+  menuContent.classList.add('translate-y-full');
+  setTimeout(() => {
+    menu.classList.add('hidden');
+  }, 300);
+}
+
+// Set status from buttons
+function setStatus(status) {
+  document.getElementById('value').value = status;
+  
+  // Highlight selected button
+  const buttons = document.querySelectorAll('#formContainer button');
+  buttons.forEach(btn => {
+    btn.classList.remove('ring-2', 'ring-offset-2');
+    if (btn.onclick && btn.onclick.toString().includes(`'${status}'`)) {
+      btn.classList.add('ring-2', 'ring-offset-2', 'ring-[#007AFF]');
+    }
+  });
+}
+
+// Load data on startup
 window.onload = async function() {
   await loadData(false);
   
-  // Handle back button on mobile
-  window.addEventListener('popstate', function() {
-    closeMobileSidebar();
-  });
+  // Set today's date
+  const today = new Date().getDate();
+  document.getElementById('col').value = today;
+  document.getElementById('selectedDate').textContent = `Tanggal ${today}`;
 };
 
-// Load data (tidak reset form)
+// Load data
 async function loadData(showLoading = true) {
   try {
     if (showLoading) {
@@ -374,7 +772,7 @@ async function loadData(showLoading = true) {
     
     const data = await res.json();
     
-    // Reorder data: pindah nama dan kelas ke depan
+    // Reorder data
     allData = data.map(row => {
       const { kelas, nama, ...rest } = row;
       return { 
@@ -387,23 +785,22 @@ async function loadData(showLoading = true) {
     // Update stats
     updateStats();
     
-    // Update kelas filter tanpa reset pilihan
+    // Update kelas filter
     updateKelasFilter();
     
-    // Update siswa filter berdasarkan kelas yang dipilih
+    // Update siswa filter
     updateSiswaFilter();
     
     // Update kolom filter
     updateKolomFilter();
     
-    // Render tabel dengan data terbaru
+    // Render tabel
     renderFilteredTable();
     
     // Update last updated time
-    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString('id-ID', {
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    const now = new Date();
+    document.getElementById('lastUpdated').textContent = 
+      `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
     
     showToast('Data berhasil dimuat ulang', 'success');
     
@@ -424,9 +821,27 @@ function updateStats() {
   
   document.getElementById('totalSiswa').textContent = totalSiswa;
   document.getElementById('totalKelas').textContent = totalKelas;
+  document.getElementById('aktifKelas').textContent = totalKelas;
+  
+  // Calculate today's attendance
+  const today = new Date().getDate();
+  let hadir = 0;
+  let tidakHadir = 0;
+  
+  allData.forEach(item => {
+    const status = item[today] || '';
+    if (status === 'MASUK' || status === '') {
+      hadir++;
+    } else if (status) {
+      tidakHadir++;
+    }
+  });
+  
+  document.getElementById('hadirHariIni').textContent = hadir;
+  document.getElementById('tidakHadir').textContent = tidakHadir;
 }
 
-// Update kelas filter (tanpa reset)
+// Update kelas filter
 function updateKelasFilter() {
   const kelasSet = new Set();
   allData.forEach(item => {
@@ -438,11 +853,7 @@ function updateKelasFilter() {
   const select = document.getElementById("kelasFilter");
   const currentValue = select.value;
   
-  // Simpan HTML sementara
-  const tempHTML = select.innerHTML;
-  
-  // Clear dan rebuild
-  select.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+  select.innerHTML = '<option value="">-- Semua Kelas --</option>';
   
   Array.from(kelasSet).sort().forEach(k => {
     const opt = document.createElement("option");
@@ -451,7 +862,6 @@ function updateKelasFilter() {
     select.appendChild(opt);
   });
   
-  // Kembalikan nilai yang dipilih sebelumnya
   if (currentValue && Array.from(kelasSet).includes(currentValue)) {
     select.value = currentValue;
   }
@@ -463,14 +873,14 @@ function updateSiswaFilter() {
   const currentValue = siswaSelect.value;
   const currentNama = siswaSelect.options[siswaSelect.selectedIndex]?.dataset.nama || "";
   
-  siswaSelect.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+  siswaSelect.innerHTML = '<option value="">-- Semua Siswa --</option>';
   
   let filteredSiswa = allData;
   if (currentKelas) {
     filteredSiswa = allData.filter(d => d.kelas === currentKelas);
   }
   
-  // Generate row mapping baru
+  // Generate row mapping
   rowMapping = {};
   allData.forEach((item, index) => {
     if (item.nama) {
@@ -487,23 +897,24 @@ function updateSiswaFilter() {
     siswaSelect.appendChild(opt);
   });
   
-  // Coba kembalikan pilihan siswa sebelumnya
   if (currentNama && rowMapping[currentNama]) {
     for(let option of siswaSelect.options) {
       if(option.dataset.nama === currentNama) {
         siswaSelect.value = option.value;
         currentSiswa = currentNama;
+        document.getElementById('selectedSiswa').textContent = currentNama;
         break;
       }
     }
   }
 }
 
+// Update kolom filter
 function updateKolomFilter() {
   const select = document.getElementById("col");
   const currentValue = select.value;
   
-  select.innerHTML = '<option value="">-- Pilih Tanggal --</option>';
+  select.innerHTML = '';
   
   for(let day = 1; day <= 31; day++) {
     const opt = document.createElement("option");
@@ -512,50 +923,51 @@ function updateKolomFilter() {
     select.appendChild(opt);
   }
   
-  // Kembalikan nilai yang dipilih
   if (currentValue) {
     select.value = currentValue;
+  } else {
+    // Default to today
+    const today = new Date().getDate();
+    select.value = today;
   }
+  
+  document.getElementById('selectedDate').textContent = `Tanggal ${select.value}`;
 }
 
-// Ketika kelas dipilih
+// Event handlers
 document.getElementById("kelasFilter").onchange = function() {
   currentKelas = this.value;
   currentSiswa = "";
   
-  // Update display
   document.getElementById("kelasDisplay").innerText = currentKelas || "Semua Kelas";
-  document.getElementById("siswaDisplay").innerText = "";
+  document.getElementById("selectedSiswa").textContent = "-";
   
-  // Update siswa dropdown
   updateSiswaFilter();
-  
-  // Update filter badges
   updateFilterBadges();
-  
-  // Render tabel
   renderFilteredTable();
   
-  // Close sidebar on mobile setelah memilih
-  if (window.innerWidth < 1024) {
-    closeMobileSidebar();
-  }
+  closeMobileMenu();
 };
 
-// Ketika siswa dipilih
 document.getElementById("siswaFilter").onchange = function() {
   const selectedOption = this.options[this.selectedIndex];
   currentSiswa = selectedOption.dataset.nama || "";
   
-  // Update display
-  document.getElementById("siswaDisplay").innerText = currentSiswa ? `- ${currentSiswa}` : "";
+  document.getElementById("selectedSiswa").textContent = currentSiswa || "-";
   
-  // Update filter badges
   updateFilterBadges();
-  
-  // Render tabel
   renderFilteredTable();
 };
+
+document.getElementById("col").onchange = function() {
+  document.getElementById('selectedDate').textContent = `Tanggal ${this.value}`;
+};
+
+// Filter table by search
+function filterTable() {
+  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+  renderFilteredTable(searchTerm);
+}
 
 // Update filter badges
 function updateFilterBadges() {
@@ -564,12 +976,12 @@ function updateFilterBadges() {
   
   if (currentKelas) {
     const badge = document.createElement("div");
-    badge.className = "bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1.5 rounded-full flex items-center";
+    badge.className = "ios-badge";
     badge.innerHTML = `
-      <i class="fas fa-graduation-cap mr-1"></i>
+      <i class="fas fa-graduation-cap"></i>
       ${currentKelas}
-      <button onclick="clearFilter('kelas')" class="ml-2 text-blue-600 hover:text-blue-800">
-        <i class="fas fa-times"></i>
+      <button onclick="clearFilter('kelas')" class="ml-2 hover:opacity-70">
+        <i class="fas fa-times text-xs"></i>
       </button>
     `;
     badgesContainer.appendChild(badge);
@@ -577,12 +989,12 @@ function updateFilterBadges() {
   
   if (currentSiswa) {
     const badge = document.createElement("div");
-    badge.className = "bg-green-100 text-green-800 text-xs font-medium px-3 py-1.5 rounded-full flex items-center";
+    badge.className = "ios-badge";
     badge.innerHTML = `
-      <i class="fas fa-user mr-1"></i>
+      <i class="fas fa-user"></i>
       ${currentSiswa}
-      <button onclick="clearFilter('siswa')" class="ml-2 text-green-600 hover:text-green-800">
-        <i class="fas fa-times"></i>
+      <button onclick="clearFilter('siswa')" class="ml-2 hover:opacity-70">
+        <i class="fas fa-times text-xs"></i>
       </button>
     `;
     badgesContainer.appendChild(badge);
@@ -595,11 +1007,12 @@ function clearFilter(type) {
     document.getElementById("kelasFilter").value = "";
     currentKelas = "";
     document.getElementById("kelasDisplay").innerText = "Semua Kelas";
+    document.getElementById("selectedSiswa").textContent = "-";
     updateSiswaFilter();
   } else if (type === 'siswa') {
     document.getElementById("siswaFilter").value = "";
     currentSiswa = "";
-    document.getElementById("siswaDisplay").innerText = "";
+    document.getElementById("selectedSiswa").textContent = "-";
   }
   
   updateFilterBadges();
@@ -611,14 +1024,14 @@ function toggleView() {
   showAllData = !showAllData;
   const btn = document.getElementById("toggleViewBtn");
   btn.innerHTML = showAllData ? 
-    '<i class="fas fa-filter mr-1"></i><span class="hidden sm:inline">Tampilkan Filter</span><span class="sm:hidden">Filter</span>' :
-    '<i class="fas fa-eye mr-1"></i><span class="hidden sm:inline">Tampilkan Semua</span><span class="sm:hidden">Semua</span>';
+    '<i class="fas fa-filter mr-2"></i><span class="hidden sm:inline">Filter</span>' :
+    '<i class="fas fa-eye mr-2"></i><span class="hidden sm:inline">Semua</span>';
   
   renderFilteredTable();
 }
 
-// Render tabel berdasarkan filter
-function renderFilteredTable() {
+// Render filtered table
+function renderFilteredTable(searchTerm = "") {
   let filteredData = allData;
   
   if (!showAllData) {
@@ -629,8 +1042,16 @@ function renderFilteredTable() {
     }
   }
   
+  // Apply search filter
+  if (searchTerm) {
+    filteredData = filteredData.filter(d => 
+      d.nama.toLowerCase().includes(searchTerm) || 
+      d.kelas.toLowerCase().includes(searchTerm)
+    );
+  }
+  
   // Update data count
-  document.getElementById("dataCount").textContent = `(${filteredData.length} data)`;
+  document.getElementById("dataCount").textContent = `• ${filteredData.length} data`;
   
   // Pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
@@ -646,7 +1067,7 @@ function renderFilteredTable() {
   const endIndex = startIndex + itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, endIndex);
   
-  // Render tabel
+  // Render table
   renderTable(paginatedData, filteredData.length);
 }
 
@@ -671,6 +1092,7 @@ function nextPage() {
   }
 }
 
+// Render table
 function renderTable(data, totalLength) {
   const table = document.getElementById("sheetTable");
   const emptyState = document.getElementById("emptyState");
@@ -678,129 +1100,100 @@ function renderTable(data, totalLength) {
   if(!data || data.length === 0) {
     table.innerHTML = "";
     emptyState.classList.remove("hidden");
-    document.getElementById("tablePagination").classList.add("hidden");
     return;
   }
   
   emptyState.classList.add("hidden");
-  document.getElementById("tablePagination").classList.remove("hidden");
-  table.innerHTML = "";
-
-  // Header - Urutannya: Nama, Kelas, Tanggal 1-31
-  const thead = document.createElement("thead");
-  thead.className = "bg-gray-50";
-  const trHead = document.createElement("tr");
   
-  // Kolom Nama
-  const thNama = document.createElement("th");
-  thNama.textContent = "Nama";
-  thNama.className = "px-4 py-3 text-left text-sm font-medium text-gray-700 border-b border-gray-200 sticky left-0 bg-gray-50 z-10 min-w-[150px]";
-  trHead.appendChild(thNama);
+  // Create table header
+  let tableHTML = `
+    <thead>
+      <tr>
+        <th class="rounded-tl-xl">Nama</th>
+        <th>Kelas</th>
+        <th class="rounded-tr-xl">Tanggal 1-31</th>
+      </tr>
+    </thead>
+    <tbody>
+  `;
   
-  // Kolom Kelas
-  const thKelas = document.createElement("th");
-  thKelas.textContent = "Kelas";
-  thKelas.className = "px-4 py-3 text-left text-sm font-medium text-gray-700 border-b border-gray-200 sticky left-[150px] bg-gray-50 z-10 min-w-[100px]";
-  trHead.appendChild(thKelas);
-  
-  // Kolom Tanggal 1-31
-  for(let day = 1; day <= 31; day++) {
-    const th = document.createElement("th");
-    th.textContent = `Tgl ${day}`;
-    th.className = "px-3 py-3 text-center text-xs font-medium text-gray-500 border-b border-gray-200 min-w-[60px]";
-    th.title = `Tanggal ${day}`;
-    th.dataset.day = day;
-    trHead.appendChild(th);
-  }
-  
-  thead.appendChild(trHead);
-  table.appendChild(thead);
-
-  // Body
-  const tbody = document.createElement("tbody");
-  
+  // Create table rows
   data.forEach((row, rowIndex) => {
-    const tr = document.createElement("tr");
-    tr.className = rowIndex % 2 === 0 ? "bg-white hover:bg-gray-50" : "bg-gray-50 hover:bg-gray-100";
+    tableHTML += `
+      <tr class="${rowIndex % 2 === 0 ? 'bg-white' : 'bg-[#F2F2F7]'}">
+        <td class="font-semibold">${row.nama || "-"}</td>
+        <td class="text-[#007AFF] font-medium">${row.kelas || "-"}</td>
+        <td>
+          <div class="flex overflow-x-auto ios-scrollbar gap-1 py-1">
+    `;
     
-    // Cell Nama (sticky)
-    const tdNama = document.createElement("td");
-    tdNama.textContent = row.nama || "";
-    tdNama.className = "px-4 py-3 text-sm font-semibold text-gray-900 border-b border-gray-200 sticky left-0 bg-inherit z-5";
-    tr.appendChild(tdNama);
-    
-    // Cell Kelas (sticky)
-    const tdKelas = document.createElement("td");
-    tdKelas.textContent = row.kelas || "";
-    tdKelas.className = "px-4 py-3 text-sm text-gray-700 border-b border-gray-200 sticky left-[150px] bg-inherit z-5";
-    tr.appendChild(tdKelas);
-    
-    // Cell Tanggal 1-31
+    // Add day cells
     for(let day = 1; day <= 31; day++) {
-      const td = document.createElement("td");
-      
-      // Ambil nilai langsung dari properti yang namanya angka (string)
       const value = row[day.toString()] || "";
-      
-      // Jika tidak ada nilai atau kosong, default ke "MASUK"
       const displayValue = value === "" ? "MASUK" : value;
-      td.textContent = displayValue;
       
-      // Styling berdasarkan value - DIUBAH UNTUK P, S, I, A
-      let cellClass = "px-3 py-3 text-center text-sm border-b border-gray-200 font-medium ";
+      let statusClass = "status-masuk";
+      if (displayValue === "P") statusClass = "status-p";
+      else if (displayValue === "S") statusClass = "status-s";
+      else if (displayValue === "I") statusClass = "status-i";
+      else if (displayValue === "A") statusClass = "status-a";
       
-      if(displayValue === "MASUK") {
-        cellClass += "bg-green-50 text-green-700";
-      } else if(displayValue === "P") {
-        cellClass += "bg-yellow-50 text-yellow-700";
-        td.title = "Izin";
-      } else if(displayValue === "S") {
-        cellClass += "bg-red-50 text-red-700";
-        td.title = "Sakit";
-      } else if(displayValue === "I") {
-        cellClass += "bg-blue-50 text-blue-700";
-        td.title = "Izin Kegiatan";
-      } else if(displayValue === "A") {
-        cellClass += "bg-gray-100 text-gray-700";
-        td.title = "Alpha/Tanpa Keterangan";
-      } else if(displayValue && displayValue !== "" && displayValue !== "MASUK") {
-        // Untuk nilai lainnya (backward compatibility)
-        cellClass += "bg-yellow-50 text-yellow-700";
-        td.title = `Alasan: ${displayValue}`;
-      } else {
-        cellClass += "bg-gray-50 text-gray-400";
-      }
-      
-      td.className = cellClass;
-      td.dataset.day = day;
-      
-      tr.appendChild(td);
+      tableHTML += `
+        <div class="flex flex-col items-center min-w-[44px]">
+          <span class="text-xs text-[#8E8E93] mb-1">${day}</span>
+          <div class="${statusClass} cursor-pointer hover:opacity-80 transition"
+               onclick="editCell('${row.nama}', ${day})">
+            ${displayValue === "MASUK" ? "✓" : displayValue}
+          </div>
+        </div>
+      `;
     }
     
-    tbody.appendChild(tr);
+    tableHTML += `
+          </div>
+        </td>
+      </tr>
+    `;
   });
   
-  table.appendChild(tbody);
+  tableHTML += "</tbody>";
+  table.innerHTML = tableHTML;
 }
 
-// Reset form
-function resetForm() {
-  document.getElementById("value").value = "";
-  document.getElementById("col").value = "";
-  document.getElementById("result").innerHTML = "";
-  showToast('Form berhasil direset', 'info');
+// Edit cell on click
+function editCell(siswaName, tanggal) {
+  // Find student in dropdown
+  const siswaSelect = document.getElementById("siswaFilter");
+  for(let option of siswaSelect.options) {
+    if(option.dataset.nama === siswaName) {
+      siswaSelect.value = option.value;
+      currentSiswa = siswaName;
+      document.getElementById('selectedSiswa').textContent = siswaName;
+      break;
+    }
+  }
+  
+  // Set tanggal
+  document.getElementById("col").value = tanggal;
+  document.getElementById('selectedDate').textContent = `Tanggal ${tanggal}`;
+  
+  // Scroll to form on mobile
+  if (window.innerWidth < 1024) {
+    document.querySelector('#formContainer').scrollIntoView({ behavior: 'smooth' });
+  }
+  
+  updateFilterBadges();
 }
 
+// Update cell
 async function updateCell() {
   const siswaSelect = document.getElementById("siswaFilter");
   const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
-  const _row = Number(siswaSelect.value); // Row siswa (misal row 3)
-  const tanggal = Number(document.getElementById("col").value); // Tanggal ke- (1, 2, 3, ...)
+  const _row = Number(siswaSelect.value);
+  const tanggal = Number(document.getElementById("col").value);
   const value = document.getElementById("value").value.trim();
   const siswaName = selectedOption?.dataset.nama || "";
-  const alasanSelect = document.getElementById("value");
 
-  // Validasi
   if(!_row || !siswaName) {
     showToast('Harap pilih siswa terlebih dahulu', 'error');
     return;
@@ -812,73 +1205,80 @@ async function updateCell() {
   }
   
   if(!value) {
-    showToast('Harap pilih alasan terlebih dahulu', 'error');
-    alasanSelect.focus();
+    showToast('Harap pilih status kehadiran', 'error');
     return;
   }
 
-  // Hitung kolom spreadsheet yang benar
-  // col 1 = kelas, col 2 = nama, col 3 = tanggal 1
-  // Jadi: tanggal ke-1 -> col 3, tanggal ke-2 -> col 4, dst
-  const col = tanggal + 2; // Konversi: tanggal 1 = col 3, tanggal 2 = col 4, dst
+  const col = tanggal + 2;
 
-  // Tampilkan loading
   const updateBtn = document.getElementById("updateBtn");
   const updateText = document.getElementById("updateText");
   const originalText = updateText.textContent;
   
   updateBtn.disabled = true;
   updateText.textContent = "Mengirim...";
-  updateBtn.innerHTML = '<div class="loader"></div> Mengirim...';
+  updateBtn.innerHTML = '<div class="ios-loader mr-2"></div> Mengirim...';
 
   try {
-    // Kirim data ke API dengan col yang sudah dikonversi
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ 
-        _row, 
-        col,  // Kolom spreadsheet yang benar
-        value 
-      })
+      body: JSON.stringify({ _row, col, value })
     });
 
-    const text = await res.text();
-    console.log("Update response:", text);
+    await res.text();
     
-    // Update data lokal
-    updateLocalData(siswaName, tanggal, value);
+    // Update local data
+    const index = allData.findIndex(d => d.nama === siswaName);
+    if (index !== -1) {
+      allData[index][tanggal.toString()] = value;
+    }
     
-    // Reset hanya input alasan, biar pilihan tetap
-    alasanSelect.value = "";
+    // Reset form
+    resetForm();
     
-    // Tampilkan notifikasi
-    showToast(`Data ${siswaName} (Tanggal ${tanggal}) berhasil diperbarui`, 'success');
+    // Update stats
+    updateStats();
     
-    // Update tampilan tabel tanpa refresh full
+    // Show success
+    showToast(`${siswaName} - Tanggal ${tanggal}: ${getStatusText(value)}`, 'success');
+    
+    // Refresh table
     renderFilteredTable();
     
   } catch(e) {
     console.error("Update error:", e);
     showToast('Gagal mengirim data', 'error');
   } finally {
-    // Restore button
     updateBtn.disabled = false;
     updateText.textContent = originalText;
-    updateBtn.innerHTML = '<i class="fas fa-check mr-2"></i>' + originalText;
+    updateBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>' + originalText;
   }
 }
 
-function updateLocalData(siswaName, tanggal, value) {
-  // Cari data siswa
-  const index = allData.findIndex(d => d.nama === siswaName);
-  if (index !== -1) {
-    // Update properti sesuai dengan tanggal (1, 2, 3, ...)
-    allData[index][tanggal.toString()] = value;
-    
-    // Refresh tampilan
-    renderFilteredTable();
-  }
+// Get status text
+function getStatusText(code) {
+  const statusMap = {
+    'MASUK': 'Hadir',
+    'P': 'Izin',
+    'S': 'Sakit',
+    'I': 'Izin Kegiatan',
+    'A': 'Alpha'
+  };
+  return statusMap[code] || code;
+}
+
+// Reset form
+function resetForm() {
+  document.getElementById("value").value = "";
+  
+  // Clear button highlights
+  const buttons = document.querySelectorAll('#formContainer button');
+  buttons.forEach(btn => {
+    btn.classList.remove('ring-2', 'ring-offset-2', 'ring-[#007AFF]');
+  });
+  
+  showToast('Form berhasil direset', 'info');
 }
 
 // Export data
@@ -891,10 +1291,8 @@ function exportData() {
     dataToExport = allData.filter(d => d.kelas === currentKelas);
   }
   
-  // Simple export to JSON
   const dataStr = JSON.stringify(dataToExport, null, 2);
   const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-  
   const exportFileDefaultName = `absensi-${currentKelas || 'semua'}-${new Date().toISOString().split('T')[0]}.json`;
   
   const linkElement = document.createElement('a');
@@ -907,40 +1305,42 @@ function exportData() {
 
 // Show/hide loading
 function showLoadingState(show) {
-  const refreshBtns = document.querySelectorAll('button:has(.fa-sync-alt)');
-  refreshBtns.forEach(btn => {
+  const refreshBtn = document.querySelector('button:has(.fa-sync-alt)');
+  if (refreshBtn) {
     if (show) {
-      btn.disabled = true;
-      btn.innerHTML = '<div class="loader"></div>';
+      refreshBtn.disabled = true;
+      refreshBtn.innerHTML = '<div class="ios-loader"></div>';
     } else {
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fas fa-sync-alt mr-1"></i> Refresh';
+      refreshBtn.disabled = false;
+      refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
     }
-  });
+  }
 }
 
-// Show toast notification
+// Show toast
 function showToast(message, type = 'info') {
-  const toast = document.getElementById('successToast');
+  const toast = document.getElementById('iosToast');
   const toastMessage = document.getElementById('toastMessage');
   
-  // Set warna berdasarkan type
-  const colors = {
-    success: 'bg-green-500',
-    error: 'bg-red-500',
-    info: 'bg-blue-500',
-    warning: 'bg-yellow-500'
-  };
+  // Set icon based on type
+  let icon = 'fas fa-check-circle';
+  if (type === 'error') icon = 'fas fa-exclamation-circle';
+  else if (type === 'info') icon = 'fas fa-info-circle';
+  else if (type === 'warning') icon = 'fas fa-exclamation-triangle';
   
-  toast.className = toast.className.replace(/bg-(green|red|blue|yellow)-500/g, '');
-  toast.classList.add(colors[type] || 'bg-blue-500');
+  toast.querySelector('i').className = `${icon} text-xl mr-3 ${
+    type === 'success' ? 'text-[#34C759]' :
+    type === 'error' ? 'text-[#FF3B30]' :
+    type === 'warning' ? 'text-[#FF9500]' :
+    'text-[#5AC8FA]'
+  }`;
   
   toastMessage.textContent = message;
   
   // Show toast
   toast.classList.remove('translate-y-full');
   
-  // Auto hide after 3 seconds
+  // Auto hide
   setTimeout(() => {
     toast.classList.add('translate-y-full');
   }, 3000);
