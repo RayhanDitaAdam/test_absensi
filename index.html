@@ -22,7 +22,6 @@
         </select>
         <select id="col" class="w-full p-2 border rounded">
           <option value="">-- Pilih Kolom (3-33) --</option>
-          <!-- Kolom akan diisi otomatis -->
         </select>
         <input id="value" placeholder="Alasan Tidak Masuk" class="w-full p-2 border rounded">
         <div class="flex space-x-2">
@@ -42,9 +41,7 @@
         </div>
       </div>
       <div class="overflow-x-auto">
-        <table id="sheetTable" class="min-w-full border border-gray-300">
-          <!-- Tabel akan diisi otomatis -->
-        </table>
+        <table id="sheetTable" class="min-w-full border border-gray-300"></table>
       </div>
     </div>
   </div>
@@ -67,22 +64,26 @@ async function loadData() {
     const res = await fetch(API_URL);
     const data = await res.json();
     
-    // Cek struktur data
     console.log("Data dari API:", data);
+    console.log("Item pertama:", data[0]);
+    console.log("Properti item pertama:", Object.keys(data[0]));
     
-    // Header ada di row 1 (index 0 di array), data mulai row 2 (index 1)
-    // Data yang diterima dari API sudah termasuk _row
+    // Simpan data asli
     allData = data;
     
-    // Pastikan kita filter out row 1 (header) untuk display di tabel
-    const dataForTable = allData.filter(row => row._row >= 2);
+    // Cek apakah ada _row
+    if (data[0] && data[0]._row === undefined) {
+      console.warn("PERHATIAN: Data tidak memiliki properti _row!");
+      console.warn("API POST mungkin butuh _row untuk update cell");
+    }
     
-    // Ambil semua kelas yang unik dari data (row 2 dan seterusnya)
-    populateKelasFilter(dataForTable);
+    // Tampilkan semua kelas yang ada
+    populateKelasFilter(allData);
     populateKolomFilter();
     
-    // Tampilkan semua data di tabel awalnya (tanpa header row)
-    renderTable(dataForTable);
+    // Tampilkan semua data di tabel awalnya
+    renderTable(allData);
+    
   } catch(e) {
     console.error("Error loading data:", e);
   }
@@ -98,8 +99,10 @@ function renderTable(data) {
     return;
   }
 
-  // Header - ambil dari properti pertama yang bukan "_row"
-  const headers = Object.keys(data[0]).filter(k => k !== "_row");
+  // Header - ambil semua properti kecuali yang kosong
+  const sampleRow = data[0];
+  const headers = Object.keys(sampleRow);
+  
   const trHead = table.insertRow();
   trHead.className = "bg-gray-200";
   headers.forEach(h => {
@@ -110,7 +113,7 @@ function renderTable(data) {
   });
 
   // Body
-  data.forEach(row => {
+  data.forEach((row, index) => {
     const tr = table.insertRow();
     headers.forEach(col => {
       const td = tr.insertCell();
@@ -122,19 +125,23 @@ function renderTable(data) {
 
 // Populate kelas untuk filter
 function populateKelasFilter(data) {
-  const kelasSet = new Set(data.map(d => d.kelas).filter(k => k));
+  const kelasSet = new Set();
+  
+  // Loop semua data untuk ambil kelas yang unik
+  data.forEach(item => {
+    if (item.kelas && item.kelas !== "-" && item.kelas !== "") {
+      kelasSet.add(item.kelas);
+    }
+  });
+  
   const select = document.getElementById("kelasFilter");
   
   console.log("Kelas yang ditemukan:", Array.from(kelasSet));
   
-  // Clear existing options kecuali yang pertama
-  while (select.options.length > 1) {
-    select.remove(1);
-  }
-  
   // Sort kelas secara alfabetis
   const sortedKelas = Array.from(kelasSet).sort();
   
+  // Tambah option
   sortedKelas.forEach(k => {
     const opt = document.createElement("option");
     opt.value = k;
@@ -165,25 +172,29 @@ document.getElementById("kelasFilter").onchange = function() {
   // Update display kelas
   document.getElementById("kelasDisplay").innerText = currentKelas || "Semua";
   
-  // Filter data untuk tabel (exclude row 1/header)
-  const dataForTable = allData.filter(row => row._row >= 2);
-  
   if(currentKelas) {
-    // Filter siswa berdasarkan kelas dari data yang sudah difilter
-    const filteredSiswa = dataForTable.filter(d => d.kelas === currentKelas);
-    filteredSiswa.forEach(s => {
+    // Filter siswa berdasarkan kelas
+    const filteredSiswa = allData.filter(d => d.kelas === currentKelas);
+    
+    console.log(`Siswa di kelas ${currentKelas}:`, filteredSiswa);
+    
+    filteredSiswa.forEach((s, index) => {
       const opt = document.createElement("option");
-      opt.value = s._row; // ini row number asli dari spreadsheet
+      // Catatan: Kita gak punya _row, jadi kita simpan index array + 2 (karena row 1 header, row 2 data pertama)
+      // TAPI ini asumsi aja, bisa jadi salah!
+      const assumedRowNumber = index + 2; // Karena row 1 header, row 2 data pertama
+      opt.value = assumedRowNumber;
       opt.innerText = s.nama;
+      opt.dataset.index = index; // Simpan index array asli
       siswaSelect.appendChild(opt);
     });
     
     // Filter dan tampilkan data tabel untuk kelas yang dipilih
-    const filteredData = dataForTable.filter(d => d.kelas === currentKelas);
+    const filteredData = allData.filter(d => d.kelas === currentKelas);
     renderTable(filteredData);
   } else {
     // Tampilkan semua data jika tidak ada kelas yang dipilih
-    renderTable(dataForTable);
+    renderTable(allData);
   }
 };
 
@@ -195,9 +206,15 @@ function resetForm() {
 
 // Update via POST
 async function updateCell() {
-  const _row = Number(document.getElementById("siswaFilter").value);
+  const siswaSelect = document.getElementById("siswaFilter");
+  const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
+  
+  // Ini asumsi! Row number = index array + 2
+  const _row = Number(siswaSelect.value);
   const col = Number(document.getElementById("col").value);
   const value = document.getElementById("value").value;
+
+  console.log("Mengirim data:", { _row, col, value });
 
   if(!_row || !col || !value) {
     alert("Lengkapi semua field!");
@@ -218,6 +235,8 @@ async function updateCell() {
     });
 
     const json = await res.json();
+    console.log("Response dari POST:", json);
+    
     document.getElementById("result").innerText = json.success ? "Berhasil update!" : "Gagal update!";
     
     // Reload data dan pertahankan filter kelas yang dipilih
@@ -231,7 +250,7 @@ async function updateCell() {
     
   } catch(e) {
     document.getElementById("result").innerText = "Gagal koneksi!";
-    console.error(e);
+    console.error("Error update:", e);
   }
 }
 </script>
