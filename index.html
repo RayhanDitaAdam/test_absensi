@@ -78,51 +78,61 @@
       color: #8E8E93;
       font-weight: 600;
       font-size: 13px;
-      padding: 12px 16px;
-      text-align: left;
+      padding: 12px 8px;
+      text-align: center;
       border-bottom: 1px solid #C6C6C8;
+      white-space: nowrap;
+      position: sticky;
+      left: 0;
+    }
+
+    /* Sticky columns for name and class */
+    .sticky-name {
+      position: sticky;
+      left: 0;
+      background: white;
+      z-index: 1;
+      border-right: 1px solid #E5E5EA;
+    }
+
+    .sticky-class {
+      position: sticky;
+      left: 150px;
+      background: white;
+      z-index: 1;
+      border-right: 1px solid #E5E5EA;
+    }
+
+    /* Make header sticky */
+    .iphone-table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
     }
 
     .iphone-table td {
-      padding: 14px 16px;
+      padding: 14px 8px;
       border-bottom: 1px solid #E5E5EA;
-      font-size: 15px;
+      font-size: 14px;
+      text-align: center;
+      min-width: 50px;
     }
 
     /* iPhone Status Badges */
-    .status-badge {
+    .status-cell {
       display: inline-block;
-      padding: 4px 10px;
+      padding: 6px 8px;
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 500;
+      min-width: 36px;
+      cursor: pointer;
     }
 
     .status-hadir { background: #DDFFE6; color: #007A52; }
     .status-izin { background: #FFF4D9; color: #A45B00; }
     .status-sakit { background: #FFE5E5; color: #D70015; }
     .status-alpha { background: #F2F2F7; color: #8E8E93; }
-
-    /* iPhone Modal */
-    .iphone-modal {
-      background: rgba(0,0,0,0.4);
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 1000;
-    }
-
-    .iphone-modal-content {
-      background: #FFFFFF;
-      border-radius: 14px;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: 16px;
-    }
 
     /* Loading */
     .loading {
@@ -141,6 +151,27 @@
       100% { transform: rotate(360deg); }
     }
 
+    /* Custom scrollbar for table */
+    .table-container {
+      overflow-x: auto;
+      max-height: 500px;
+    }
+
+    .table-container::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+      background: #F2F2F7;
+      border-radius: 3px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+      background: #C7C7CC;
+      border-radius: 3px;
+    }
+
     /* Mobile Responsive */
     @media (max-width: 640px) {
       .mobile-full {
@@ -148,12 +179,23 @@
       }
       
       .iphone-table {
-        font-size: 14px;
+        font-size: 13px;
       }
       
       .iphone-table th,
       .iphone-table td {
-        padding: 10px 12px;
+        padding: 10px 6px;
+        min-width: 45px;
+      }
+      
+      .status-cell {
+        padding: 4px 6px;
+        font-size: 11px;
+        min-width: 32px;
+      }
+      
+      .sticky-class {
+        left: 120px;
       }
     }
 
@@ -359,7 +401,7 @@
             <div>
               <h2 class="font-bold text-lg mb-1">
                 <i class="fas fa-table text-green-500 mr-2"></i>
-                Data Presensi
+                Data Presensi (Tanggal 1-31)
               </h2>
               <p class="text-sm text-gray-500">
                 <span id="kelasDisplay" class="font-medium text-blue-500">Semua Kelas</span>
@@ -368,10 +410,12 @@
             </div>
             
             <div class="flex items-center space-x-2 mt-3 sm:mt-0">
-              <input type="text" id="searchInput" placeholder="Cari siswa..." 
-                     class="iphone-select pl-10 w-full sm:w-48" 
-                     onkeyup="filterTable()">
-              <i class="fas fa-search absolute left-3 text-gray-400"></i>
+              <div class="relative">
+                <input type="text" id="searchInput" placeholder="Cari siswa..." 
+                       class="iphone-select pl-10 w-full sm:w-48" 
+                       onkeyup="filterTable()">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              </div>
               
               <button onclick="toggleView()" id="toggleViewBtn" class="iphone-btn-secondary px-4 py-2 whitespace-nowrap">
                 <i class="fas fa-eye mr-2"></i>
@@ -385,9 +429,9 @@
             <!-- Tags will appear here -->
           </div>
 
-          <!-- Table -->
+          <!-- Table Container with Scroll -->
           <div class="border border-gray-200 rounded-lg overflow-hidden">
-            <div class="overflow-x-auto">
+            <div class="table-container">
               <table id="sheetTable" class="iphone-table">
                 <!-- Table will be populated -->
               </table>
@@ -775,7 +819,7 @@ function nextPage() {
   }
 }
 
-// Render table
+// Render table with ALL 31 days
 function renderTable(data) {
   const table = document.getElementById("sheetTable");
   const emptyState = document.getElementById("emptyState");
@@ -788,29 +832,35 @@ function renderTable(data) {
   
   emptyState.classList.add("hidden");
   
-  // Create table
+  // Create table header
   let tableHTML = `
     <thead>
       <tr>
-        <th>Nama</th>
-        <th>Kelas</th>
-        <th>Tanggal 1-5</th>
+        <th class="sticky-name text-left pl-4">Nama</th>
+        <th class="sticky-class text-left">Kelas</th>
+  `;
+  
+  // Create header for days 1-31
+  for(let day = 1; day <= 31; day++) {
+    tableHTML += `<th>T${day}</th>`;
+  }
+  
+  tableHTML += `
       </tr>
     </thead>
     <tbody>
   `;
   
+  // Create table rows
   data.forEach((row, rowIndex) => {
     tableHTML += `
       <tr class="${rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
-        <td class="font-medium">${row.nama || "-"}</td>
-        <td class="text-blue-500 font-medium">${row.kelas || "-"}</td>
-        <td>
-          <div class="flex space-x-1">
+        <td class="sticky-name text-left pl-4 font-medium">${row.nama || "-"}</td>
+        <td class="sticky-class text-left font-medium text-blue-500">${row.kelas || "-"}</td>
     `;
     
-    // Show only first 5 days for better readability
-    for(let day = 1; day <= 5; day++) {
+    // Create cells for days 1-31
+    for(let day = 1; day <= 31; day++) {
       const value = row[day.toString()] || "";
       const displayValue = value === "" ? "MASUK" : value;
       
@@ -820,20 +870,15 @@ function renderTable(data) {
       else if (displayValue === "A") statusClass = "status-alpha";
       
       tableHTML += `
-        <div class="text-center">
-          <div class="text-xs text-gray-400 mb-1">${day}</div>
-          <div class="${statusClass} cursor-pointer" onclick="quickEdit('${row.nama}', ${day})">
+        <td onclick="quickEdit('${row.nama}', ${day})">
+          <div class="status-cell ${statusClass}" title="Klik untuk edit">
             ${displayValue === "MASUK" ? "✓" : displayValue}
           </div>
-        </div>
+        </td>
       `;
     }
     
-    tableHTML += `
-          </div>
-        </td>
-      </tr>
-    `;
+    tableHTML += `</tr>`;
   });
   
   tableHTML += "</tbody>";
@@ -856,6 +901,11 @@ function quickEdit(siswaName, tanggal) {
   document.getElementById('selectedDate').textContent = `Tanggal ${tanggal}`;
   
   updateFilterBadges();
+  
+  // Scroll to form on mobile
+  if (window.innerWidth < 1024) {
+    document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
+  }
 }
 
 // Update cell
