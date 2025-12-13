@@ -293,38 +293,48 @@ const API_URL = "https://script.google.com/macros/s/AKfycbyqQOikUdA_eg8KsEGsU5Hw
 let allData = [];
 let currentKelas = "";
 let currentSiswa = "";
+let showAllData = false;
 let rowMapping = {};
+let currentPage = 1;
+const itemsPerPage = 10;
 
-// Mapping kolom yang benar
-const COLUMN_MAPPING = {
-  // Jika di JSON ada "1", "2", "3" dst...
-  // Tapi di POST API, kolom 3 = tanggal 1 (hari pertama)
-  // Coba kita tes dulu
-};
+// Mobile menu handlers
+document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+  document.getElementById('sidebarForm').classList.remove('-translate-x-full');
+  document.getElementById('mobileSidebarOverlay').classList.remove('hidden');
+});
 
-// Debug: Tampilkan struktur data
+document.getElementById('closeSidebarBtn').addEventListener('click', closeMobileSidebar);
+document.getElementById('mobileSidebarOverlay').addEventListener('click', closeMobileSidebar);
+
+function closeMobileSidebar() {
+  document.getElementById('sidebarForm').classList.add('-translate-x-full');
+  document.getElementById('mobileSidebarOverlay').classList.add('hidden');
+}
+
+// Load data saat awal
 window.onload = async function() {
-  console.log("=== DEBUG INFO ===");
-  console.log("Struktur spreadsheet kamu:");
-  console.log("Row 1: Header (tanggal 1-31, kelas, nama)");
-  console.log("Row 2+: Data siswa");
-  console.log("Kolom di Excel:");
-  console.log("A=1, B=2, C=3, D=4, E=5, F=6, G=7, H=8, I=9, J=10");
-  console.log("K=11, L=12, M=13, N=14, O=15, P=16, Q=17, R=18");
-  console.log("S=19, T=20, U=21, V=22, W=23, X=24, Y=25, Z=26");
-  console.log("AA=27, AB=28, AC=29, AD=30, AE=31, AF=32, AG=33");
-  console.log("=== END DEBUG ===");
+  await loadData(false);
   
-  await loadData();
+  // Handle back button on mobile
+  window.addEventListener('popstate', function() {
+    closeMobileSidebar();
+  });
 };
 
-async function loadData() {
+// Load data (tidak reset form)
+async function loadData(showLoading = true) {
   try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
-    console.log("Data pertama:", data[0]);
-    console.log("Properti data pertama:", Object.keys(data[0]));
+    if (showLoading) {
+      showLoadingState(true);
+    }
     
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    
+    const data = await res.json();
+    
+    // Reorder data: pindah nama dan kelas ke depan
     allData = data.map(row => {
       const { kelas, nama, ...rest } = row;
       return { 
@@ -334,166 +344,366 @@ async function loadData() {
       };
     });
     
-    // Debug: Cek kolom tanggal
-    const sample = allData[0];
-    console.log("Sample data AINNA:");
-    for(let i = 1; i <= 31; i++) {
-      console.log(`Hari ${i}: kolom "${i}" = ${sample[i] || "(kosong)"}`);
-    }
+    // Update stats
+    updateStats();
     
-    populateKelasFilter(allData);
-    populateKolomFilter();
+    // Update kelas filter tanpa reset pilihan
+    updateKelasFilter();
+    
+    // Update siswa filter berdasarkan kelas yang dipilih
+    updateSiswaFilter();
+    
+    // Update kolom filter
+    updateKolomFilter();
+    
+    // Render tabel dengan data terbaru
     renderFilteredTable();
     
+    // Update last updated time
+    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    showToast('Data berhasil dimuat ulang', 'success');
+    
   } catch(e) {
-    console.error("Error:", e);
+    console.error("Error loading data:", e);
+    showToast('Gagal memuat data', 'error');
+  } finally {
+    if (showLoading) {
+      showLoadingState(false);
+    }
   }
 }
 
-// Populate kolom filter dengan mapping yang benar
-function populateKolomFilter() {
-  const select = document.getElementById("col");
-  select.innerHTML = '<option value="">-- Pilih Tanggal --</option>';
+// Update stats
+function updateStats() {
+  const totalSiswa = new Set(allData.map(d => d.nama)).size;
+  const totalKelas = new Set(allData.map(d => d.kelas).filter(k => k && k !== '-')).size;
   
-  // MENURUT SAYA INI MASALAHNYA:
-  // Di JSON properti "1", "2", "3"...
-  // Tapi di POST API, kolom 3 = Excel kolom C = tanggal 1
+  document.getElementById('totalSiswa').textContent = totalSiswa;
+  document.getElementById('totalKelas').textContent = totalKelas;
+}
+
+// Update kelas filter (tanpa reset)
+function updateKelasFilter() {
+  const kelasSet = new Set();
+  allData.forEach(item => {
+    if (item.kelas && item.kelas !== "-" && item.kelas !== "") {
+      kelasSet.add(item.kelas);
+    }
+  });
   
-  // Coba mapping ini:
-  const dateMapping = [
-    { jsonKey: "3", excelCol: 3, label: "Tanggal 1 (Kolom 3)" },
-    { jsonKey: "4", excelCol: 4, label: "Tanggal 2 (Kolom 4)" },
-    { jsonKey: "5", excelCol: 5, label: "Tanggal 3 (Kolom 5)" },
-    { jsonKey: "6", excelCol: 6, label: "Tanggal 4 (Kolom 6)" },
-    { jsonKey: "7", excelCol: 7, label: "Tanggal 5 (Kolom 7)" },
-    { jsonKey: "8", excelCol: 8, label: "Tanggal 6 (Kolom 8)" },
-    { jsonKey: "9", excelCol: 9, label: "Tanggal 7 (Kolom 9)" },
-    { jsonKey: "10", excelCol: 10, label: "Tanggal 8 (Kolom 10)" },
-    { jsonKey: "11", excelCol: 11, label: "Tanggal 9 (Kolom 11)" },
-    { jsonKey: "12", excelCol: 12, label: "Tanggal 10 (Kolom 12)" },
-    { jsonKey: "13", excelCol: 13, label: "Tanggal 11 (Kolom 13)" },
-    { jsonKey: "14", excelCol: 14, label: "Tanggal 12 (Kolom 14)" },
-    { jsonKey: "15", excelCol: 15, label: "Tanggal 13 (Kolom 15)" },
-    { jsonKey: "16", excelCol: 16, label: "Tanggal 14 (Kolom 16)" },
-    { jsonKey: "17", excelCol: 17, label: "Tanggal 15 (Kolom 17)" },
-    { jsonKey: "18", excelCol: 18, label: "Tanggal 16 (Kolom 18)" },
-    { jsonKey: "19", excelCol: 19, label: "Tanggal 17 (Kolom 19)" },
-    { jsonKey: "20", excelCol: 20, label: "Tanggal 18 (Kolom 20)" },
-    { jsonKey: "21", excelCol: 21, label: "Tanggal 19 (Kolom 21)" },
-    { jsonKey: "22", excelCol: 22, label: "Tanggal 20 (Kolom 22)" },
-    { jsonKey: "23", excelCol: 23, label: "Tanggal 21 (Kolom 23)" },
-    { jsonKey: "24", excelCol: 24, label: "Tanggal 22 (Kolom 24)" },
-    { jsonKey: "25", excelCol: 25, label: "Tanggal 23 (Kolom 25)" },
-    { jsonKey: "26", excelCol: 26, label: "Tanggal 24 (Kolom 26)" },
-    { jsonKey: "27", excelCol: 27, label: "Tanggal 25 (Kolom 27)" },
-    { jsonKey: "28", excelCol: 28, label: "Tanggal 26 (Kolom 28)" },
-    { jsonKey: "29", excelCol: 29, label: "Tanggal 27 (Kolom 29)" },
-    { jsonKey: "30", excelCol: 30, label: "Tanggal 28 (Kolom 30)" },
-    { jsonKey: "31", excelCol: 31, label: "Tanggal 29 (Kolom 31)" },
-    { jsonKey: "32", excelCol: 32, label: "Tanggal 30 (Kolom 32)" },
-    { jsonKey: "33", excelCol: 33, label: "Tanggal 31 (Kolom 33)" }
-  ];
+  const select = document.getElementById("kelasFilter");
+  const currentValue = select.value;
   
-  dateMapping.forEach(item => {
+  // Simpan HTML sementara
+  const tempHTML = select.innerHTML;
+  
+  // Clear dan rebuild
+  select.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+  
+  Array.from(kelasSet).sort().forEach(k => {
     const opt = document.createElement("option");
-    opt.value = item.excelCol; // Nilai untuk POST API
-    opt.textContent = item.label;
-    opt.dataset.jsonKey = item.jsonKey; // Untuk tampilan tabel
+    opt.value = k;
+    opt.innerText = k;
     select.appendChild(opt);
   });
   
-  console.log("Kolom filter dibuat:", dateMapping.length, "items");
+  // Kembalikan nilai yang dipilih sebelumnya
+  if (currentValue && Array.from(kelasSet).includes(currentValue)) {
+    select.value = currentValue;
+  }
 }
 
-// Render tabel dengan mapping yang benar
-function renderTable(data) {
-  const table = document.getElementById("sheetTable");
-  table.innerHTML = "";
+// Update siswa filter
+function updateSiswaFilter() {
+  const siswaSelect = document.getElementById("siswaFilter");
+  const currentValue = siswaSelect.value;
+  const currentNama = siswaSelect.options[siswaSelect.selectedIndex]?.dataset.nama || "";
+  
+  siswaSelect.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+  
+  let filteredSiswa = allData;
+  if (currentKelas) {
+    filteredSiswa = allData.filter(d => d.kelas === currentKelas);
+  }
+  
+  // Generate row mapping baru
+  rowMapping = {};
+  allData.forEach((item, index) => {
+    if (item.nama) {
+      rowMapping[item.nama] = index + 2;
+    }
+  });
+  
+  filteredSiswa.forEach(s => {
+    const opt = document.createElement("option");
+    const rowNum = rowMapping[s.nama] || 0;
+    opt.value = rowNum;
+    opt.innerText = s.nama;
+    opt.dataset.nama = s.nama;
+    siswaSelect.appendChild(opt);
+  });
+  
+  // Coba kembalikan pilihan siswa sebelumnya
+  if (currentNama && rowMapping[currentNama]) {
+    for(let option of siswaSelect.options) {
+      if(option.dataset.nama === currentNama) {
+        siswaSelect.value = option.value;
+        currentSiswa = currentNama;
+        break;
+      }
+    }
+  }
+}
 
+// Update kolom filter
+function updateKolomFilter() {
+  const select = document.getElementById("col");
+  const currentValue = select.value;
+  
+  select.innerHTML = '<option value="">-- Pilih Tanggal --</option>';
+  
+  for(let i = 3; i <= 33; i++) {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.innerText = `Hari ${i-2}`;
+    select.appendChild(opt);
+  }
+  
+  // Kembalikan nilai yang dipilih
+  if (currentValue) {
+    select.value = currentValue;
+  }
+}
+
+// Ketika kelas dipilih
+document.getElementById("kelasFilter").onchange = function() {
+  currentKelas = this.value;
+  currentSiswa = "";
+  
+  // Update display
+  document.getElementById("kelasDisplay").innerText = currentKelas || "Semua Kelas";
+  document.getElementById("siswaDisplay").innerText = "";
+  
+  // Update siswa dropdown
+  updateSiswaFilter();
+  
+  // Update filter badges
+  updateFilterBadges();
+  
+  // Render tabel
+  renderFilteredTable();
+  
+  // Close sidebar on mobile setelah memilih
+  if (window.innerWidth < 1024) {
+    closeMobileSidebar();
+  }
+};
+
+// Ketika siswa dipilih
+document.getElementById("siswaFilter").onchange = function() {
+  const selectedOption = this.options[this.selectedIndex];
+  currentSiswa = selectedOption.dataset.nama || "";
+  
+  // Update display
+  document.getElementById("siswaDisplay").innerText = currentSiswa ? `- ${currentSiswa}` : "";
+  
+  // Update filter badges
+  updateFilterBadges();
+  
+  // Render tabel
+  renderFilteredTable();
+};
+
+// Update filter badges
+function updateFilterBadges() {
+  const badgesContainer = document.getElementById("filterBadges");
+  badgesContainer.innerHTML = "";
+  
+  if (currentKelas) {
+    const badge = document.createElement("div");
+    badge.className = "bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1.5 rounded-full flex items-center";
+    badge.innerHTML = `
+      <i class="fas fa-graduation-cap mr-1"></i>
+      ${currentKelas}
+      <button onclick="clearFilter('kelas')" class="ml-2 text-blue-600 hover:text-blue-800">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+    badgesContainer.appendChild(badge);
+  }
+  
+  if (currentSiswa) {
+    const badge = document.createElement("div");
+    badge.className = "bg-green-100 text-green-800 text-xs font-medium px-3 py-1.5 rounded-full flex items-center";
+    badge.innerHTML = `
+      <i class="fas fa-user mr-1"></i>
+      ${currentSiswa}
+      <button onclick="clearFilter('siswa')" class="ml-2 text-green-600 hover:text-green-800">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+    badgesContainer.appendChild(badge);
+  }
+}
+
+// Clear filter
+function clearFilter(type) {
+  if (type === 'kelas') {
+    document.getElementById("kelasFilter").value = "";
+    currentKelas = "";
+    document.getElementById("kelasDisplay").innerText = "Semua Kelas";
+    updateSiswaFilter();
+  } else if (type === 'siswa') {
+    document.getElementById("siswaFilter").value = "";
+    currentSiswa = "";
+    document.getElementById("siswaDisplay").innerText = "";
+  }
+  
+  updateFilterBadges();
+  renderFilteredTable();
+}
+
+// Toggle view
+function toggleView() {
+  showAllData = !showAllData;
+  const btn = document.getElementById("toggleViewBtn");
+  btn.innerHTML = showAllData ? 
+    '<i class="fas fa-filter mr-1"></i><span class="hidden sm:inline">Tampilkan Filter</span><span class="sm:hidden">Filter</span>' :
+    '<i class="fas fa-eye mr-1"></i><span class="hidden sm:inline">Tampilkan Semua</span><span class="sm:hidden">Semua</span>';
+  
+  renderFilteredTable();
+}
+
+// Render tabel berdasarkan filter
+function renderFilteredTable() {
+  let filteredData = allData;
+  
+  if (!showAllData) {
+    if (currentSiswa) {
+      filteredData = allData.filter(d => d.nama === currentSiswa);
+    } else if (currentKelas) {
+      filteredData = allData.filter(d => d.kelas === currentKelas);
+    }
+  }
+  
+  // Update data count
+  document.getElementById("dataCount").textContent = `(${filteredData.length} data)`;
+  
+  // Pagination
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  if (currentPage > totalPages && totalPages > 0) {
+    currentPage = totalPages;
+  }
+  
+  document.getElementById("totalPages").textContent = totalPages || 1;
+  document.getElementById("currentPage").textContent = currentPage;
+  
+  // Paginate data
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, endIndex);
+  
+  // Render tabel
+  renderTable(paginatedData, filteredData.length);
+}
+
+// Navigation
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    renderFilteredTable();
+  }
+}
+
+function nextPage() {
+  const totalPages = Math.ceil(
+    (currentSiswa ? allData.filter(d => d.nama === currentSiswa) :
+     currentKelas ? allData.filter(d => d.kelas === currentKelas) :
+     allData).length / itemsPerPage
+  );
+  
+  if (currentPage < totalPages) {
+    currentPage++;
+    renderFilteredTable();
+  }
+}
+
+// Render tabel
+function renderTable(data, totalLength) {
+  const table = document.getElementById("sheetTable");
+  const emptyState = document.getElementById("emptyState");
+  
   if(!data || data.length === 0) {
-    table.innerHTML = '<tr><td colspan="33" class="p-4 text-center text-gray-500">Tidak ada data</td></tr>';
+    table.innerHTML = "";
+    emptyState.classList.remove("hidden");
+    document.getElementById("tablePagination").classList.add("hidden");
     return;
   }
+  
+  emptyState.classList.add("hidden");
+  document.getElementById("tablePagination").classList.remove("hidden");
+  table.innerHTML = "";
 
-  // Header dengan urutan: Nama, Kelas, Tanggal 1-31
+  // Header
+  const sampleRow = data[0];
+  const headers = Object.keys(sampleRow);
+  const orderedHeaders = ['nama', 'kelas', ...headers.filter(h => h !== 'nama' && h !== 'kelas')];
+  
+  // Create header
   const thead = document.createElement("thead");
   thead.className = "bg-gray-50";
   const trHead = document.createElement("tr");
   
-  // Kolom Nama
-  const thNama = document.createElement("th");
-  thNama.textContent = "Nama";
-  thNama.className = "px-4 py-3 text-left text-sm font-medium text-gray-700 border-b border-gray-200 sticky left-0 bg-gray-50 z-10";
-  trHead.appendChild(thNama);
-  
-  // Kolom Kelas
-  const thKelas = document.createElement("th");
-  thKelas.textContent = "Kelas";
-  thKelas.className = "px-4 py-3 text-left text-sm font-medium text-gray-700 border-b border-gray-200 sticky left-[120px] bg-gray-50 z-10";
-  trHead.appendChild(thKelas);
-  
-  // Kolom Tanggal 1-31
-  for(let day = 1; day <= 31; day++) {
+  orderedHeaders.forEach((h, index) => {
     const th = document.createElement("th");
-    th.textContent = day;
-    th.className = "px-3 py-3 text-center text-xs font-medium text-gray-500 border-b border-gray-200 min-w-[60px]";
-    th.title = `Tanggal ${day}`;
+    th.innerText = formatHeader(h);
+    th.className = "px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 whitespace-nowrap";
+    
+    // Kolom nama dan kelas lebih lebar
+    if (h === 'nama') th.className += " w-1/4";
+    if (h === 'kelas') th.className += " w-1/6";
+    
     trHead.appendChild(th);
-  }
+  });
   
   thead.appendChild(trHead);
   table.appendChild(thead);
 
   // Body
   const tbody = document.createElement("tbody");
+  tbody.className = "bg-white divide-y divide-gray-200";
   
-  data.forEach((row, rowIndex) => {
+  data.forEach((row, index) => {
     const tr = document.createElement("tr");
-    tr.className = rowIndex % 2 === 0 ? "bg-white" : "bg-gray-50";
+    tr.className = index % 2 === 0 ? "bg-white hover:bg-gray-50" : "bg-gray-50 hover:bg-gray-100";
     
-    // Cell Nama (sticky)
-    const tdNama = document.createElement("td");
-    tdNama.textContent = row.nama || "";
-    tdNama.className = "px-4 py-3 text-sm font-semibold text-gray-900 border-b border-gray-200 sticky left-0 bg-inherit z-5";
-    tr.appendChild(tdNama);
-    
-    // Cell Kelas (sticky)
-    const tdKelas = document.createElement("td");
-    tdKelas.textContent = row.kelas || "";
-    tdKelas.className = "px-4 py-3 text-sm text-gray-700 border-b border-gray-200 sticky left-[120px] bg-inherit z-5";
-    tr.appendChild(tdKelas);
-    
-    // Cell Tanggal 1-31
-    for(let day = 1; day <= 31; day++) {
+    orderedHeaders.forEach(col => {
       const td = document.createElement("td");
+      const value = row[col] || "";
+      td.innerText = value;
       
-      // INI KUNCI MASALAHNYA:
-      // Di JSON, tanggal 1 ada di properti "1" atau "3"?
-      // Coba beberapa kemungkinan:
-      let value = "";
-      
-      // Kemungkinan 1: Properti "1" = tanggal 1
-      if(row[day.toString()]) {
-        value = row[day.toString()];
-      }
-      // Kemungkinan 2: Properti "3" = tanggal 1 (karena kolom 1&2 untuk nama/kelas)
-      else if(row[(day + 2).toString()]) {
-        value = row[(day + 2).toString()];
-      }
-      
-      td.textContent = value;
-      
-      // Styling berdasarkan value
-      if(value === "MASUK") {
-        td.className = "px-3 py-3 text-center text-sm border-b border-gray-200 bg-green-50 text-green-700";
-      } else if(value && value !== "" && value !== "MASUK") {
-        td.className = "px-3 py-3 text-center text-sm border-b border-gray-200 bg-yellow-50 text-yellow-700 font-medium";
+      if (col === 'nama' || col === 'kelas') {
+        td.className = "px-3 py-3 text-sm font-medium text-gray-900 whitespace-nowrap";
+        if (col === 'nama') td.classList.add("font-semibold");
       } else {
-        td.className = "px-3 py-3 text-center text-sm border-b border-gray-200 bg-gray-50 text-gray-400";
+        td.className = "px-3 py-3 text-sm text-center whitespace-nowrap";
+        
+        // Warna untuk status
+        if (value === "MASUK") {
+          td.className += " bg-green-50 text-green-800";
+        } else if (value && value !== "" && value !== "MASUK") {
+          td.className += " bg-yellow-50 text-yellow-800";
+        } else {
+          td.className += " bg-gray-50 text-gray-500";
+        }
       }
       
       tr.appendChild(td);
-    }
+    });
     
     tbody.appendChild(tr);
   });
@@ -501,123 +711,170 @@ function renderTable(data) {
   table.appendChild(tbody);
 }
 
-// Update cell - PERBAIKI MAPPING KOLOM
+// Format header
+function formatHeader(header) {
+  if (header === 'nama') return 'Nama';
+  if (header === 'kelas') return 'Kelas';
+  if (/^\d+$/.test(header)) return header;
+  return header;
+}
+
+// Reset form
+function resetForm() {
+  document.getElementById("value").value = "";
+  document.getElementById("col").value = "";
+  document.getElementById("result").innerHTML = "";
+  showToast('Form berhasil direset', 'info');
+}
+
+// Update cell - TANPA REFRESH FULL
 async function updateCell() {
   const siswaSelect = document.getElementById("siswaFilter");
-  const colSelect = document.getElementById("col");
   const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
-  const colOption = colSelect.options[colSelect.selectedIndex];
-  
   const _row = Number(siswaSelect.value);
-  const col = Number(colSelect.value); // Kolom Excel (3-33)
+  const col = Number(document.getElementById("col").value);
   const value = document.getElementById("value").value.trim();
   const siswaName = selectedOption?.dataset.nama || "";
-  const tanggalLabel = colOption.textContent || "";
-  
-  console.log("DEBUG UPDATE:");
-  console.log("- Siswa:", siswaName, "Row:", _row);
-  console.log("- Kolom Excel untuk POST:", col);
-  console.log("- Label dropdown:", tanggalLabel);
-  console.log("- Value:", value);
-  
+  const alasanInput = document.getElementById("value");
+
+  // Validasi
   if(!_row || !siswaName) {
-    showToast('Pilih siswa dulu', 'error');
+    showToast('Harap pilih siswa terlebih dahulu', 'error');
     return;
   }
   
   if(!col) {
-    showToast('Pilih tanggal dulu', 'error');
+    showToast('Harap pilih tanggal terlebih dahulu', 'error');
     return;
   }
   
   if(!value) {
-    showToast('Isi alasan dulu', 'error');
-    document.getElementById("value").focus();
+    showToast('Harap isi alasan terlebih dahulu', 'error');
+    alasanInput.focus();
     return;
   }
-  
+
   // Tampilkan loading
   const updateBtn = document.getElementById("updateBtn");
-  updateBtn.disabled = true;
-  updateBtn.innerHTML = '<div class="loader"></div> Mengirim...';
+  const updateText = document.getElementById("updateText");
+  const originalText = updateText.textContent;
   
+  updateBtn.disabled = true;
+  updateText.textContent = "Mengirim...";
+  updateBtn.innerHTML = '<div class="loader"></div> Mengirim...';
+
   try {
-    // TEST: Kirim data test dulu
-    console.log("Mengirim ke API:", { _row, col, value });
-    
+    // Kirim data
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
       body: JSON.stringify({ _row, col, value })
     });
-    
+
     const text = await res.text();
-    console.log("Response API:", text);
+    console.log("Update response:", text);
     
-    // Update data lokal
-    // Tentukan properti JSON yang sesuai dengan kolom Excel
-    const jsonKey = col.toString(); // Jika kolom Excel = properti JSON
+    // Update data lokal (simulasi)
+    updateLocalData(siswaName, col, value);
     
-    // Cari siswa di allData
-    const siswaIndex = allData.findIndex(d => d.nama === siswaName);
-    if(siswaIndex !== -1) {
-      allData[siswaIndex][jsonKey] = value;
-      console.log(`Updated lokal: ${siswaName}[${jsonKey}] = ${value}`);
-    }
+    // Reset hanya input alasan, biar pilihan tetap
+    alasanInput.value = "";
     
-    // Reset input
-    document.getElementById("value").value = "";
+    // Tampilkan notifikasi
+    showToast(`Data ${siswaName} berhasil diperbarui`, 'success');
     
-    // Update tampilan
+    // Update tampilan tabel tanpa refresh full
     renderFilteredTable();
-    showToast(`Data ${siswaName} berhasil diupdate (Kolom ${col})`, 'success');
     
   } catch(e) {
     console.error("Update error:", e);
-    showToast('Gagal mengirim', 'error');
+    showToast('Gagal mengirim data', 'error');
   } finally {
+    // Restore button
     updateBtn.disabled = false;
-    updateBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Update Data';
+    updateText.textContent = originalText;
+    updateBtn.innerHTML = '<i class="fas fa-check mr-2"></i>' + originalText;
   }
 }
 
-// Tapi sebelum itu, kita perlu tahu mapping yang benar.
-// Coba test dengan console.log:
-
-function debugSpreadsheetStructure() {
-  if(allData.length > 0) {
-    const firstRow = allData[0];
-    console.log("=== STRUKTUR SPREADSHEET ===");
-    console.log("Contoh data pertama (AINNA):");
+// Update data lokal (simulasi perubahan)
+function updateLocalData(siswaName, col, value) {
+  const index = allData.findIndex(d => d.nama === siswaName);
+  if (index !== -1) {
+    allData[index][col] = value;
     
-    // Cek semua properti
-    Object.keys(firstRow).forEach(key => {
-      console.log(`Properti "${key}": ${firstRow[key]}`);
-    });
-    
-    // Coba tebak mapping
-    console.log("\n=== TEBAKAN MAPPING ===");
-    console.log("Jika '1' = 'Update via curl', kemungkinan itu kolom A (pertama)");
-    console.log("Jika 'kelas' = '12 tkj 1', itu kolom sebelum tanggal?");
-    console.log("Jika 'nama' = 'AINNA...', itu kolom sebelum kelas?");
-    
-    // Cari pola
-    const keys = Object.keys(firstRow);
-    const dateKeys = keys.filter(k => /^\d+$/.test(k)).map(Number).sort((a,b) => a-b);
-    
-    console.log("\nKunci numerik (tanggal?):", dateKeys);
-    console.log("Rentang tanggal:", dateKeys[0], "sampai", dateKeys[dateKeys.length-1]);
-    
-    // Coba match dengan tanggal
-    for(let i = 0; i < Math.min(10, dateKeys.length); i++) {
-      const key = dateKeys[i];
-      console.log(`Key "${key}" -> Excel kolom ${key} -> Mungkin tanggal ${key-2}?`);
+    // Juga update di filtered view
+    if (currentSiswa === siswaName) {
+      // Jika siswa ini sedang dilihat, update langsung
+      renderFilteredTable();
     }
   }
 }
 
-// Panggil debug setelah load
-// debugSpreadsheetStructure();
-    </script>
+// Export data
+function exportData() {
+  let dataToExport = allData;
+  
+  if (currentSiswa) {
+    dataToExport = allData.filter(d => d.nama === currentSiswa);
+  } else if (currentKelas) {
+    dataToExport = allData.filter(d => d.kelas === currentKelas);
+  }
+  
+  // Simple export to JSON
+  const dataStr = JSON.stringify(dataToExport, null, 2);
+  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+  
+  const exportFileDefaultName = `absensi-${currentKelas || 'semua'}-${new Date().toISOString().split('T')[0]}.json`;
+  
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('download', exportFileDefaultName);
+  linkElement.click();
+  
+  showToast('Data berhasil diunduh', 'success');
+}
+
+// Show/hide loading
+function showLoadingState(show) {
+  const refreshBtns = document.querySelectorAll('button:has(.fa-sync-alt)');
+  refreshBtns.forEach(btn => {
+    if (show) {
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loader"></div>';
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-sync-alt mr-1"></i> Refresh';
+    }
+  });
+}
+
+// Show toast notification
+function showToast(message, type = 'info') {
+  const toast = document.getElementById('successToast');
+  const toastMessage = document.getElementById('toastMessage');
+  
+  // Set warna berdasarkan type
+  const colors = {
+    success: 'bg-green-500',
+    error: 'bg-red-500',
+    info: 'bg-blue-500',
+    warning: 'bg-yellow-500'
+  };
+  
+  toast.className = toast.className.replace(/bg-(green|red|blue|yellow)-500/g, '');
+  toast.classList.add(colors[type] || 'bg-blue-500');
+  
+  toastMessage.textContent = message;
+  
+  // Show toast
+  toast.classList.remove('translate-y-full');
+  
+  // Auto hide after 3 seconds
+  setTimeout(() => {
+    toast.classList.add('translate-y-full');
+  }, 3000);
+}
+</script>
 </body>
 </html>
