@@ -7,12 +7,17 @@
 </head>
 <body class="bg-gray-100 p-8">
 
-<!-- Form update manual -->
-<div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+<!-- Filter Kelas & Pilih Siswa -->
+<div class="max-w-4xl mx-auto bg-white p-6 rounded shadow mb-6">
   <h2 class="text-2xl font-bold mb-4">Update Cell Spreadsheet</h2>
   <div class="space-y-2">
-    <input id="row" type="number" placeholder="Nomor Row" class="w-full p-2 border rounded">
-    <input id="col" placeholder="Kolom" class="w-full p-2 border rounded">
+    <select id="kelasFilter" class="w-full p-2 border rounded" onchange="filterSiswa()">
+      <option value="">-- Pilih Kelas --</option>
+    </select>
+    <select id="siswaFilter" class="w-full p-2 border rounded">
+      <option value="">-- Pilih Siswa --</option>
+    </select>
+    <input id="col" type="number" placeholder="Kolom (angka mulai 3)" class="w-full p-2 border rounded">
     <input id="value" placeholder="Value Baru" class="w-full p-2 border rounded">
     <button onclick="updateCell()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Update</button>
     <p id="result" class="text-green-600 font-semibold"></p>
@@ -31,56 +36,98 @@
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyqQOikUdA_eg8KsEGsU5HwPN5U0mNpiQ0EaXS7AWD9oXZ2le0AWZ7IqI5v080bLN6s/exec";
 
+let allData = [];
+
 // Load data GET
 async function loadData() {
   try {
     const res = await fetch(API_URL);
     const data = await res.json();
-    const table = document.getElementById("sheetTable");
-    table.innerHTML = "";
-
-    if(data.length === 0) return;
-
-    // Header
-    const headers = Object.keys(data[0]).filter(k => k !== "_row");
-    const trHead = table.insertRow();
-    trHead.className = "bg-gray-200";
-    headers.forEach(h => {
-      const th = document.createElement("th");
-      th.innerText = h;
-      th.className = "border px-2 py-1";
-      trHead.appendChild(th);
+    allData = data.map(row => {
+      // pindahin kelas dan nama ke depan
+      const { kelas, nama, ...rest } = row;
+      return { kelas, nama, ...rest };
     });
-
-    // Body
-    data.forEach(row => {
-      const tr = table.insertRow();
-      headers.forEach(col => {
-        const td = tr.insertCell();
-        td.innerText = row[col];
-        td.className = "border px-2 py-1 editable cursor-pointer hover:bg-gray-100";
-        td.onclick = () => editCell(td, row._row, col);
-      });
-    });
-
+    renderTable(allData);
+    populateKelasFilter(allData);
   } catch(e) {
     console.error(e);
   }
 }
 
+// Render tabel read-only
+function renderTable(data) {
+  const table = document.getElementById("sheetTable");
+  table.innerHTML = "";
+
+  if(data.length === 0) return;
+
+  // Header
+  const headers = Object.keys(data[0]).filter(k => k !== "_row");
+  const trHead = table.insertRow();
+  trHead.className = "bg-gray-200";
+  headers.forEach(h => {
+    const th = document.createElement("th");
+    th.innerText = h;
+    th.className = "border px-2 py-1";
+    trHead.appendChild(th);
+  });
+
+  // Body
+  data.forEach(row => {
+    const tr = table.insertRow();
+    headers.forEach(col => {
+      const td = tr.insertCell();
+      td.innerText = row[col];
+      td.className = "border px-2 py-1";
+    });
+  });
+}
+
+// Populate kelas untuk filter
+function populateKelasFilter(data) {
+  const kelasSet = new Set(data.map(d => d.kelas));
+  const select = document.getElementById("kelasFilter");
+  select.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+  kelasSet.forEach(k => {
+    const opt = document.createElement("option");
+    opt.value = k;
+    opt.innerText = k;
+    select.appendChild(opt);
+  });
+}
+
+// Filter siswa berdasarkan kelas
+function filterSiswa() {
+  const kelas = document.getElementById("kelasFilter").value;
+  const siswaSelect = document.getElementById("siswaFilter");
+  siswaSelect.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+
+  const filtered = allData.filter(d => d.kelas === kelas);
+  filtered.forEach((s, idx) => {
+    const opt = document.createElement("option");
+    opt.value = s._row; // pakai row index dari spreadsheet
+    opt.innerText = s.nama;
+    siswaSelect.appendChild(opt);
+  });
+}
+
 // Update via POST
 async function updateCell() {
-  const payload = {
-    _row: Number(document.getElementById("row").value),
-    col: document.getElementById("col").value,
-    value: document.getElementById("value").value
-  };
+  const _row = Number(document.getElementById("siswaFilter").value);
+  const col = Number(document.getElementById("col").value);
+  const value = document.getElementById("value").value;
+
+  if(!_row || !col || !value) {
+    alert("Lengkapi semua field!");
+    return;
+  }
 
   try {
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify({ _row, col, value })
     });
 
     const json = await res.json();
@@ -90,38 +137,6 @@ async function updateCell() {
     document.getElementById("result").innerText = "Gagal koneksi!";
     console.error(e);
   }
-}
-
-// Edit cell langsung di tabel
-function editCell(td, row, col) {
-  const oldValue = td.innerText;
-  const input = document.createElement("input");
-  input.type = "text";
-  input.value = oldValue;
-  input.className = "w-full border p-1 rounded";
-  td.innerHTML = "";
-  td.appendChild(input);
-  input.focus();
-
-  input.onblur = async () => {
-    const newValue = input.value;
-    td.innerText = newValue; // update tampilan
-    try {
-      await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ _row: row, col: col, value: newValue })
-      });
-    } catch(e) {
-      td.innerText = oldValue; // rollback
-      alert("Gagal update data!");
-      console.error(e);
-    }
-  };
-
-  input.onkeydown = e => {
-    if(e.key === "Enter") input.blur();
-  };
 }
 
 // Load awal
