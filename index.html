@@ -460,16 +460,22 @@ function updateSiswaFilter() {
 }
 
 // Update kolom filter
+// Update kolom filter
 function updateKolomFilter() {
   const select = document.getElementById("col");
   const currentValue = select.value;
   
   select.innerHTML = '<option value="">-- Pilih Tanggal --</option>';
   
-  for(let i = 3; i <= 33; i++) {
+  // Mapping tanggal ke properti JSON
+  // Tanggal 1 -> properti "1" (string)
+  // Tanggal 2 -> properti "2" (string)
+  // dst...
+  for(let day = 1; day <= 31; day++) {
     const opt = document.createElement("option");
-    opt.value = i;
-    opt.innerText = `Hari ${i-2}`;
+    opt.value = day; // Simpan sebagai angka untuk dropdown
+    opt.innerText = `Hari ${day}`;
+    opt.dataset.jsonProperty = day.toString(); // Simpan mapping ke string
     select.appendChild(opt);
   }
   
@@ -631,7 +637,7 @@ function nextPage() {
     renderFilteredTable();
   }
 }
-function renderTable(data, totalLength) {
+  function renderTable(data, totalLength) {
   const table = document.getElementById("sheetTable");
   const emptyState = document.getElementById("emptyState");
   
@@ -664,15 +670,14 @@ function renderTable(data, totalLength) {
   trHead.appendChild(thKelas);
   
   // Kolom Tanggal 1-31
-  // PERBAIKAN: Mapping yang benar
-  // Di JSON: "3" = Tanggal 1, "4" = Tanggal 2, dst
+  // PERBAIKAN: Mapping yang benar ke properti JSON
   for(let day = 1; day <= 31; day++) {
-    const excelColumn = day + 2; // Karena tanggal 1 di kolom C (3), tanggal 2 di D (4), dst
+    const jsonProperty = day.toString(); // "1", "2", "3", dst (STRING!)
     const th = document.createElement("th");
     th.textContent = day;
     th.className = "px-3 py-3 text-center text-xs font-medium text-gray-500 border-b border-gray-200 min-w-[60px]";
-    th.title = `Tanggal ${day} (Kolom ${excelColumn})`;
-    th.dataset.excelCol = excelColumn; // Simpan mapping
+    th.title = `Tanggal ${day} (Properti "${jsonProperty}")`;
+    th.dataset.jsonProperty = jsonProperty; // Simpan sebagai string
     trHead.appendChild(th);
   }
   
@@ -698,15 +703,13 @@ function renderTable(data, totalLength) {
     tdKelas.className = "px-4 py-3 text-sm text-gray-700 border-b border-gray-200 sticky left-[150px] bg-inherit z-5";
     tr.appendChild(tdKelas);
     
-    // Cell Tanggal 1-31
-    // PERBAIKAN: Mapping yang benar
+    // Cell Tanggal 1-31 - PERBAIKAN DI SINI
     for(let day = 1; day <= 31; day++) {
-      const excelColumn = day + 2; // Tanggal 1 = kolom 3, tanggal 2 = kolom 4, dst
+      const jsonProperty = day.toString(); // "1", "2", "3", dst
       const td = document.createElement("td");
       
-      // Ambil nilai dari properti yang sesuai
-      // Di JSON, tanggal 1 ada di properti "3", tanggal 2 di "4", dst
-      const value = row[excelColumn.toString()] || "";
+      // Ambil nilai dari properti dengan KEY STRING
+      const value = row[jsonProperty] || "";
       td.textContent = value;
       
       // Styling berdasarkan value
@@ -722,7 +725,7 @@ function renderTable(data, totalLength) {
       
       td.className = cellClass;
       td.dataset.day = day;
-      td.dataset.excelCol = excelColumn;
+      td.dataset.jsonProperty = jsonProperty;
       
       tr.appendChild(td);
     }
@@ -734,13 +737,16 @@ function renderTable(data, totalLength) {
 }
 
 // Format header
+// Format header
 function formatHeader(header) {
   if (header === 'nama') return 'Nama';
   if (header === 'kelas') return 'Kelas';
-  if (/^\d+$/.test(header)) return header;
+  if (/^\d+$/.test(header)) {
+    // Jika header adalah angka/string angka, tampilkan sebagai tanggal
+    return `Tanggal ${header}`;
+  }
   return header;
 }
-
 // Reset form
 function resetForm() {
   document.getElementById("value").value = "";
@@ -748,13 +754,13 @@ function resetForm() {
   document.getElementById("result").innerHTML = "";
   showToast('Form berhasil direset', 'info');
 }
-
-// Update cell - TANPA REFRESH FULL
 async function updateCell() {
   const siswaSelect = document.getElementById("siswaFilter");
   const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
   const _row = Number(siswaSelect.value);
-  const col = Number(document.getElementById("col").value);
+  const colSelect = document.getElementById("col");
+  const selectedColOption = colSelect.options[colSelect.selectedIndex];
+  const colProperty = selectedColOption?.dataset.jsonProperty || ""; // Ambil properti JSON
   const value = document.getElementById("value").value.trim();
   const siswaName = selectedOption?.dataset.nama || "";
   const alasanInput = document.getElementById("value");
@@ -765,7 +771,7 @@ async function updateCell() {
     return;
   }
   
-  if(!col) {
+  if(!colProperty) {
     showToast('Harap pilih tanggal terlebih dahulu', 'error');
     return;
   }
@@ -786,18 +792,28 @@ async function updateCell() {
   updateBtn.innerHTML = '<div class="loader"></div> Mengirim...';
 
   try {
-    // Kirim data
+    // Kirim data - sesuaikan kolom
+    // PERHATIAN: Sesuaikan dengan API Anda
+    // Jika API Anda mengharapkan col sebagai angka (3, 4, dst), konversi
+    const colNumber = Number(colProperty) + 2; // Atau logika konversi sesuai API
+    // Cek dulu format yang diharapkan API
+    console.log("Mengirim:", { _row, col: colProperty, value });
+    
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ _row, col, value })
+      body: JSON.stringify({ 
+        _row, 
+        col: colProperty, // Kirim sebagai string "1", "2", dst
+        value 
+      })
     });
 
     const text = await res.text();
     console.log("Update response:", text);
     
-    // Update data lokal (simulasi)
-    updateLocalData(siswaName, col, value);
+    // Update data lokal (simulasi) - gunakan colProperty sebagai string
+    updateLocalData(siswaName, colProperty, value);
     
     // Reset hanya input alasan, biar pilihan tetap
     alasanInput.value = "";
@@ -817,13 +833,12 @@ async function updateCell() {
     updateText.textContent = originalText;
     updateBtn.innerHTML = '<i class="fas fa-check mr-2"></i>' + originalText;
   }
-}
-
-// Update data lokal (simulasi perubahan)
-function updateLocalData(siswaName, col, value) {
+}// Update data lokal (simulasi perubahan)
+function updateLocalData(siswaName, colProperty, value) {
   const index = allData.findIndex(d => d.nama === siswaName);
   if (index !== -1) {
-    allData[index][col] = value;
+    // Gunakan colProperty sebagai string key
+    allData[index][colProperty] = value;
     
     // Juga update di filtered view
     if (currentSiswa === siswaName) {
