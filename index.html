@@ -8,28 +8,45 @@
 <body class="bg-gray-100 p-8">
 
 <!-- Filter Kelas & Pilih Siswa -->
-<div class="max-w-4xl mx-auto bg-white p-6 rounded shadow mb-6">
-  <h2 class="text-2xl font-bold mb-4">Update Cell Spreadsheet</h2>
-  <div class="space-y-2">
-    <select id="kelasFilter" class="w-full p-2 border rounded" onchange="filterSiswa()">
-      <option value="">-- Pilih Kelas --</option>
-    </select>
-    <select id="siswaFilter" class="w-full p-2 border rounded">
-      <option value="">-- Pilih Siswa --</option>
-    </select>
-    <input id="col" type="number" placeholder="Kolom (angka mulai 3)" class="w-full p-2 border rounded">
-    <input id="value" placeholder="Value Baru" class="w-full p-2 border rounded">
-    <button onclick="updateCell()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Update</button>
-    <p id="result" class="text-green-600 font-semibold"></p>
-  </div>
-</div>
-
-<!-- Tabel data -->
-<div class="max-w-6xl mx-auto bg-white p-6 mt-8 rounded shadow">
-  <h2 class="text-2xl font-bold mb-4">Data Spreadsheet</h2>
-  <button onclick="loadData()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4">Load Data</button>
-  <div class="overflow-x-auto">
-    <table id="sheetTable" class="min-w-full border border-gray-300"></table>
+<div class="max-w-6xl mx-auto bg-white p-6 rounded shadow mb-6">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Form Update -->
+    <div class="md:col-span-1">
+      <h2 class="text-2xl font-bold mb-4">Update Alasan Tidak Masuk</h2>
+      <div class="space-y-3">
+        <select id="kelasFilter" class="w-full p-2 border rounded">
+          <option value="">-- Pilih Kelas --</option>
+        </select>
+        <select id="siswaFilter" class="w-full p-2 border rounded">
+          <option value="">-- Pilih Siswa --</option>
+        </select>
+        <select id="col" class="w-full p-2 border rounded">
+          <option value="">-- Pilih Kolom (3-33) --</option>
+          <!-- Kolom akan diisi otomatis -->
+        </select>
+        <input id="value" placeholder="Alasan Tidak Masuk" class="w-full p-2 border rounded">
+        <div class="flex space-x-2">
+          <button onclick="updateCell()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex-1">Update</button>
+          <button onclick="resetForm()" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">Reset</button>
+        </div>
+        <p id="result" class="text-green-600 font-semibold"></p>
+      </div>
+    </div>
+    
+    <!-- Tabel -->
+    <div class="md:col-span-2">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold">Data Siswa</h2>
+        <div class="text-sm text-gray-600">
+          Menampilkan data dari kelas: <span id="kelasDisplay" class="font-bold">Semua</span>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table id="sheetTable" class="min-w-full border border-gray-300">
+          <!-- Tabel akan diisi otomatis -->
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -37,6 +54,12 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbyqQOikUdA_eg8KsEGsU5HwPN5U0mNpiQ0EaXS7AWD9oXZ2le0AWZ7IqI5v080bLN6s/exec";
 
 let allData = [];
+let currentKelas = "";
+
+// Load data saat awal
+window.onload = async function() {
+  await loadData();
+};
 
 // Load data GET
 async function loadData() {
@@ -44,12 +67,18 @@ async function loadData() {
     const res = await fetch(API_URL);
     const data = await res.json();
     allData = data.map(row => {
-      // pindahin kelas dan nama ke depan
       const { kelas, nama, ...rest } = row;
       return { kelas, nama, ...rest };
     });
-    renderTable(allData);
+    
+    // Filter hanya ambil data dari row 2 dan seterusnya (skip header)
+    allData = allData.filter(row => row._row >= 2);
+    
     populateKelasFilter(allData);
+    populateKolomFilter();
+    
+    // Tampilkan semua data di tabel awalnya
+    renderTable(allData);
   } catch(e) {
     console.error(e);
   }
@@ -60,7 +89,10 @@ function renderTable(data) {
   const table = document.getElementById("sheetTable");
   table.innerHTML = "";
 
-  if(data.length === 0) return;
+  if(data.length === 0) {
+    table.innerHTML = '<tr><td class="p-4 text-center text-gray-500">Tidak ada data</td></tr>';
+    return;
+  }
 
   // Header
   const headers = Object.keys(data[0]).filter(k => k !== "_row");
@@ -69,7 +101,7 @@ function renderTable(data) {
   headers.forEach(h => {
     const th = document.createElement("th");
     th.innerText = h;
-    th.className = "border px-2 py-1";
+    th.className = "border px-4 py-2 text-left";
     trHead.appendChild(th);
   });
 
@@ -78,17 +110,17 @@ function renderTable(data) {
     const tr = table.insertRow();
     headers.forEach(col => {
       const td = tr.insertCell();
-      td.innerText = row[col];
-      td.className = "border px-2 py-1";
+      td.innerText = row[col] || "";
+      td.className = "border px-4 py-2";
     });
   });
 }
 
 // Populate kelas untuk filter
 function populateKelasFilter(data) {
-  const kelasSet = new Set(data.map(d => d.kelas));
+  const kelasSet = new Set(data.map(d => d.kelas).filter(k => k));
   const select = document.getElementById("kelasFilter");
-  select.innerHTML = '<option value="">-- Pilih Kelas --</option>';
+  
   kelasSet.forEach(k => {
     const opt = document.createElement("option");
     opt.value = k;
@@ -97,19 +129,51 @@ function populateKelasFilter(data) {
   });
 }
 
-// Filter siswa berdasarkan kelas
-function filterSiswa() {
-  const kelas = document.getElementById("kelasFilter").value;
+// Populate kolom filter (3-33)
+function populateKolomFilter() {
+  const select = document.getElementById("col");
+  select.innerHTML = '<option value="">-- Pilih Kolom (3-33) --</option>';
+  
+  for(let i = 3; i <= 33; i++) {
+    const opt = document.createElement("option");
+    opt.value = i;
+    opt.innerText = `Kolom ${i} (${i-2})`;
+    select.appendChild(opt);
+  }
+}
+
+// Ketika kelas dipilih
+document.getElementById("kelasFilter").onchange = function() {
+  currentKelas = this.value;
   const siswaSelect = document.getElementById("siswaFilter");
   siswaSelect.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+  
+  // Update display kelas
+  document.getElementById("kelasDisplay").innerText = currentKelas || "Semua";
+  
+  if(currentKelas) {
+    // Filter siswa berdasarkan kelas
+    const filteredSiswa = allData.filter(d => d.kelas === currentKelas);
+    filteredSiswa.forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s._row;
+      opt.innerText = s.nama;
+      siswaSelect.appendChild(opt);
+    });
+    
+    // Filter dan tampilkan data tabel untuk kelas yang dipilih
+    const filteredData = allData.filter(d => d.kelas === currentKelas);
+    renderTable(filteredData);
+  } else {
+    // Tampilkan semua data jika tidak ada kelas yang dipilih
+    renderTable(allData);
+  }
+};
 
-  const filtered = allData.filter(d => d.kelas === kelas);
-  filtered.forEach((s, idx) => {
-    const opt = document.createElement("option");
-    opt.value = s._row; // pakai row index dari spreadsheet
-    opt.innerText = s.nama;
-    siswaSelect.appendChild(opt);
-  });
+// Reset form
+function resetForm() {
+  document.getElementById("value").value = "";
+  document.getElementById("result").innerText = "";
 }
 
 // Update via POST
@@ -132,14 +196,23 @@ async function updateCell() {
 
     const json = await res.json();
     document.getElementById("result").innerText = json.success ? "Berhasil update!" : "Gagal update!";
-    loadData(); // reload table setelah update
+    
+    // Reload data dan pertahankan filter kelas yang dipilih
+    await loadData();
+    
+    // Setelah reload, otomatis pilih kelas yang sama
+    if(currentKelas) {
+      document.getElementById("kelasFilter").value = currentKelas;
+      document.getElementById("kelasFilter").onchange();
+    }
+    
   } catch(e) {
     document.getElementById("result").innerText = "Gagal koneksi!";
     console.error(e);
   }
 }
 
-// Load awal
+// Load data saat awal
 loadData();
 </script>
 
