@@ -825,16 +825,16 @@ async function updateCell() {
 }
 
 // Update data lokal (simulasi perubahan)
+// GANTI fungsi updateLocalData():
 function updateLocalData(siswaName, col, value) {
+  // Cari data siswa
   const index = allData.findIndex(d => d.nama === siswaName);
   if (index !== -1) {
-    allData[index][col] = value;
+    // Update properti sesuai dengan nomor kolom Excel
+    allData[index][col.toString()] = value;
     
-    // Juga update di filtered view
-    if (currentSiswa === siswaName) {
-      // Jika siswa ini sedang dilihat, update langsung
-      renderFilteredTable();
-    }
+    // Refresh tampilan
+    renderFilteredTable();
   }
 }
 
