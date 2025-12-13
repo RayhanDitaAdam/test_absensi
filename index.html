@@ -749,8 +749,8 @@ function resetForm() {
 async function updateCell() {
   const siswaSelect = document.getElementById("siswaFilter");
   const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
-  const _row = Number(siswaSelect.value);
-  const col = Number(document.getElementById("col").value); // Ini sekarang langsung hari ke- (1, 2, 3, dst)
+  const _row = Number(siswaSelect.value); // Row siswa (misal row 3)
+  const tanggal = Number(document.getElementById("col").value); // Tanggal ke- (1, 2, 3, ...)
   const value = document.getElementById("value").value.trim();
   const siswaName = selectedOption?.dataset.nama || "";
   const alasanInput = document.getElementById("value");
@@ -761,7 +761,7 @@ async function updateCell() {
     return;
   }
   
-  if(!col) {
+  if(!tanggal) {
     showToast('Harap pilih tanggal terlebih dahulu', 'error');
     return;
   }
@@ -771,6 +771,11 @@ async function updateCell() {
     alasanInput.focus();
     return;
   }
+
+  // PERBAIKAN PENTING: Hitung kolom spreadsheet yang benar
+  // col 1 = kelas, col 2 = nama, col 3 = tanggal 1
+  // Jadi: tanggal ke-1 -> col 3, tanggal ke-2 -> col 4, dst
+  const col = tanggal + 2; // Konversi: tanggal 1 = col 3, tanggal 2 = col 4, dst
 
   // Tampilkan loading
   const updateBtn = document.getElementById("updateBtn");
@@ -782,13 +787,13 @@ async function updateCell() {
   updateBtn.innerHTML = '<div class="loader"></div> Mengirim...';
 
   try {
-    // Kirim data ke API
+    // Kirim data ke API dengan col yang sudah dikonversi
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "text/plain" },
       body: JSON.stringify({ 
         _row, 
-        col,  // Ini TIDAK PERLU diubah, API sudah paham mapping-nya
+        col,  // Kolom spreadsheet yang benar
         value 
       })
     });
@@ -797,13 +802,13 @@ async function updateCell() {
     console.log("Update response:", text);
     
     // Update data lokal (simulasi)
-    updateLocalData(siswaName, col, value);
+    updateLocalData(siswaName, tanggal, value);
     
     // Reset hanya input alasan, biar pilihan tetap
     alasanInput.value = "";
     
     // Tampilkan notifikasi
-    showToast(`Data ${siswaName} (Tanggal ${col}) berhasil diperbarui`, 'success');
+    showToast(`Data ${siswaName} (Tanggal ${tanggal}) berhasil diperbarui`, 'success');
     
     // Update tampilan tabel tanpa refresh full
     renderFilteredTable();
@@ -816,6 +821,19 @@ async function updateCell() {
     updateBtn.disabled = false;
     updateText.textContent = originalText;
     updateBtn.innerHTML = '<i class="fas fa-check mr-2"></i>' + originalText;
+  }
+}
+
+// Juga perbaiki updateLocalData untuk menggunakan tanggal bukan col
+function updateLocalData(siswaName, tanggal, value) {
+  // Cari data siswa
+  const index = allData.findIndex(d => d.nama === siswaName);
+  if (index !== -1) {
+    // Update properti sesuai dengan tanggal (1, 2, 3, ...)
+    allData[index][tanggal.toString()] = value;
+    
+    // Refresh tampilan
+    renderFilteredTable();
   }
 }
 function updateLocalData(siswaName, col, value) {
