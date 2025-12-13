@@ -91,7 +91,7 @@ function editCell(td, row, col) {
     td.innerText = newValue;
 
     await fetch(API_URL, {
-      method: "PUT",
+      method: "POST",
       body: JSON.stringify({ _row: row, col: col, value: newValue }),
       headers: { "Content-Type": "application/json" }
     });
