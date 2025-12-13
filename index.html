@@ -7,7 +7,7 @@
 </head>
 <body class="bg-gray-100 p-8">
 
-<!-- Form edit cell -->
+<!-- Form update manual -->
 <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
   <h2 class="text-2xl font-bold mb-4">Update Cell Spreadsheet</h2>
   <div class="space-y-2">
@@ -19,9 +19,56 @@
   </div>
 </div>
 
+<!-- Tabel data -->
+<div class="max-w-6xl mx-auto bg-white p-6 mt-8 rounded shadow">
+  <h2 class="text-2xl font-bold mb-4">Data Spreadsheet</h2>
+  <button onclick="loadData()" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mb-4">Load Data</button>
+  <div class="overflow-x-auto">
+    <table id="sheetTable" class="min-w-full border border-gray-300"></table>
+  </div>
+</div>
+
 <script>
 const API_URL = "https://script.google.com/macros/s/AKfycbyqQOikUdA_eg8KsEGsU5HwPN5U0mNpiQ0EaXS7AWD9oXZ2le0AWZ7IqI5v080bLN6s/exec";
 
+// Load data GET
+async function loadData() {
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    const table = document.getElementById("sheetTable");
+    table.innerHTML = "";
+
+    if(data.length === 0) return;
+
+    // Header
+    const headers = Object.keys(data[0]).filter(k => k !== "_row");
+    const trHead = table.insertRow();
+    trHead.className = "bg-gray-200";
+    headers.forEach(h => {
+      const th = document.createElement("th");
+      th.innerText = h;
+      th.className = "border px-2 py-1";
+      trHead.appendChild(th);
+    });
+
+    // Body
+    data.forEach(row => {
+      const tr = table.insertRow();
+      headers.forEach(col => {
+        const td = tr.insertCell();
+        td.innerText = row[col];
+        td.className = "border px-2 py-1 editable cursor-pointer hover:bg-gray-100";
+        td.onclick = () => editCell(td, row._row, col);
+      });
+    });
+
+  } catch(e) {
+    console.error(e);
+  }
+}
+
+// Update via POST
 async function updateCell() {
   const payload = {
     _row: Number(document.getElementById("row").value),
@@ -38,11 +85,47 @@ async function updateCell() {
 
     const json = await res.json();
     document.getElementById("result").innerText = json.success ? "Berhasil update!" : "Gagal update!";
+    loadData(); // reload table setelah update
   } catch(e) {
     document.getElementById("result").innerText = "Gagal koneksi!";
     console.error(e);
   }
 }
+
+// Edit cell langsung di tabel
+function editCell(td, row, col) {
+  const oldValue = td.innerText;
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = oldValue;
+  input.className = "w-full border p-1 rounded";
+  td.innerHTML = "";
+  td.appendChild(input);
+  input.focus();
+
+  input.onblur = async () => {
+    const newValue = input.value;
+    td.innerText = newValue; // update tampilan
+    try {
+      await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ _row: row, col: col, value: newValue })
+      });
+    } catch(e) {
+      td.innerText = oldValue; // rollback
+      alert("Gagal update data!");
+      console.error(e);
+    }
+  };
+
+  input.onkeydown = e => {
+    if(e.key === "Enter") input.blur();
+  };
+}
+
+// Load awal
+loadData();
 </script>
 
 </body>
