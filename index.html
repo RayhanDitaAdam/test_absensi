@@ -3,158 +3,286 @@
 <head>
   <meta charset="UTF-8">
   <title>Absensi Siswa</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    /* Custom scrollbar untuk mobile */
     .scrollbar-thin {
       scrollbar-width: thin;
+      -webkit-overflow-scrolling: touch;
     }
     .scrollbar-thin::-webkit-scrollbar {
-      height: 6px;
-      width: 6px;
+      height: 4px;
+      width: 4px;
     }
     .scrollbar-thin::-webkit-scrollbar-track {
       background: #f1f1f1;
-      border-radius: 3px;
+      border-radius: 2px;
     }
     .scrollbar-thin::-webkit-scrollbar-thumb {
-      background: #888;
-      border-radius: 3px;
+      background: #c1c1c1;
+      border-radius: 2px;
     }
-    .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-      background: #555;
+    
+    /* Touch-friendly buttons */
+    .btn-touch {
+      min-height: 44px;
+      padding: 12px 16px;
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 640px) {
+      .mobile-stack {
+        display: flex;
+        flex-direction: column;
+      }
+      .mobile-full {
+        width: 100% !important;
+      }
+      .mobile-text-sm {
+        font-size: 14px;
+      }
+      .mobile-p-3 {
+        padding: 12px;
+      }
+      select, input {
+        font-size: 16px !important; /* Prevent zoom on iOS */
+      }
+    }
+    
+    /* Loading animation */
+    .loader {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #3498db;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
   </style>
 </head>
-<body class="bg-gray-100 p-4 md:p-6 min-h-screen">
+<body class="bg-gray-50 min-h-screen">
+<!-- Mobile Menu Button (hidden on desktop) -->
+<div class="lg:hidden fixed top-4 right-4 z-50">
+  <button id="mobileMenuBtn" class="bg-blue-600 text-white p-3 rounded-full shadow-lg">
+    <i class="fas fa-bars"></i>
+  </button>
+</div>
 
-<div class="max-w-7xl mx-auto">
+<!-- Main Container -->
+<div class="container mx-auto px-3 py-4 max-w-7xl">
   <!-- Header -->
-  <div class="mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">📊 Dashboard Absensi Siswa</h1>
-    <p class="text-gray-600 mt-1">Update alasan tidak masuk per siswa</p>
+  <div class="mb-5 mobile-p-3">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-800">
+      <i class="fas fa-chart-bar text-blue-600 mr-2"></i>
+      Dashboard Absensi
+    </h1>
+    <p class="text-gray-600 mt-1 mobile-text-sm">Update alasan tidak masuk per siswa - Mobile Friendly</p>
   </div>
 
-  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-    <!-- Sidebar Form -->
-    <div class="lg:col-span-1 bg-white rounded-xl shadow p-5">
-      <div class="mb-6">
-        <h2 class="text-xl font-bold text-gray-800 mb-3 flex items-center">
-          <span class="bg-blue-100 p-2 rounded-lg mr-2">📝</span>
-          Update Alasan
+  <div class="flex flex-col lg:flex-row gap-4">
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobileSidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden hidden"></div>
+    
+    <!-- Sidebar Form (Mobile: Slide-in) -->
+    <div id="sidebarForm" class="lg:w-1/4 w-full bg-white rounded-xl shadow-lg p-4 lg:p-5 lg:static fixed top-0 left-0 h-full lg:h-auto z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 overflow-y-auto">
+      <!-- Close button for mobile -->
+      <div class="flex justify-between items-center mb-5 lg:hidden">
+        <h2 class="text-xl font-bold text-gray-800">
+          <i class="fas fa-edit text-blue-600 mr-2"></i>
+          Update Data
         </h2>
-        <p class="text-sm text-gray-500 mb-4">Isi form untuk update ketidakhadiran siswa</p>
+        <button id="closeSidebarBtn" class="text-gray-500 hover:text-gray-700">
+          <i class="fas fa-times text-2xl"></i>
+        </button>
+      </div>
+      
+      <!-- Desktop title -->
+      <div class="hidden lg:block mb-5">
+        <h2 class="text-xl font-bold text-gray-800">
+          <i class="fas fa-edit text-blue-600 mr-2"></i>
+          Update Data
+        </h2>
+        <p class="text-sm text-gray-500 mt-1">Isi form untuk update ketidakhadiran</p>
       </div>
 
       <div class="space-y-4">
         <!-- Kelas Filter -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
-          <select id="kelasFilter" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            <i class="fas fa-graduation-cap text-blue-500 mr-1"></i>
+            Kelas
+          </label>
+          <select id="kelasFilter" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-base">
             <option value="">-- Pilih Kelas --</option>
           </select>
         </div>
 
         <!-- Siswa Filter -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Siswa</label>
-          <select id="siswaFilter" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            <i class="fas fa-user text-blue-500 mr-1"></i>
+            Siswa
+          </label>
+          <select id="siswaFilter" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-base">
             <option value="">-- Pilih Siswa --</option>
           </select>
         </div>
 
         <!-- Kolom (Tanggal) -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Tanggal (Kolom)</label>
-          <select id="col" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            <i class="fas fa-calendar-alt text-blue-500 mr-1"></i>
+            Tanggal
+          </label>
+          <select id="col" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-base">
             <option value="">-- Pilih Tanggal --</option>
           </select>
         </div>
 
         <!-- Alasan -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Alasan Tidak Masuk</label>
-          <input id="value" placeholder="Contoh: Sakit, Izin, dll" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            <i class="fas fa-sticky-note text-blue-500 mr-1"></i>
+            Alasan Tidak Masuk
+          </label>
+          <input id="value" placeholder="Sakit, Izin, dll" class="w-full p-3 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition text-base">
         </div>
 
         <!-- Buttons -->
-        <div class="flex space-x-3 pt-2">
-          <button onclick="updateCell()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center">
-            <span class="mr-2">✅</span>
-            Update Data
+        <div class="mobile-stack space-y-3 pt-3">
+          <button onclick="updateCell()" id="updateBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center btn-touch">
+            <i class="fas fa-check mr-2"></i>
+            <span id="updateText">Update Data</span>
           </button>
-          <button onclick="resetForm()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-4 rounded-lg transition duration-200">
-            Reset
-          </button>
+          <div class="flex space-x-3">
+            <button onclick="resetForm()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 px-4 rounded-lg transition duration-200 btn-touch">
+              <i class="fas fa-redo mr-1"></i> Reset
+            </button>
+            <button onclick="loadData(true)" class="flex-1 bg-green-100 hover:bg-green-200 text-green-700 font-medium py-3 px-4 rounded-lg transition duration-200 btn-touch">
+              <i class="fas fa-sync-alt mr-1"></i> Refresh
+            </button>
+          </div>
         </div>
 
         <!-- Result Message -->
-        <p id="result" class="text-green-600 font-semibold text-sm mt-3 min-h-[24px]"></p>
+        <div id="result" class="mt-3 p-3 rounded-lg hidden">
+          <!-- Message akan muncul di sini -->
+        </div>
 
-        <!-- Info -->
+        <!-- Quick Stats -->
         <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
-          <p class="text-sm text-blue-800 font-medium mb-1">ℹ️ Informasi</p>
-          <p class="text-xs text-blue-700">• Row 1 = Header, Row 2 = Data pertama siswa</p>
-          <p class="text-xs text-blue-700">• Kolom 3-33 = Tanggal 1-31 (bulan berjalan)</p>
-          <p class="text-xs text-blue-700">• Tabel otomatis filter sesuai pilihan</p>
+          <p class="text-sm text-blue-800 font-medium mb-2">
+            <i class="fas fa-info-circle mr-1"></i>
+            Info Cepat
+          </p>
+          <div class="grid grid-cols-2 gap-2">
+            <div class="text-center p-2 bg-white rounded">
+              <p class="text-xs text-gray-500">Total Siswa</p>
+              <p id="totalSiswa" class="font-bold text-lg">0</p>
+            </div>
+            <div class="text-center p-2 bg-white rounded">
+              <p class="text-xs text-gray-500">Total Kelas</p>
+              <p id="totalKelas" class="font-bold text-lg">0</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Main Content / Tabel -->
-    <div class="lg:col-span-3">
-      <div class="bg-white rounded-xl shadow p-5 h-full">
+    <div class="lg:w-3/4 w-full">
+      <div class="bg-white rounded-xl shadow-lg p-4 md:p-5 h-full">
         <!-- Tabel Header -->
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-          <div>
-            <h2 class="text-xl font-bold text-gray-800 mb-1 flex items-center">
-              <span class="bg-green-100 p-2 rounded-lg mr-2">📋</span>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5">
+          <div class="mb-3 sm:mb-0">
+            <h2 class="text-xl font-bold text-gray-800 mb-1">
+              <i class="fas fa-table text-green-600 mr-2"></i>
               Data Absensi
             </h2>
             <div class="text-sm text-gray-600">
               <span id="kelasDisplay" class="font-bold text-blue-600">Semua Kelas</span>
               <span id="siswaDisplay" class="ml-2 text-gray-500"></span>
+              <span id="dataCount" class="ml-2 text-gray-400">(0 data)</span>
             </div>
           </div>
-          <div class="mt-3 sm:mt-0 flex space-x-2">
-            <button onclick="toggleView()" id="toggleViewBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium py-2 px-4 rounded-lg transition">
-              Tampilkan Semua
+          <div class="flex space-x-2 mobile-full">
+            <button onclick="toggleView()" id="toggleViewBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium py-2 px-3 rounded-lg transition btn-touch">
+              <i class="fas fa-eye mr-1"></i>
+              <span class="hidden sm:inline">Tampilkan Semua</span>
+              <span class="sm:hidden">Semua</span>
             </button>
-            <button onclick="loadData()" class="bg-green-100 hover:bg-green-200 text-green-700 text-sm font-medium py-2 px-4 rounded-lg transition flex items-center">
-              <span class="mr-2">🔄</span>
-              Refresh Data
+            <button onclick="exportData()" class="bg-purple-100 hover:bg-purple-200 text-purple-700 text-sm font-medium py-2 px-3 rounded-lg transition btn-touch">
+              <i class="fas fa-download"></i>
+              <span class="hidden sm:inline ml-1">Export</span>
             </button>
           </div>
         </div>
 
+        <!-- Filter Badges (Mobile friendly) -->
+        <div id="filterBadges" class="mb-4 flex flex-wrap gap-2">
+          <!-- Badges akan muncul di sini -->
+        </div>
+
         <!-- Tabel Container -->
         <div class="border border-gray-200 rounded-lg overflow-hidden">
-          <div class="overflow-x-auto scrollbar-thin max-h-[500px]">
+          <div class="overflow-x-auto scrollbar-thin max-h-[60vh]">
             <table id="sheetTable" class="min-w-full divide-y divide-gray-200">
               <!-- Tabel akan diisi otomatis -->
             </table>
           </div>
           
           <!-- Empty State -->
-          <div id="emptyState" class="hidden p-8 text-center">
-            <div class="text-gray-400 text-4xl mb-3">📭</div>
+          <div id="emptyState" class="hidden p-6 text-center">
+            <div class="text-gray-300 text-5xl mb-3">
+              <i class="fas fa-clipboard-list"></i>
+            </div>
             <p class="text-gray-500 font-medium">Tidak ada data untuk ditampilkan</p>
             <p class="text-gray-400 text-sm mt-1">Pilih kelas atau siswa untuk melihat data</p>
+            <button onclick="loadData(true)" class="mt-4 bg-blue-100 hover:bg-blue-200 text-blue-700 font-medium py-2 px-4 rounded-lg transition">
+              <i class="fas fa-sync-alt mr-1"></i> Muat Ulang Data
+            </button>
           </div>
         </div>
 
-        <!-- Tabel Info Footer -->
-        <div class="mt-4 flex flex-wrap justify-between items-center text-xs text-gray-500">
+        <!-- Table Pagination (Mobile) -->
+        <div id="tablePagination" class="mt-4 flex justify-between items-center text-sm text-gray-600">
           <div class="flex items-center">
-            <div class="w-3 h-3 bg-green-100 rounded mr-2"></div>
-            <span>MASUK</span>
-            <div class="w-3 h-3 bg-yellow-100 rounded mx-3 ml-4"></div>
-            <span>IZIN/SAKIT</span>
-            <div class="w-3 h-3 bg-blue-100 rounded mx-3"></div>
-            <span>KOSONG</span>
+            <button onclick="prevPage()" class="p-2 rounded-lg hover:bg-gray-100">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <span class="mx-3">
+              Halaman <span id="currentPage">1</span> dari <span id="totalPages">1</span>
+            </span>
+            <button onclick="nextPage()" class="p-2 rounded-lg hover:bg-gray-100">
+              <i class="fas fa-chevron-right"></i>
+            </button>
           </div>
-          <div id="rowCount" class="mt-2 sm:mt-0">0 data ditampilkan</div>
+          <div class="text-xs">
+            <i class="fas fa-history mr-1"></i>
+            <span id="lastUpdated">Baru saja dimuat</span>
+          </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Toast Notification -->
+<div id="successToast" class="fixed bottom-4 right-4 bg-green-500 text-white p-4 rounded-lg shadow-lg transform translate-y-full transition-transform duration-300 z-50 max-w-sm">
+  <div class="flex items-center">
+    <i class="fas fa-check-circle text-2xl mr-3"></i>
+    <div>
+      <p class="font-bold">Berhasil!</p>
+      <p id="toastMessage" class="text-sm">Data berhasil diperbarui</p>
     </div>
   </div>
 </div>
@@ -167,22 +295,44 @@ let currentKelas = "";
 let currentSiswa = "";
 let showAllData = false;
 let rowMapping = {};
+let currentPage = 1;
+const itemsPerPage = 10;
+
+// Mobile menu handlers
+document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+  document.getElementById('sidebarForm').classList.remove('-translate-x-full');
+  document.getElementById('mobileSidebarOverlay').classList.remove('hidden');
+});
+
+document.getElementById('closeSidebarBtn').addEventListener('click', closeMobileSidebar);
+document.getElementById('mobileSidebarOverlay').addEventListener('click', closeMobileSidebar);
+
+function closeMobileSidebar() {
+  document.getElementById('sidebarForm').classList.add('-translate-x-full');
+  document.getElementById('mobileSidebarOverlay').classList.add('hidden');
+}
 
 // Load data saat awal
 window.onload = async function() {
-  await loadData();
+  await loadData(false);
+  
+  // Handle back button on mobile
+  window.addEventListener('popstate', function() {
+    closeMobileSidebar();
+  });
 };
 
-// Load data
-async function loadData() {
+// Load data (tidak reset form)
+async function loadData(showLoading = true) {
   try {
-    document.getElementById("result").innerText = "Memuat data...";
+    if (showLoading) {
+      showLoadingState(true);
+    }
     
     const res = await fetch(API_URL);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     
     const data = await res.json();
-    console.log("Data loaded:", data);
     
     // Reorder data: pindah nama dan kelas ke depan
     allData = data.map(row => {
@@ -190,47 +340,68 @@ async function loadData() {
       return { 
         nama, 
         kelas, 
-        ...rest,
-        _originalData: row // Simpan data asli untuk referensi
+        ...rest
       };
     });
     
-    // Generate row mapping
-    rowMapping = {};
-    allData.forEach((item, index) => {
-      if (item.nama) {
-        rowMapping[item.nama] = index + 2; // Row 1 header, row 2 data pertama
-      }
+    // Update stats
+    updateStats();
+    
+    // Update kelas filter tanpa reset pilihan
+    updateKelasFilter();
+    
+    // Update siswa filter berdasarkan kelas yang dipilih
+    updateSiswaFilter();
+    
+    // Update kolom filter
+    updateKolomFilter();
+    
+    // Render tabel dengan data terbaru
+    renderFilteredTable();
+    
+    // Update last updated time
+    document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString('id-ID', {
+      hour: '2-digit',
+      minute: '2-digit'
     });
     
-    // Update UI
-    populateKelasFilter(allData);
-    populateKolomFilter();
-    
-    // Reset view
-    showAllData = false;
-    document.getElementById("toggleViewBtn").innerText = "Tampilkan Semua";
-    
-    // Render tabel awal
-    renderFilteredTable();
-    document.getElementById("result").innerText = "";
+    showToast('Data berhasil dimuat ulang', 'success');
     
   } catch(e) {
     console.error("Error loading data:", e);
-    document.getElementById("result").innerText = "❌ Gagal memuat data";
+    showToast('Gagal memuat data', 'error');
+  } finally {
+    if (showLoading) {
+      showLoadingState(false);
+    }
   }
 }
 
-// Populate kelas filter
-function populateKelasFilter(data) {
+// Update stats
+function updateStats() {
+  const totalSiswa = new Set(allData.map(d => d.nama)).size;
+  const totalKelas = new Set(allData.map(d => d.kelas).filter(k => k && k !== '-')).size;
+  
+  document.getElementById('totalSiswa').textContent = totalSiswa;
+  document.getElementById('totalKelas').textContent = totalKelas;
+}
+
+// Update kelas filter (tanpa reset)
+function updateKelasFilter() {
   const kelasSet = new Set();
-  data.forEach(item => {
+  allData.forEach(item => {
     if (item.kelas && item.kelas !== "-" && item.kelas !== "") {
       kelasSet.add(item.kelas);
     }
   });
   
   const select = document.getElementById("kelasFilter");
+  const currentValue = select.value;
+  
+  // Simpan HTML sementara
+  const tempHTML = select.innerHTML;
+  
+  // Clear dan rebuild
   select.innerHTML = '<option value="">-- Pilih Kelas --</option>';
   
   Array.from(kelasSet).sort().forEach(k => {
@@ -239,47 +410,97 @@ function populateKelasFilter(data) {
     opt.innerText = k;
     select.appendChild(opt);
   });
+  
+  // Kembalikan nilai yang dipilih sebelumnya
+  if (currentValue && Array.from(kelasSet).includes(currentValue)) {
+    select.value = currentValue;
+  }
 }
 
-// Populate kolom filter
-function populateKolomFilter() {
+// Update siswa filter
+function updateSiswaFilter() {
+  const siswaSelect = document.getElementById("siswaFilter");
+  const currentValue = siswaSelect.value;
+  const currentNama = siswaSelect.options[siswaSelect.selectedIndex]?.dataset.nama || "";
+  
+  siswaSelect.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+  
+  let filteredSiswa = allData;
+  if (currentKelas) {
+    filteredSiswa = allData.filter(d => d.kelas === currentKelas);
+  }
+  
+  // Generate row mapping baru
+  rowMapping = {};
+  allData.forEach((item, index) => {
+    if (item.nama) {
+      rowMapping[item.nama] = index + 2;
+    }
+  });
+  
+  filteredSiswa.forEach(s => {
+    const opt = document.createElement("option");
+    const rowNum = rowMapping[s.nama] || 0;
+    opt.value = rowNum;
+    opt.innerText = s.nama;
+    opt.dataset.nama = s.nama;
+    siswaSelect.appendChild(opt);
+  });
+  
+  // Coba kembalikan pilihan siswa sebelumnya
+  if (currentNama && rowMapping[currentNama]) {
+    for(let option of siswaSelect.options) {
+      if(option.dataset.nama === currentNama) {
+        siswaSelect.value = option.value;
+        currentSiswa = currentNama;
+        break;
+      }
+    }
+  }
+}
+
+// Update kolom filter
+function updateKolomFilter() {
   const select = document.getElementById("col");
+  const currentValue = select.value;
+  
   select.innerHTML = '<option value="">-- Pilih Tanggal --</option>';
   
   for(let i = 3; i <= 33; i++) {
     const opt = document.createElement("option");
     opt.value = i;
-    opt.innerText = `Hari ${i-2} (Kolom ${i})`;
+    opt.innerText = `Hari ${i-2}`;
     select.appendChild(opt);
+  }
+  
+  // Kembalikan nilai yang dipilih
+  if (currentValue) {
+    select.value = currentValue;
   }
 }
 
 // Ketika kelas dipilih
 document.getElementById("kelasFilter").onchange = function() {
   currentKelas = this.value;
-  const siswaSelect = document.getElementById("siswaFilter");
-  siswaSelect.innerHTML = '<option value="">-- Pilih Siswa --</option>';
   currentSiswa = "";
   
   // Update display
   document.getElementById("kelasDisplay").innerText = currentKelas || "Semua Kelas";
   document.getElementById("siswaDisplay").innerText = "";
   
-  if(currentKelas) {
-    // Filter siswa berdasarkan kelas
-    const filteredSiswa = allData.filter(d => d.kelas === currentKelas);
-    
-    filteredSiswa.forEach(s => {
-      const opt = document.createElement("option");
-      const rowNum = rowMapping[s.nama] || 0;
-      opt.value = rowNum;
-      opt.innerText = s.nama;
-      opt.dataset.nama = s.nama;
-      siswaSelect.appendChild(opt);
-    });
-  }
+  // Update siswa dropdown
+  updateSiswaFilter();
   
+  // Update filter badges
+  updateFilterBadges();
+  
+  // Render tabel
   renderFilteredTable();
+  
+  // Close sidebar on mobile setelah memilih
+  if (window.innerWidth < 1024) {
+    closeMobileSidebar();
+  }
 };
 
 // Ketika siswa dipilih
@@ -290,13 +511,70 @@ document.getElementById("siswaFilter").onchange = function() {
   // Update display
   document.getElementById("siswaDisplay").innerText = currentSiswa ? `- ${currentSiswa}` : "";
   
+  // Update filter badges
+  updateFilterBadges();
+  
+  // Render tabel
   renderFilteredTable();
 };
+
+// Update filter badges
+function updateFilterBadges() {
+  const badgesContainer = document.getElementById("filterBadges");
+  badgesContainer.innerHTML = "";
+  
+  if (currentKelas) {
+    const badge = document.createElement("div");
+    badge.className = "bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1.5 rounded-full flex items-center";
+    badge.innerHTML = `
+      <i class="fas fa-graduation-cap mr-1"></i>
+      ${currentKelas}
+      <button onclick="clearFilter('kelas')" class="ml-2 text-blue-600 hover:text-blue-800">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+    badgesContainer.appendChild(badge);
+  }
+  
+  if (currentSiswa) {
+    const badge = document.createElement("div");
+    badge.className = "bg-green-100 text-green-800 text-xs font-medium px-3 py-1.5 rounded-full flex items-center";
+    badge.innerHTML = `
+      <i class="fas fa-user mr-1"></i>
+      ${currentSiswa}
+      <button onclick="clearFilter('siswa')" class="ml-2 text-green-600 hover:text-green-800">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+    badgesContainer.appendChild(badge);
+  }
+}
+
+// Clear filter
+function clearFilter(type) {
+  if (type === 'kelas') {
+    document.getElementById("kelasFilter").value = "";
+    currentKelas = "";
+    document.getElementById("kelasDisplay").innerText = "Semua Kelas";
+    updateSiswaFilter();
+  } else if (type === 'siswa') {
+    document.getElementById("siswaFilter").value = "";
+    currentSiswa = "";
+    document.getElementById("siswaDisplay").innerText = "";
+  }
+  
+  updateFilterBadges();
+  renderFilteredTable();
+}
 
 // Toggle view
 function toggleView() {
   showAllData = !showAllData;
-  document.getElementById("toggleViewBtn").innerText = showAllData ? "Tampilkan Filter" : "Tampilkan Semua";
+  const btn = document.getElementById("toggleViewBtn");
+  btn.innerHTML = showAllData ? 
+    '<i class="fas fa-filter mr-1"></i><span class="hidden sm:inline">Tampilkan Filter</span><span class="sm:hidden">Filter</span>' :
+    '<i class="fas fa-eye mr-1"></i><span class="hidden sm:inline">Tampilkan Semua</span><span class="sm:hidden">Semua</span>';
+  
   renderFilteredTable();
 }
 
@@ -306,51 +584,89 @@ function renderFilteredTable() {
   
   if (!showAllData) {
     if (currentSiswa) {
-      // Tampilkan hanya siswa yang dipilih
       filteredData = allData.filter(d => d.nama === currentSiswa);
     } else if (currentKelas) {
-      // Tampilkan semua siswa di kelas yang dipilih
       filteredData = allData.filter(d => d.kelas === currentKelas);
     }
   }
   
-  // Update row count
-  document.getElementById("rowCount").innerText = `${filteredData.length} data ditampilkan`;
+  // Update data count
+  document.getElementById("dataCount").textContent = `(${filteredData.length} data)`;
+  
+  // Pagination
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  if (currentPage > totalPages && totalPages > 0) {
+    currentPage = totalPages;
+  }
+  
+  document.getElementById("totalPages").textContent = totalPages || 1;
+  document.getElementById("currentPage").textContent = currentPage;
+  
+  // Paginate data
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedData = filteredData.slice(startIndex, endIndex);
   
   // Render tabel
-  renderTable(filteredData);
+  renderTable(paginatedData, filteredData.length);
+}
+
+// Navigation
+function prevPage() {
+  if (currentPage > 1) {
+    currentPage--;
+    renderFilteredTable();
+  }
+}
+
+function nextPage() {
+  const totalPages = Math.ceil(
+    (currentSiswa ? allData.filter(d => d.nama === currentSiswa) :
+     currentKelas ? allData.filter(d => d.kelas === currentKelas) :
+     allData).length / itemsPerPage
+  );
+  
+  if (currentPage < totalPages) {
+    currentPage++;
+    renderFilteredTable();
+  }
 }
 
 // Render tabel
-function renderTable(data) {
+function renderTable(data, totalLength) {
   const table = document.getElementById("sheetTable");
   const emptyState = document.getElementById("emptyState");
   
   if(!data || data.length === 0) {
     table.innerHTML = "";
     emptyState.classList.remove("hidden");
+    document.getElementById("tablePagination").classList.add("hidden");
     return;
   }
   
   emptyState.classList.add("hidden");
+  document.getElementById("tablePagination").classList.remove("hidden");
   table.innerHTML = "";
 
-  // Header - Ambil semua properti kecuali _originalData
+  // Header
   const sampleRow = data[0];
-  const headers = Object.keys(sampleRow).filter(key => key !== '_originalData');
-  
-  // Pastikan nama dan kelas di depan
+  const headers = Object.keys(sampleRow);
   const orderedHeaders = ['nama', 'kelas', ...headers.filter(h => h !== 'nama' && h !== 'kelas')];
   
   // Create header
   const thead = document.createElement("thead");
-  thead.className = "bg-gray-50 sticky top-0 z-10";
+  thead.className = "bg-gray-50";
   const trHead = document.createElement("tr");
   
-  orderedHeaders.forEach(h => {
+  orderedHeaders.forEach((h, index) => {
     const th = document.createElement("th");
     th.innerText = formatHeader(h);
-    th.className = "px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200";
+    th.className = "px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b border-gray-200 whitespace-nowrap";
+    
+    // Kolom nama dan kelas lebih lebar
+    if (h === 'nama') th.className += " w-1/4";
+    if (h === 'kelas') th.className += " w-1/6";
+    
     trHead.appendChild(th);
   });
   
@@ -363,24 +679,26 @@ function renderTable(data) {
   
   data.forEach((row, index) => {
     const tr = document.createElement("tr");
-    tr.className = index % 2 === 0 ? "bg-white" : "bg-gray-50 hover:bg-gray-100";
+    tr.className = index % 2 === 0 ? "bg-white hover:bg-gray-50" : "bg-gray-50 hover:bg-gray-100";
     
     orderedHeaders.forEach(col => {
       const td = document.createElement("td");
-      td.innerText = row[col] || "";
+      const value = row[col] || "";
+      td.innerText = value;
       
-      // Styling berdasarkan nilai
       if (col === 'nama' || col === 'kelas') {
-        td.className = "px-4 py-3 text-sm font-medium text-gray-900 whitespace-nowrap";
+        td.className = "px-3 py-3 text-sm font-medium text-gray-900 whitespace-nowrap";
         if (col === 'nama') td.classList.add("font-semibold");
       } else {
-        td.className = "px-4 py-3 text-sm text-gray-700 whitespace-nowrap";
+        td.className = "px-3 py-3 text-sm text-center whitespace-nowrap";
         
         // Warna untuk status
-        if (row[col] === "MASUK") {
-          td.className = "px-4 py-3 text-sm text-gray-700 whitespace-nowrap bg-green-50";
-        } else if (row[col] && row[col] !== "" && row[col] !== "MASUK") {
-          td.className = "px-4 py-3 text-sm text-gray-700 whitespace-nowrap bg-yellow-50";
+        if (value === "MASUK") {
+          td.className += " bg-green-50 text-green-800";
+        } else if (value && value !== "" && value !== "MASUK") {
+          td.className += " bg-yellow-50 text-yellow-800";
+        } else {
+          td.className += " bg-gray-50 text-gray-500";
         }
       }
       
@@ -395,74 +713,57 @@ function renderTable(data) {
 
 // Format header
 function formatHeader(header) {
-  const map = {
-    'nama': 'Nama Siswa',
-    'kelas': 'Kelas',
-    '1': 'Hari 1',
-    '2': 'Hari 2',
-    '3': 'Hari 3',
-    '4': 'Hari 4',
-    '5': 'Hari 5',
-    '6': 'Hari 6',
-    '7': 'Hari 7',
-    '8': 'Hari 8',
-    '9': 'Hari 9',
-    '10': 'Hari 10',
-    '11': 'Hari 11',
-    '12': 'Hari 12',
-    '13': 'Hari 13',
-    '14': 'Hari 14',
-    '15': 'Hari 15',
-    '16': 'Hari 16',
-    '17': 'Hari 17',
-    '18': 'Hari 18',
-    '19': 'Hari 19',
-    '20': 'Hari 20',
-    '21': 'Hari 21',
-    '22': 'Hari 22',
-    '23': 'Hari 23',
-    '24': 'Hari 24',
-    '25': 'Hari 25',
-    '26': 'Hari 26',
-    '27': 'Hari 27',
-    '28': 'Hari 28',
-    '29': 'Hari 29',
-    '30': 'Hari 30',
-    '31': 'Hari 31'
-  };
-  
-  return map[header] || header;
+  if (header === 'nama') return 'Nama';
+  if (header === 'kelas') return 'Kelas';
+  if (/^\d+$/.test(header)) return header;
+  return header;
 }
 
 // Reset form
 function resetForm() {
   document.getElementById("value").value = "";
-  document.getElementById("result").innerText = "";
   document.getElementById("col").value = "";
+  document.getElementById("result").innerHTML = "";
+  showToast('Form berhasil direset', 'info');
 }
 
-// Update cell
+// Update cell - TANPA REFRESH FULL
 async function updateCell() {
   const siswaSelect = document.getElementById("siswaFilter");
   const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
   const _row = Number(siswaSelect.value);
   const col = Number(document.getElementById("col").value);
-  const value = document.getElementById("value").value;
+  const value = document.getElementById("value").value.trim();
   const siswaName = selectedOption?.dataset.nama || "";
+  const alasanInput = document.getElementById("value");
 
-  if(!_row || !col || !value || !siswaName) {
-    alert("Harap pilih siswa, tanggal, dan isi alasan terlebih dahulu!");
+  // Validasi
+  if(!_row || !siswaName) {
+    showToast('Harap pilih siswa terlebih dahulu', 'error');
+    return;
+  }
+  
+  if(!col) {
+    showToast('Harap pilih tanggal terlebih dahulu', 'error');
+    return;
+  }
+  
+  if(!value) {
+    showToast('Harap isi alasan terlebih dahulu', 'error');
+    alasanInput.focus();
     return;
   }
 
-  if(col < 3 || col > 33) {
-    alert("Kolom harus antara 3-33!");
-    return;
-  }
+  // Tampilkan loading
+  const updateBtn = document.getElementById("updateBtn");
+  const updateText = document.getElementById("updateText");
+  const originalText = updateText.textContent;
+  
+  updateBtn.disabled = true;
+  updateText.textContent = "Mengirim...";
+  updateBtn.innerHTML = '<div class="loader"></div> Mengirim...';
 
   try {
-    document.getElementById("result").innerText = "⏳ Mengirim data...";
-    
     // Kirim data
     const res = await fetch(API_URL, {
       method: "POST",
@@ -473,30 +774,106 @@ async function updateCell() {
     const text = await res.text();
     console.log("Update response:", text);
     
-    document.getElementById("result").innerText = "✅ Data berhasil dikirim!";
+    // Update data lokal (simulasi)
+    updateLocalData(siswaName, col, value);
     
-    // Refresh data setelah 1 detik
-    setTimeout(() => {
-      loadData();
-      if(currentKelas) {
-        document.getElementById("kelasFilter").value = currentKelas;
-        document.getElementById("kelasFilter").onchange();
-      }
-      if(currentSiswa) {
-        const siswaSelect = document.getElementById("siswaFilter");
-        for(let option of siswaSelect.options) {
-          if(option.dataset.nama === currentSiswa) {
-            siswaSelect.value = option.value;
-            break;
-          }
-        }
-      }
-    }, 1000);
+    // Reset hanya input alasan, biar pilihan tetap
+    alasanInput.value = "";
+    
+    // Tampilkan notifikasi
+    showToast(`Data ${siswaName} berhasil diperbarui`, 'success');
+    
+    // Update tampilan tabel tanpa refresh full
+    renderFilteredTable();
     
   } catch(e) {
     console.error("Update error:", e);
-    document.getElementById("result").innerText = "❌ Gagal mengirim data";
+    showToast('Gagal mengirim data', 'error');
+  } finally {
+    // Restore button
+    updateBtn.disabled = false;
+    updateText.textContent = originalText;
+    updateBtn.innerHTML = '<i class="fas fa-check mr-2"></i>' + originalText;
   }
+}
+
+// Update data lokal (simulasi perubahan)
+function updateLocalData(siswaName, col, value) {
+  const index = allData.findIndex(d => d.nama === siswaName);
+  if (index !== -1) {
+    allData[index][col] = value;
+    
+    // Juga update di filtered view
+    if (currentSiswa === siswaName) {
+      // Jika siswa ini sedang dilihat, update langsung
+      renderFilteredTable();
+    }
+  }
+}
+
+// Export data
+function exportData() {
+  let dataToExport = allData;
+  
+  if (currentSiswa) {
+    dataToExport = allData.filter(d => d.nama === currentSiswa);
+  } else if (currentKelas) {
+    dataToExport = allData.filter(d => d.kelas === currentKelas);
+  }
+  
+  // Simple export to JSON
+  const dataStr = JSON.stringify(dataToExport, null, 2);
+  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+  
+  const exportFileDefaultName = `absensi-${currentKelas || 'semua'}-${new Date().toISOString().split('T')[0]}.json`;
+  
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('download', exportFileDefaultName);
+  linkElement.click();
+  
+  showToast('Data berhasil diunduh', 'success');
+}
+
+// Show/hide loading
+function showLoadingState(show) {
+  const refreshBtns = document.querySelectorAll('button:has(.fa-sync-alt)');
+  refreshBtns.forEach(btn => {
+    if (show) {
+      btn.disabled = true;
+      btn.innerHTML = '<div class="loader"></div>';
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-sync-alt mr-1"></i> Refresh';
+    }
+  });
+}
+
+// Show toast notification
+function showToast(message, type = 'info') {
+  const toast = document.getElementById('successToast');
+  const toastMessage = document.getElementById('toastMessage');
+  
+  // Set warna berdasarkan type
+  const colors = {
+    success: 'bg-green-500',
+    error: 'bg-red-500',
+    info: 'bg-blue-500',
+    warning: 'bg-yellow-500'
+  };
+  
+  toast.className = toast.className.replace(/bg-(green|red|blue|yellow)-500/g, '');
+  toast.classList.add(colors[type] || 'bg-blue-500');
+  
+  toastMessage.textContent = message;
+  
+  // Show toast
+  toast.classList.remove('translate-y-full');
+  
+  // Auto hide after 3 seconds
+  setTimeout(() => {
+    toast.classList.add('translate-y-full');
+  }, 3000);
 }
 </script>
 </body>
