@@ -7,143 +7,145 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    /* iPhone-like Styles */
+    /* Custom iOS-like styles */
+    :root {
+      --primary: #007AFF;
+      --secondary: #5856D6;
+      --success: #34C759;
+      --danger: #FF3B30;
+      --warning: #FF9500;
+      --info: #5AC8FA;
+      --light: #F2F2F7;
+      --dark: #1C1C1E;
+    }
+
+    /* Smooth scrolling and iOS-like animations */
+    * {
+      -webkit-tap-highlight-color: transparent;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif;
-      background: #F2F2F7;
-      color: #000;
-      -webkit-font-smoothing: antialiased;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #F5F7FA 0%, #E4EDF5 100%);
+      color: #1C1C1E;
     }
 
-    /* iPhone Navigation */
-    .iphone-nav {
-      background: #FFFFFF;
-      border-bottom: 1px solid #C6C6C8;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+    /* Glassmorphism effect */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.05),
+        0 2px 8px rgba(0, 0, 0, 0.03);
     }
 
-    /* iPhone Card */
-    .iphone-card {
-      background: #FFFFFF;
-      border-radius: 12px;
-      border: 1px solid #E5E5EA;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    .glass-navbar {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     }
 
-    /* iPhone Buttons */
-    .iphone-btn {
-      background: #007AFF;
+    /* iOS-like buttons */
+    .ios-btn {
+      background: linear-gradient(180deg, #007AFF 0%, #0056D6 100%);
       color: white;
-      border-radius: 10px;
-      font-weight: 500;
-      font-size: 16px;
       border: none;
-      padding: 12px 20px;
-    }
-
-    .iphone-btn-secondary {
-      background: #F2F2F7;
-      color: #007AFF;
-      border: 1px solid #C7C7CC;
-    }
-
-    .iphone-btn-success {
-      background: #34C759;
-      color: white;
-    }
-
-    /* iPhone Form Elements */
-    .iphone-select {
-      background: #FFFFFF;
-      border: 1.5px solid #C7C7CC;
-      border-radius: 8px;
-      padding: 12px 16px;
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-weight: 600;
       font-size: 16px;
-      width: 100%;
+      letter-spacing: -0.2px;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 4px 12px rgba(0, 122, 255, 0.15),
+        0 2px 4px rgba(0, 122, 255, 0.1);
     }
 
-    .iphone-select:focus {
+    .ios-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 
+        0 6px 20px rgba(0, 122, 255, 0.2),
+        0 4px 8px rgba(0, 122, 255, 0.15);
+    }
+
+    .ios-btn:active {
+      transform: translateY(0);
+      box-shadow: 
+        0 2px 6px rgba(0, 122, 255, 0.1),
+        0 1px 2px rgba(0, 122, 255, 0.05);
+    }
+
+    .ios-btn-secondary {
+      background: linear-gradient(180deg, #F2F2F7 0%, #E5E5EA 100%);
+      color: #007AFF;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    /* iOS-like form elements */
+    .ios-select, .ios-input {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1.5px solid #C7C7CC;
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .ios-select:focus, .ios-input:focus {
       outline: none;
       border-color: #007AFF;
+      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
     }
 
-    /* iPhone Table */
-    .iphone-table {
-      border-collapse: collapse;
-      width: 100%;
-    }
-
-    .iphone-table th {
-      background: #F2F2F7;
-      color: #8E8E93;
-      font-weight: 600;
+    /* iOS-like badges */
+    .ios-badge {
+      background: rgba(0, 122, 255, 0.1);
+      color: #007AFF;
+      border-radius: 20px;
+      padding: 6px 14px;
       font-size: 13px;
-      padding: 12px 8px;
-      text-align: center;
-      border-bottom: 1px solid #C6C6C8;
-      white-space: nowrap;
-      position: sticky;
-      left: 0;
-    }
-
-    /* Sticky columns for name and class */
-    .sticky-name {
-      position: sticky;
-      left: 0;
-      background: white;
-      z-index: 1;
-      border-right: 1px solid #E5E5EA;
-    }
-
-    .sticky-class {
-      position: sticky;
-      left: 150px;
-      background: white;
-      z-index: 1;
-      border-right: 1px solid #E5E5EA;
-    }
-
-    /* Make header sticky */
-    .iphone-table thead th {
-      position: sticky;
-      top: 0;
-      z-index: 2;
-    }
-
-    .iphone-table td {
-      padding: 14px 8px;
-      border-bottom: 1px solid #E5E5EA;
-      font-size: 14px;
-      text-align: center;
-      min-width: 50px;
-    }
-
-    /* iPhone Status Badges */
-    .status-cell {
-      display: inline-block;
-      padding: 6px 8px;
-      border-radius: 6px;
-      font-size: 12px;
       font-weight: 500;
-      min-width: 36px;
-      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
 
-    .status-hadir { background: #DDFFE6; color: #007A52; }
-    .status-izin { background: #FFF4D9; color: #A45B00; }
-    .status-sakit { background: #FFE5E5; color: #D70015; }
-    .status-alpha { background: #F2F2F7; color: #8E8E93; }
+    /* Custom scrollbar iOS-like */
+    .ios-scrollbar {
+      scrollbar-width: thin;
+      scrollbar-color: #C7C7CC transparent;
+    }
 
-    /* Loading */
-    .loading {
-      border: 2px solid #F2F2F7;
-      border-top: 2px solid #007AFF;
+    .ios-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+
+    .ios-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 2px;
+    }
+
+    .ios-scrollbar::-webkit-scrollbar-thumb {
+      background: #C7C7CC;
+      border-radius: 2px;
+    }
+
+    .ios-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #8E8E93;
+    }
+
+    /* Loading animation */
+    .ios-loader {
+      width: 20px;
+      height: 20px;
+      border: 2.5px solid rgba(0, 122, 255, 0.1);
+      border-top: 2.5px solid #007AFF;
       border-radius: 50%;
-      width: 18px;
-      height: 18px;
       animation: spin 1s linear infinite;
-      display: inline-block;
-      margin-right: 8px;
     }
 
     @keyframes spin {
@@ -151,74 +153,225 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Custom scrollbar for table */
-    .table-container {
-      overflow-x: auto;
-      max-height: 500px;
+    /* iOS-like table */
+    .ios-table {
+      border-collapse: separate;
+      border-spacing: 0;
     }
 
-    .table-container::-webkit-scrollbar {
-      height: 6px;
-      width: 6px;
-    }
-
-    .table-container::-webkit-scrollbar-track {
+    .ios-table th {
       background: #F2F2F7;
-      border-radius: 3px;
+      color: #8E8E93;
+      font-weight: 600;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
-    .table-container::-webkit-scrollbar-thumb {
-      background: #C7C7CC;
-      border-radius: 3px;
+    .ios-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+      transition: background 0.2s ease;
     }
 
-    /* Mobile Responsive */
+    .ios-table tr:hover td {
+      background: rgba(0, 122, 255, 0.03);
+    }
+
+    /* Status colors iOS-like */
+    .status-masuk {
+      background: rgba(52, 199, 89, 0.1);
+      color: #34C759;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-weight: 600;
+    }
+
+    .status-p {
+      background: rgba(255, 149, 0, 0.1);
+      color: #FF9500;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-weight: 600;
+    }
+
+    .status-s {
+      background: rgba(255, 59, 48, 0.1);
+      color: #FF3B30;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-weight: 600;
+    }
+
+    .status-i {
+      background: rgba(90, 200, 250, 0.1);
+      color: #5AC8FA;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-weight: 600;
+    }
+
+    .status-a {
+      background: rgba(142, 142, 147, 0.1);
+      color: #8E8E93;
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-weight: 600;
+    }
+
+    /* iOS-like toast */
+    .ios-toast {
+      background: rgba(40, 40, 40, 0.95);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      color: white;
+      border-radius: 14px;
+      padding: 16px 20px;
+      box-shadow: 
+        0 12px 32px rgba(0, 0, 0, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.1);
+      animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUp {
+      from {
+        transform: translateY(100px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    /* Mobile optimizations */
     @media (max-width: 640px) {
       .mobile-full {
         width: 100% !important;
       }
       
-      .iphone-table {
-        font-size: 13px;
+      select, input {
+        font-size: 16px !important;
       }
       
-      .iphone-table th,
-      .iphone-table td {
-        padding: 10px 6px;
-        min-width: 45px;
+      .ios-table {
+        font-size: 14px;
       }
       
-      .status-cell {
-        padding: 4px 6px;
-        font-size: 11px;
-        min-width: 32px;
-      }
-      
-      .sticky-class {
-        left: 120px;
+      .ios-table th,
+      .ios-table td {
+        padding: 10px 12px;
       }
     }
 
-    /* Fix for iOS zoom on input */
-    select, input {
-      font-size: 16px !important;
+    /* iOS-like switch */
+    .ios-switch {
+      position: relative;
+      display: inline-block;
+      width: 52px;
+      height: 32px;
+    }
+
+    .ios-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .ios-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #E5E5EA;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .ios-slider:before {
+      position: absolute;
+      content: "";
+      height: 28px;
+      width: 28px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    input:checked + .ios-slider {
+      background-color: #34C759;
+    }
+
+    input:checked + .ios-slider:before {
+      transform: translateX(20px);
+    }
+
+    /* Floating action button iOS-like */
+    .fab {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 56px;
+      height: 56px;
+      border-radius: 28px;
+      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+      color: white;
+      border: none;
+      box-shadow: 
+        0 8px 24px rgba(0, 122, 255, 0.25),
+        0 4px 12px rgba(0, 122, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 1000;
+    }
+
+    .fab:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 
+        0 12px 32px rgba(0, 122, 255, 0.3),
+        0 6px 16px rgba(0, 122, 255, 0.25);
+    }
+
+    .fab:active {
+      transform: translateY(0) scale(1);
+      box-shadow: 
+        0 6px 20px rgba(0, 122, 255, 0.2),
+        0 3px 8px rgba(0, 122, 255, 0.15);
     }
   </style>
 </head>
 <body class="min-h-screen">
-<!-- iPhone Navigation -->
-<div class="iphone-nav fixed top-0 left-0 right-0 z-50">
-  <div class="max-w-7xl mx-auto px-4">
-    <div class="flex items-center justify-between h-14">
-      <div class="flex items-center">
-        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
-          <i class="fas fa-calendar-alt text-white text-sm"></i>
+<!-- iOS-like Navbar -->
+<div class="glass-navbar fixed top-0 left-0 right-0 z-50">
+  <div class="container mx-auto px-4 py-3">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-8 h-8 bg-gradient-to-br from-[#007AFF] to-[#5856D6] rounded-lg flex items-center justify-center">
+          <i class="fas fa-calendar-check text-white text-sm"></i>
         </div>
-        <h1 class="font-bold text-lg">Absensi Siswa</h1>
+        <div>
+          <h1 class="font-bold text-lg text-[#1C1C1E]">Absensi Siswa</h1>
+          <p class="text-xs text-[#8E8E93]">Dashboard Presensi Digital</p>
+        </div>
       </div>
       <div class="flex items-center space-x-3">
-        <button onclick="loadData(true)" class="w-8 h-8 flex items-center justify-center text-blue-500">
+        <button onclick="loadData(true)" class="w-8 h-8 flex items-center justify-center text-[#007AFF] hover:bg-[#007AFF]/10 rounded-full transition">
           <i class="fas fa-sync-alt"></i>
+        </button>
+        <button onclick="exportData()" class="w-8 h-8 flex items-center justify-center text-[#007AFF] hover:bg-[#007AFF]/10 rounded-full transition">
+          <i class="fas fa-download"></i>
         </button>
       </div>
     </div>
@@ -226,260 +379,316 @@
 </div>
 
 <!-- Main Content -->
-<main class="pt-14 pb-8">
-  <div class="max-w-7xl mx-auto px-4">
-    <!-- Stats Summary -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-      <div class="iphone-card p-4">
-        <div class="flex items-center">
-          <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-            <i class="fas fa-users text-blue-500"></i>
-          </div>
+<div class="container mx-auto px-4 py-24">
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="glass-card rounded-2xl p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-[#8E8E93] mb-1">Total Siswa</p>
+          <p id="totalSiswa" class="text-2xl font-bold text-[#1C1C1E]">0</p>
+        </div>
+        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
+          <i class="fas fa-users text-white text-lg"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="glass-card rounded-2xl p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-[#8E8E93] mb-1">Total Kelas</p>
+          <p id="totalKelas" class="text-2xl font-bold text-[#1C1C1E]">0</p>
+        </div>
+        <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+          <i class="fas fa-graduation-cap text-white text-lg"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="glass-card rounded-2xl p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-[#8E8E93] mb-1">Hadir Hari Ini</p>
+          <p id="hadirHariIni" class="text-2xl font-bold text-[#1C1C1E]">0</p>
+        </div>
+        <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center">
+          <i class="fas fa-check-circle text-white text-lg"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="glass-card rounded-2xl p-5">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-[#8E8E93] mb-1">Tidak Hadir</p>
+          <p id="tidakHadir" class="text-2xl font-bold text-[#1C1C1E]">0</p>
+        </div>
+        <div class="w-12 h-12 bg-gradient-to-br from-rose-500 to-rose-600 rounded-xl flex items-center justify-center">
+          <i class="fas fa-user-times text-white text-lg"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col lg:flex-row gap-6">
+    <!-- Sidebar Form -->
+    <div class="lg:w-1/3 w-full">
+      <div class="glass-card rounded-2xl p-6 mb-6">
+        <div class="flex items-center justify-between mb-6">
           <div>
-            <p class="text-xs text-gray-500">Total Siswa</p>
-            <p id="totalSiswa" class="font-bold text-lg">0</p>
+            <h2 class="text-xl font-bold text-[#1C1C1E] mb-1">
+              <i class="fas fa-edit text-[#007AFF] mr-2"></i>
+              Update Presensi
+            </h2>
+            <p class="text-sm text-[#8E8E93]">Perbarui data ketidakhadiran</p>
+          </div>
+          <label class="ios-switch">
+            <input type="checkbox" id="toggleForm" checked>
+            <span class="ios-slider"></span>
+          </label>
+        </div>
+
+        <div id="formContainer" class="space-y-4">
+          <!-- Kelas Filter -->
+          <div>
+            <label class="block text-sm font-medium text-[#1C1C1E] mb-2">
+              <i class="fas fa-graduation-cap text-[#007AFF] mr-2"></i>
+              Pilih Kelas
+            </label>
+            <select id="kelasFilter" class="ios-select w-full">
+              <option value="">-- Semua Kelas --</option>
+            </select>
+          </div>
+
+          <!-- Siswa Filter -->
+          <div>
+            <label class="block text-sm font-medium text-[#1C1C1E] mb-2">
+              <i class="fas fa-user text-[#007AFF] mr-2"></i>
+              Pilih Siswa
+            </label>
+            <select id="siswaFilter" class="ios-select w-full">
+              <option value="">-- Semua Siswa --</option>
+            </select>
+          </div>
+
+          <!-- Tanggal -->
+          <div>
+            <label class="block text-sm font-medium text-[#1C1C1E] mb-2">
+              <i class="fas fa-calendar-alt text-[#007AFF] mr-2"></i>
+              Pilih Tanggal
+            </label>
+            <select id="col" class="ios-select w-full">
+              <option value="">-- Pilih Tanggal --</option>
+            </select>
+          </div>
+
+          <!-- Alasan -->
+          <div>
+            <label class="block text-sm font-medium text-[#1C1C1E] mb-2">
+              <i class="fas fa-sticky-note text-[#007AFF] mr-2"></i>
+              Status Kehadiran
+            </label>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="setStatus('MASUK')" class="py-3 px-4 bg-emerald-50 text-emerald-700 rounded-xl border border-emerald-100 hover:bg-emerald-100 transition flex items-center justify-center">
+                <i class="fas fa-check mr-2"></i> Hadir
+              </button>
+              <button onclick="setStatus('P')" class="py-3 px-4 bg-amber-50 text-amber-700 rounded-xl border border-amber-100 hover:bg-amber-100 transition flex items-center justify-center">
+                <i class="fas fa-home mr-2"></i> Izin
+              </button>
+              <button onclick="setStatus('S')" class="py-3 px-4 bg-rose-50 text-rose-700 rounded-xl border border-rose-100 hover:bg-rose-100 transition flex items-center justify-center">
+                <i class="fas fa-heartbeat mr-2"></i> Sakit
+              </button>
+              <button onclick="setStatus('A')" class="py-3 px-4 bg-gray-100 text-gray-700 rounded-xl border border-gray-200 hover:bg-gray-200 transition flex items-center justify-center">
+                <i class="fas fa-times mr-2"></i> Alpha
+              </button>
+            </div>
+            <input type="hidden" id="value">
+          </div>
+
+          <!-- Status Legend -->
+          <div class="mt-4 p-4 bg-[#F2F2F7] rounded-xl">
+            <p class="text-sm font-medium text-[#1C1C1E] mb-2">Legenda Status:</p>
+            <div class="grid grid-cols-2 gap-2">
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-emerald-500 rounded-full mr-2"></div>
+                <span class="text-xs text-[#8E8E93]">Hadir</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-amber-500 rounded-full mr-2"></div>
+                <span class="text-xs text-[#8E8E93]">Izin</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-rose-500 rounded-full mr-2"></div>
+                <span class="text-xs text-[#8E8E93]">Sakit</span>
+              </div>
+              <div class="flex items-center">
+                <div class="w-3 h-3 bg-gray-400 rounded-full mr-2"></div>
+                <span class="text-xs text-[#8E8E93]">Alpha</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex space-x-3 pt-4">
+            <button onclick="updateCell()" id="updateBtn" class="flex-1 ios-btn">
+              <i class="fas fa-paper-plane mr-2"></i>
+              <span id="updateText">Update</span>
+            </button>
+            <button onclick="resetForm()" class="ios-btn-secondary px-6 rounded-xl">
+              <i class="fas fa-redo"></i>
+            </button>
           </div>
         </div>
       </div>
-      
-      <div class="iphone-card p-4">
-        <div class="flex items-center">
-          <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-3">
-            <i class="fas fa-graduation-cap text-green-500"></i>
+
+      <!-- Quick Stats -->
+      <div class="glass-card rounded-2xl p-6">
+        <h3 class="font-bold text-lg text-[#1C1C1E] mb-4">
+          <i class="fas fa-chart-pie text-[#007AFF] mr-2"></i>
+          Ringkasan
+        </h3>
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-[#8E8E93]">Kelas Aktif</span>
+            <span id="aktifKelas" class="font-semibold text-[#1C1C1E]">-</span>
           </div>
-          <div>
-            <p class="text-xs text-gray-500">Total Kelas</p>
-            <p id="totalKelas" class="font-bold text-lg">0</p>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-[#8E8E93]">Siswa Terpilih</span>
+            <span id="selectedSiswa" class="font-semibold text-[#1C1C1E]">-</span>
           </div>
-        </div>
-      </div>
-      
-      <div class="iphone-card p-4">
-        <div class="flex items-center">
-          <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mr-3">
-            <i class="fas fa-check-circle text-emerald-500"></i>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-[#8E8E93]">Tanggal</span>
+            <span id="selectedDate" class="font-semibold text-[#1C1C1E]">-</span>
           </div>
-          <div>
-            <p class="text-xs text-gray-500">Hadir Hari Ini</p>
-            <p id="hadirHariIni" class="font-bold text-lg">0</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="iphone-card p-4">
-        <div class="flex items-center">
-          <div class="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center mr-3">
-            <i class="fas fa-user-times text-red-500"></i>
-          </div>
-          <div>
-            <p class="text-xs text-gray-500">Tidak Hadir</p>
-            <p id="tidakHadir" class="font-bold text-lg">0</p>
+          <div class="pt-3 border-t border-[#C7C7CC]/30">
+            <p class="text-xs text-[#8E8E93] text-center">
+              <i class="fas fa-history mr-1"></i>
+              Terakhir diperbarui: <span id="lastUpdated">-</span>
+            </p>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="flex flex-col lg:flex-row gap-6">
-      <!-- Sidebar Form -->
-      <div class="lg:w-1/3">
-        <div class="iphone-card p-5 mb-6">
-          <h2 class="font-bold text-lg mb-4">
-            <i class="fas fa-edit text-blue-500 mr-2"></i>
-            Update Presensi
-          </h2>
-          
-          <div class="space-y-4">
-            <!-- Kelas -->
-            <div>
-              <label class="block text-sm font-medium mb-2">
-                <i class="fas fa-graduation-cap text-gray-500 mr-2"></i>
-                Kelas
-              </label>
-              <select id="kelasFilter" class="iphone-select">
-                <option value="">-- Semua Kelas --</option>
-              </select>
+    <!-- Main Table -->
+    <div class="lg:w-2/3 w-full">
+      <div class="glass-card rounded-2xl p-6">
+        <!-- Table Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+          <div>
+            <h2 class="text-xl font-bold text-[#1C1C1E] mb-1">
+              <i class="fas fa-table text-[#34C759] mr-2"></i>
+              Data Presensi
+            </h2>
+            <div class="text-sm text-[#8E8E93]">
+              <span id="kelasDisplay" class="font-semibold text-[#007AFF]">Semua Kelas</span>
+              <span id="dataCount" class="ml-2">• 0 data</span>
             </div>
-
-            <!-- Siswa -->
-            <div>
-              <label class="block text-sm font-medium mb-2">
-                <i class="fas fa-user text-gray-500 mr-2"></i>
-                Siswa
-              </label>
-              <select id="siswaFilter" class="iphone-select">
-                <option value="">-- Semua Siswa --</option>
-              </select>
-            </div>
-
-            <!-- Tanggal -->
-            <div>
-              <label class="block text-sm font-medium mb-2">
-                <i class="fas fa-calendar-alt text-gray-500 mr-2"></i>
-                Tanggal
-              </label>
-              <select id="col" class="iphone-select">
-                <option value="">-- Pilih Tanggal --</option>
-              </select>
-            </div>
-
-            <!-- Status -->
-            <div>
-              <label class="block text-sm font-medium mb-2">
-                <i class="fas fa-sticky-note text-gray-500 mr-2"></i>
-                Status
-              </label>
-              <div class="grid grid-cols-4 gap-2">
-                <button onclick="setStatus('MASUK')" class="py-3 bg-emerald-50 text-emerald-600 rounded-lg border border-emerald-100 text-sm">
-                  <i class="fas fa-check mr-1"></i> Hadir
-                </button>
-                <button onclick="setStatus('P')" class="py-3 bg-amber-50 text-amber-600 rounded-lg border border-amber-100 text-sm">
-                  <i class="fas fa-home mr-1"></i> Izin
-                </button>
-                <button onclick="setStatus('S')" class="py-3 bg-rose-50 text-rose-600 rounded-lg border border-rose-100 text-sm">
-                  <i class="fas fa-heartbeat mr-1"></i> Sakit
-                </button>
-                <button onclick="setStatus('A')" class="py-3 bg-gray-100 text-gray-600 rounded-lg border border-gray-200 text-sm">
-                  <i class="fas fa-times mr-1"></i> Alpha
-                </button>
-              </div>
-              <input type="hidden" id="value">
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="pt-4 space-y-3">
-              <button onclick="updateCell()" id="updateBtn" class="iphone-btn w-full">
-                <i class="fas fa-paper-plane mr-2"></i>
-                <span id="updateText">Update Data</span>
-              </button>
-              
-              <div class="flex space-x-3">
-                <button onclick="resetForm()" class="iphone-btn-secondary flex-1 py-3">
-                  <i class="fas fa-redo mr-2"></i> Reset
-                </button>
-                <button onclick="exportData()" class="iphone-btn-secondary flex-1 py-3">
-                  <i class="fas fa-download mr-2"></i> Export
-                </button>
-              </div>
+          </div>
+          <div class="flex items-center space-x-2 mt-3 sm:mt-0">
+            <button onclick="toggleView()" id="toggleViewBtn" class="ios-btn-secondary px-4 py-2 rounded-xl">
+              <i class="fas fa-eye mr-2"></i>
+              <span class="hidden sm:inline">Tampilkan Semua</span>
+            </button>
+            <div class="relative">
+              <input type="text" id="searchInput" placeholder="Cari siswa..." 
+                     class="ios-input pl-10 pr-4 w-full sm:w-64" 
+                     onkeyup="filterTable()">
+              <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-[#8E8E93]"></i>
             </div>
           </div>
         </div>
 
-        <!-- Info Panel -->
-        <div class="iphone-card p-5">
-          <h3 class="font-bold text-lg mb-4">
-            <i class="fas fa-info-circle text-blue-500 mr-2"></i>
-            Informasi
-          </h3>
-          <div class="space-y-3 text-sm">
-            <div class="flex justify-between">
-              <span class="text-gray-500">Kelas Aktif:</span>
-              <span id="aktifKelas" class="font-medium">-</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-500">Siswa Terpilih:</span>
-              <span id="selectedSiswa" class="font-medium">-</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-500">Tanggal:</span>
-              <span id="selectedDate" class="font-medium">-</span>
-            </div>
-            <div class="pt-3 border-t border-gray-200">
-              <p class="text-xs text-gray-400">
-                <i class="fas fa-clock mr-1"></i>
-                Update: <span id="lastUpdated">-</span>
-              </p>
-            </div>
-          </div>
+        <!-- Filter Badges -->
+        <div id="filterBadges" class="flex flex-wrap gap-2 mb-4">
+          <!-- Badges will appear here -->
         </div>
-      </div>
 
-      <!-- Main Table -->
-      <div class="lg:w-2/3">
-        <div class="iphone-card p-5">
-          <!-- Table Header -->
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5">
-            <div>
-              <h2 class="font-bold text-lg mb-1">
-                <i class="fas fa-table text-green-500 mr-2"></i>
-                Data Presensi (Tanggal 1-31)
-              </h2>
-              <p class="text-sm text-gray-500">
-                <span id="kelasDisplay" class="font-medium text-blue-500">Semua Kelas</span>
-                <span id="dataCount" class="ml-2">• 0 data</span>
-              </p>
-            </div>
+        <!-- Table Container -->
+        <div class="border border-[#C7C7CC]/30 rounded-xl overflow-hidden">
+          <div class="overflow-x-auto ios-scrollbar max-h-[500px]">
+            <table id="sheetTable" class="ios-table w-full">
+              <!-- Table will be populated automatically -->
+            </table>
             
-            <div class="flex items-center space-x-2 mt-3 sm:mt-0">
-              <div class="relative">
-                <input type="text" id="searchInput" placeholder="Cari siswa..." 
-                       class="iphone-select pl-10 w-full sm:w-48" 
-                       onkeyup="filterTable()">
-                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden p-12 text-center">
+              <div class="w-20 h-20 bg-gradient-to-br from-[#F2F2F7] to-[#E5E5EA] rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-clipboard-list text-3xl text-[#C7C7CC]"></i>
               </div>
-              
-              <button onclick="toggleView()" id="toggleViewBtn" class="iphone-btn-secondary px-4 py-2 whitespace-nowrap">
-                <i class="fas fa-eye mr-2"></i>
-                <span class="hidden sm:inline">Semua</span>
+              <p class="text-lg font-medium text-[#8E8E93] mb-2">Tidak ada data</p>
+              <p class="text-sm text-[#C7C7CC] mb-6">Pilih kelas atau siswa untuk melihat data presensi</p>
+              <button onclick="loadData(true)" class="ios-btn px-6">
+                <i class="fas fa-sync-alt mr-2"></i> Muat Ulang Data
               </button>
             </div>
           </div>
+        </div>
 
-          <!-- Filter Tags -->
-          <div id="filterBadges" class="flex flex-wrap gap-2 mb-4">
-            <!-- Tags will appear here -->
+        <!-- Table Footer -->
+        <div class="flex justify-between items-center mt-6 text-sm text-[#8E8E93]">
+          <div class="flex items-center space-x-4">
+            <button onclick="prevPage()" class="w-10 h-10 flex items-center justify-center hover:bg-[#F2F2F7] rounded-xl transition">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <span>
+              Halaman <span id="currentPage" class="font-semibold text-[#1C1C1E]">1</span>
+              dari <span id="totalPages" class="font-semibold text-[#1C1C1E]">1</span>
+            </span>
+            <button onclick="nextPage()" class="w-10 h-10 flex items-center justify-center hover:bg-[#F2F2F7] rounded-xl transition">
+              <i class="fas fa-chevron-right"></i>
+            </button>
           </div>
-
-          <!-- Table Container with Scroll -->
-          <div class="border border-gray-200 rounded-lg overflow-hidden">
-            <div class="table-container">
-              <table id="sheetTable" class="iphone-table">
-                <!-- Table will be populated -->
-              </table>
-              
-              <!-- Empty State -->
-              <div id="emptyState" class="hidden p-8 text-center">
-                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <i class="fas fa-clipboard-list text-2xl text-gray-400"></i>
-                </div>
-                <p class="text-gray-500 mb-2">Tidak ada data</p>
-                <p class="text-sm text-gray-400 mb-4">Pilih kelas atau siswa untuk melihat data</p>
-                <button onclick="loadData(true)" class="iphone-btn px-6">
-                  <i class="fas fa-sync-alt mr-2"></i> Muat Ulang
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pagination -->
-          <div class="flex justify-between items-center mt-4 text-sm text-gray-500">
-            <div class="flex items-center space-x-3">
-              <button onclick="prevPage()" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-lg">
-                <i class="fas fa-chevron-left"></i>
-              </button>
-              <span>
-                Halaman <span id="currentPage" class="font-medium">1</span>
-                dari <span id="totalPages" class="font-medium">1</span>
-              </span>
-              <button onclick="nextPage()" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-lg">
-                <i class="fas fa-chevron-right"></i>
-              </button>
-            </div>
-            <div class="text-xs">
-              <i class="fas fa-history mr-1"></i>
-              Terakhir dimuat: <span id="lastUpdatedTime">-</span>
-            </div>
+          <div class="text-xs">
+            <i class="fas fa-info-circle mr-1"></i>
+            Klik pada sel untuk mengedit
           </div>
         </div>
       </div>
     </div>
   </div>
-</main>
+</div>
 
-<!-- Simple Toast -->
-<div id="toast" class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-3 rounded-lg shadow-lg z-50 hidden">
+<!-- iOS Toast -->
+<div id="iosToast" class="ios-toast fixed bottom-6 left-1/2 transform -translate-x-1/2 translate-y-full transition-transform duration-300 z-50 max-w-sm">
   <div class="flex items-center">
-    <i class="fas fa-check-circle mr-2 text-green-400"></i>
-    <span id="toastMessage"></span>
+    <i class="fas fa-check-circle text-xl mr-3 text-[#34C759]"></i>
+    <div>
+      <p class="font-semibold text-white mb-0.5">Berhasil!</p>
+      <p id="toastMessage" class="text-sm text-white/90">Data berhasil diperbarui</p>
+    </div>
+  </div>
+</div>
+
+<!-- Floating Action Button -->
+<button id="fabMenu" class="fab lg:hidden">
+  <i class="fas fa-bars"></i>
+</button>
+
+<!-- Mobile Menu -->
+<div id="mobileMenu" class="fixed inset-0 bg-black/50 z-40 hidden">
+  <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 transform translate-y-full transition-transform duration-300">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-lg font-bold text-[#1C1C1E]">Menu</h3>
+      <button onclick="closeMobileMenu()" class="w-10 h-10 flex items-center justify-center hover:bg-[#F2F2F7] rounded-xl">
+        <i class="fas fa-times text-lg"></i>
+      </button>
+    </div>
+    <div class="space-y-4">
+      <button onclick="loadData(true)" class="w-full text-left p-4 hover:bg-[#F2F2F7] rounded-xl transition">
+        <i class="fas fa-sync-alt text-[#007AFF] mr-3"></i>
+        Refresh Data
+      </button>
+      <button onclick="exportData()" class="w-full text-left p-4 hover:bg-[#F2F2F7] rounded-xl transition">
+        <i class="fas fa-download text-[#007AFF] mr-3"></i>
+        Export Data
+      </button>
+      <button onclick="resetForm()" class="w-full text-left p-4 hover:bg-[#F2F2F7] rounded-xl transition">
+        <i class="fas fa-redo text-[#007AFF] mr-3"></i>
+        Reset Form
+      </button>
+    </div>
   </div>
 </div>
 
@@ -494,9 +703,58 @@ let rowMapping = {};
 let currentPage = 1;
 const itemsPerPage = 8;
 
-// Load on startup
+// Toggle form visibility
+document.getElementById('toggleForm').addEventListener('change', function(e) {
+  const formContainer = document.getElementById('formContainer');
+  if (e.target.checked) {
+    formContainer.style.display = 'block';
+    setTimeout(() => formContainer.style.opacity = '1', 10);
+  } else {
+    formContainer.style.opacity = '0';
+    setTimeout(() => formContainer.style.display = 'none', 200);
+  }
+});
+
+// Mobile menu handlers
+document.getElementById('fabMenu').addEventListener('click', openMobileMenu);
+
+function openMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const menuContent = menu.querySelector('div');
+  menu.classList.remove('hidden');
+  setTimeout(() => {
+    menuContent.classList.remove('translate-y-full');
+  }, 10);
+}
+
+function closeMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const menuContent = menu.querySelector('div');
+  menuContent.classList.add('translate-y-full');
+  setTimeout(() => {
+    menu.classList.add('hidden');
+  }, 300);
+}
+
+// Set status from buttons
+function setStatus(status) {
+  document.getElementById('value').value = status;
+  
+  // Highlight selected button
+  const buttons = document.querySelectorAll('#formContainer button');
+  buttons.forEach(btn => {
+    btn.classList.remove('ring-2', 'ring-offset-2');
+    if (btn.onclick && btn.onclick.toString().includes(`'${status}'`)) {
+      btn.classList.add('ring-2', 'ring-offset-2', 'ring-[#007AFF]');
+    }
+  });
+}
+
+// Load data on startup
 window.onload = async function() {
   await loadData(false);
+  
+  // Set today's date
   const today = new Date().getDate();
   document.getElementById('col').value = today;
   document.getElementById('selectedDate').textContent = `Tanggal ${today}`;
@@ -510,28 +768,44 @@ async function loadData(showLoading = true) {
     }
     
     const res = await fetch(API_URL);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    
     const data = await res.json();
     
+    // Reorder data
     allData = data.map(row => {
       const { kelas, nama, ...rest } = row;
-      return { nama, kelas, ...rest };
+      return { 
+        nama, 
+        kelas, 
+        ...rest
+      };
     });
     
+    // Update stats
     updateStats();
+    
+    // Update kelas filter
     updateKelasFilter();
+    
+    // Update siswa filter
     updateSiswaFilter();
+    
+    // Update kolom filter
     updateKolomFilter();
+    
+    // Render tabel
     renderFilteredTable();
     
+    // Update last updated time
     const now = new Date();
-    const time = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    document.getElementById('lastUpdated').textContent = time;
-    document.getElementById('lastUpdatedTime').textContent = time;
+    document.getElementById('lastUpdated').textContent = 
+      `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
     
-    showToast('Data berhasil dimuat');
+    showToast('Data berhasil dimuat ulang', 'success');
     
   } catch(e) {
-    console.error("Error:", e);
+    console.error("Error loading data:", e);
     showToast('Gagal memuat data', 'error');
   } finally {
     if (showLoading) {
@@ -549,7 +823,7 @@ function updateStats() {
   document.getElementById('totalKelas').textContent = totalKelas;
   document.getElementById('aktifKelas').textContent = totalKelas;
   
-  // Today's stats
+  // Calculate today's attendance
   const today = new Date().getDate();
   let hadir = 0;
   let tidakHadir = 0;
@@ -606,6 +880,7 @@ function updateSiswaFilter() {
     filteredSiswa = allData.filter(d => d.kelas === currentKelas);
   }
   
+  // Generate row mapping
   rowMapping = {};
   allData.forEach((item, index) => {
     if (item.nama) {
@@ -651,6 +926,7 @@ function updateKolomFilter() {
   if (currentValue) {
     select.value = currentValue;
   } else {
+    // Default to today
     const today = new Date().getDate();
     select.value = today;
   }
@@ -669,6 +945,8 @@ document.getElementById("kelasFilter").onchange = function() {
   updateSiswaFilter();
   updateFilterBadges();
   renderFilteredTable();
+  
+  closeMobileMenu();
 };
 
 document.getElementById("siswaFilter").onchange = function() {
@@ -685,12 +963,7 @@ document.getElementById("col").onchange = function() {
   document.getElementById('selectedDate').textContent = `Tanggal ${this.value}`;
 };
 
-// Set status
-function setStatus(status) {
-  document.getElementById('value').value = status;
-}
-
-// Filter table
+// Filter table by search
 function filterTable() {
   const searchTerm = document.getElementById('searchInput').value.toLowerCase();
   renderFilteredTable(searchTerm);
@@ -703,12 +976,12 @@ function updateFilterBadges() {
   
   if (currentKelas) {
     const badge = document.createElement("div");
-    badge.className = "flex items-center bg-blue-100 text-blue-600 text-xs px-3 py-1.5 rounded-full";
+    badge.className = "ios-badge";
     badge.innerHTML = `
-      <i class="fas fa-graduation-cap mr-1 text-xs"></i>
+      <i class="fas fa-graduation-cap"></i>
       ${currentKelas}
-      <button onclick="clearFilter('kelas')" class="ml-2 text-blue-400 hover:text-blue-600">
-        <i class="fas fa-times"></i>
+      <button onclick="clearFilter('kelas')" class="ml-2 hover:opacity-70">
+        <i class="fas fa-times text-xs"></i>
       </button>
     `;
     badgesContainer.appendChild(badge);
@@ -716,12 +989,12 @@ function updateFilterBadges() {
   
   if (currentSiswa) {
     const badge = document.createElement("div");
-    badge.className = "flex items-center bg-green-100 text-green-600 text-xs px-3 py-1.5 rounded-full";
+    badge.className = "ios-badge";
     badge.innerHTML = `
-      <i class="fas fa-user mr-1 text-xs"></i>
+      <i class="fas fa-user"></i>
       ${currentSiswa}
-      <button onclick="clearFilter('siswa')" class="ml-2 text-green-400 hover:text-green-600">
-        <i class="fas fa-times"></i>
+      <button onclick="clearFilter('siswa')" class="ml-2 hover:opacity-70">
+        <i class="fas fa-times text-xs"></i>
       </button>
     `;
     badgesContainer.appendChild(badge);
@@ -769,7 +1042,7 @@ function renderFilteredTable(searchTerm = "") {
     }
   }
   
-  // Search filter
+  // Apply search filter
   if (searchTerm) {
     filteredData = filteredData.filter(d => 
       d.nama.toLowerCase().includes(searchTerm) || 
@@ -777,7 +1050,7 @@ function renderFilteredTable(searchTerm = "") {
     );
   }
   
-  // Update count
+  // Update data count
   document.getElementById("dataCount").textContent = `• ${filteredData.length} data`;
   
   // Pagination
@@ -789,13 +1062,13 @@ function renderFilteredTable(searchTerm = "") {
   document.getElementById("totalPages").textContent = totalPages || 1;
   document.getElementById("currentPage").textContent = currentPage;
   
-  // Paginate
+  // Paginate data
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedData = filteredData.slice(startIndex, endIndex);
   
   // Render table
-  renderTable(paginatedData);
+  renderTable(paginatedData, filteredData.length);
 }
 
 // Navigation
@@ -819,8 +1092,8 @@ function nextPage() {
   }
 }
 
-// Render table with ALL 31 days
-function renderTable(data) {
+// Render table
+function renderTable(data, totalLength) {
   const table = document.getElementById("sheetTable");
   const emptyState = document.getElementById("emptyState");
   
@@ -836,16 +1109,9 @@ function renderTable(data) {
   let tableHTML = `
     <thead>
       <tr>
-        <th class="sticky-name text-left pl-4">Nama</th>
-        <th class="sticky-class text-left">Kelas</th>
-  `;
-  
-  // Create header for days 1-31
-  for(let day = 1; day <= 31; day++) {
-    tableHTML += `<th>T${day}</th>`;
-  }
-  
-  tableHTML += `
+        <th class="rounded-tl-xl">Nama</th>
+        <th>Kelas</th>
+        <th class="rounded-tr-xl">Tanggal 1-31</th>
       </tr>
     </thead>
     <tbody>
@@ -854,39 +1120,49 @@ function renderTable(data) {
   // Create table rows
   data.forEach((row, rowIndex) => {
     tableHTML += `
-      <tr class="${rowIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
-        <td class="sticky-name text-left pl-4 font-medium">${row.nama || "-"}</td>
-        <td class="sticky-class text-left font-medium text-blue-500">${row.kelas || "-"}</td>
+      <tr class="${rowIndex % 2 === 0 ? 'bg-white' : 'bg-[#F2F2F7]'}">
+        <td class="font-semibold">${row.nama || "-"}</td>
+        <td class="text-[#007AFF] font-medium">${row.kelas || "-"}</td>
+        <td>
+          <div class="flex overflow-x-auto ios-scrollbar gap-1 py-1">
     `;
     
-    // Create cells for days 1-31
+    // Add day cells
     for(let day = 1; day <= 31; day++) {
       const value = row[day.toString()] || "";
       const displayValue = value === "" ? "MASUK" : value;
       
-      let statusClass = "status-hadir";
-      if (displayValue === "P") statusClass = "status-izin";
-      else if (displayValue === "S") statusClass = "status-sakit";
-      else if (displayValue === "A") statusClass = "status-alpha";
+      let statusClass = "status-masuk";
+      if (displayValue === "P") statusClass = "status-p";
+      else if (displayValue === "S") statusClass = "status-s";
+      else if (displayValue === "I") statusClass = "status-i";
+      else if (displayValue === "A") statusClass = "status-a";
       
       tableHTML += `
-        <td onclick="quickEdit('${row.nama}', ${day})">
-          <div class="status-cell ${statusClass}" title="Klik untuk edit">
+        <div class="flex flex-col items-center min-w-[44px]">
+          <span class="text-xs text-[#8E8E93] mb-1">${day}</span>
+          <div class="${statusClass} cursor-pointer hover:opacity-80 transition"
+               onclick="editCell('${row.nama}', ${day})">
             ${displayValue === "MASUK" ? "✓" : displayValue}
           </div>
-        </td>
+        </div>
       `;
     }
     
-    tableHTML += `</tr>`;
+    tableHTML += `
+          </div>
+        </td>
+      </tr>
+    `;
   });
   
   tableHTML += "</tbody>";
   table.innerHTML = tableHTML;
 }
 
-// Quick edit from table
-function quickEdit(siswaName, tanggal) {
+// Edit cell on click
+function editCell(siswaName, tanggal) {
+  // Find student in dropdown
   const siswaSelect = document.getElementById("siswaFilter");
   for(let option of siswaSelect.options) {
     if(option.dataset.nama === siswaName) {
@@ -897,15 +1173,16 @@ function quickEdit(siswaName, tanggal) {
     }
   }
   
+  // Set tanggal
   document.getElementById("col").value = tanggal;
   document.getElementById('selectedDate').textContent = `Tanggal ${tanggal}`;
   
-  updateFilterBadges();
-  
   // Scroll to form on mobile
   if (window.innerWidth < 1024) {
-    document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
+    document.querySelector('#formContainer').scrollIntoView({ behavior: 'smooth' });
   }
+  
+  updateFilterBadges();
 }
 
 // Update cell
@@ -918,17 +1195,17 @@ async function updateCell() {
   const siswaName = selectedOption?.dataset.nama || "";
 
   if(!_row || !siswaName) {
-    showToast('Pilih siswa terlebih dahulu', 'error');
+    showToast('Harap pilih siswa terlebih dahulu', 'error');
     return;
   }
   
   if(!tanggal) {
-    showToast('Pilih tanggal terlebih dahulu', 'error');
+    showToast('Harap pilih tanggal terlebih dahulu', 'error');
     return;
   }
   
   if(!value) {
-    showToast('Pilih status terlebih dahulu', 'error');
+    showToast('Harap pilih status kehadiran', 'error');
     return;
   }
 
@@ -940,7 +1217,7 @@ async function updateCell() {
   
   updateBtn.disabled = true;
   updateText.textContent = "Mengirim...";
-  updateBtn.innerHTML = '<div class="loading"></div> Mengirim...';
+  updateBtn.innerHTML = '<div class="ios-loader mr-2"></div> Mengirim...';
 
   try {
     const res = await fetch(API_URL, {
@@ -964,14 +1241,7 @@ async function updateCell() {
     updateStats();
     
     // Show success
-    const statusText = {
-      'MASUK': 'Hadir',
-      'P': 'Izin',
-      'S': 'Sakit',
-      'A': 'Alpha'
-    }[value] || value;
-    
-    showToast(`${siswaName} - Tanggal ${tanggal}: ${statusText}`);
+    showToast(`${siswaName} - Tanggal ${tanggal}: ${getStatusText(value)}`, 'success');
     
     // Refresh table
     renderFilteredTable();
@@ -986,10 +1256,29 @@ async function updateCell() {
   }
 }
 
+// Get status text
+function getStatusText(code) {
+  const statusMap = {
+    'MASUK': 'Hadir',
+    'P': 'Izin',
+    'S': 'Sakit',
+    'I': 'Izin Kegiatan',
+    'A': 'Alpha'
+  };
+  return statusMap[code] || code;
+}
+
 // Reset form
 function resetForm() {
   document.getElementById("value").value = "";
-  showToast('Form direset');
+  
+  // Clear button highlights
+  const buttons = document.querySelectorAll('#formContainer button');
+  buttons.forEach(btn => {
+    btn.classList.remove('ring-2', 'ring-offset-2', 'ring-[#007AFF]');
+  });
+  
+  showToast('Form berhasil direset', 'info');
 }
 
 // Export data
@@ -1004,14 +1293,14 @@ function exportData() {
   
   const dataStr = JSON.stringify(dataToExport, null, 2);
   const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-  const fileName = `absensi-${currentKelas || 'semua'}-${new Date().toISOString().split('T')[0]}.json`;
+  const exportFileDefaultName = `absensi-${currentKelas || 'semua'}-${new Date().toISOString().split('T')[0]}.json`;
   
-  const link = document.createElement('a');
-  link.setAttribute('href', dataUri);
-  link.setAttribute('download', fileName);
-  link.click();
+  const linkElement = document.createElement('a');
+  linkElement.setAttribute('href', dataUri);
+  linkElement.setAttribute('download', exportFileDefaultName);
+  linkElement.click();
   
-  showToast('Data berhasil diunduh');
+  showToast('Data berhasil diunduh', 'success');
 }
 
 // Show/hide loading
@@ -1020,7 +1309,7 @@ function showLoadingState(show) {
   if (refreshBtn) {
     if (show) {
       refreshBtn.disabled = true;
-      refreshBtn.innerHTML = '<div class="loading"></div>';
+      refreshBtn.innerHTML = '<div class="ios-loader"></div>';
     } else {
       refreshBtn.disabled = false;
       refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
@@ -1029,28 +1318,31 @@ function showLoadingState(show) {
 }
 
 // Show toast
-function showToast(message, type = 'success') {
-  const toast = document.getElementById('toast');
+function showToast(message, type = 'info') {
+  const toast = document.getElementById('iosToast');
   const toastMessage = document.getElementById('toastMessage');
   
-  // Set icon
+  // Set icon based on type
   let icon = 'fas fa-check-circle';
   if (type === 'error') icon = 'fas fa-exclamation-circle';
   else if (type === 'info') icon = 'fas fa-info-circle';
+  else if (type === 'warning') icon = 'fas fa-exclamation-triangle';
   
-  toast.innerHTML = `
-    <div class="flex items-center">
-      <i class="${icon} mr-2 ${type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : 'text-blue-400'}"></i>
-      <span>${message}</span>
-    </div>
-  `;
+  toast.querySelector('i').className = `${icon} text-xl mr-3 ${
+    type === 'success' ? 'text-[#34C759]' :
+    type === 'error' ? 'text-[#FF3B30]' :
+    type === 'warning' ? 'text-[#FF9500]' :
+    'text-[#5AC8FA]'
+  }`;
   
-  // Show
-  toast.classList.remove('hidden');
+  toastMessage.textContent = message;
   
-  // Hide after 3 seconds
+  // Show toast
+  toast.classList.remove('translate-y-full');
+  
+  // Auto hide
   setTimeout(() => {
-    toast.classList.add('hidden');
+    toast.classList.add('translate-y-full');
   }, 3000);
 }
 </script>
