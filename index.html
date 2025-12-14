@@ -1,1316 +1,1549 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
+  <meta charset="UTF-8">
   <title>Absensi Siswa</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
- <style>
-/* iOS 15 Style System */
-:root {
-    --ios-bg: #F2F2F7;
-    --ios-surface: #FFFFFF;
-    --ios-primary: #007AFF;
-    --ios-secondary: #5856D6;
-    --ios-red: #FF3B30;
-    --ios-orange: #FF9500;
-    --ios-green: #34C759;
-    --ios-blue: #007AFF;
-    --ios-teal: #5AC8FA;
-    --ios-indigo: #5856D6;
-    --ios-purple: #AF52DE;
-    --ios-pink: #FF2D55;
-    --ios-gray-1: #8E8E93;
-    --ios-gray-2: #AEAEB2;
-    --ios-gray-3: #C7C7CC;
-    --ios-gray-4: #D1D1D6;
-    --ios-gray-5: #E5E5EA;
-    --ios-gray-6: #F2F2F7;
-}
-
-/* iOS 15 Base Styling */
-body {
-    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', sans-serif;
-    background-color: var(--ios-bg);
-    color: #1C1C1E;
-    -webkit-font-smoothing: antialiased;
-    margin: 0;
-    padding: 0;
-}
-
-/* iOS 15 Navbar (Large Title Style) */
-.glass-navbar {
-    background: var(--ios-surface);
-    border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
-    backdrop-filter: saturate(180%) blur(20px);
-    -webkit-backdrop-filter: saturate(180%) blur(20px);
-}
-
-/* iOS 15 Card Style */
-.glass-card {
-    background: var(--ios-surface);
-    border-radius: 16px;
-    box-shadow: 
-        0 0.5px 0 rgba(0, 0, 0, 0.05),
-        0 1px 3px rgba(0, 0, 0, 0.05),
-        0 6px 16px rgba(0, 0, 0, 0.03);
-    border: 0.5px solid rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-}
-
-/* iOS 15 Stats Cards */
-.stat-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.98) 100%);
-    border-radius: 14px;
-    border: 0.5px solid rgba(0, 0, 0, 0.05);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-}
-
-.stat-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 122, 255, 0.1);
-    color: var(--ios-primary);
-}
-
-/* iOS 15 Buttons */
-.ios-btn {
-    background: var(--ios-primary);
-    color: white;
-    border: none;
-    border-radius: 12px;
-    padding: 14px 20px;
-    font-weight: 600;
-    font-size: 16px;
-    letter-spacing: -0.24px;
-    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    position: relative;
-    overflow: hidden;
-}
-
-.ios-btn:active {
-    transform: scale(0.98);
-    opacity: 0.9;
-}
-
-.ios-btn::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255, 255, 255, 0.1);
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-
-.ios-btn:active::after {
-    opacity: 1;
-}
-
-.ios-btn-secondary {
-    background: rgba(0, 122, 255, 0.1);
-    color: var(--ios-primary);
-    border: none;
-    border-radius: 12px;
-    padding: 12px 18px;
-    font-weight: 600;
-    font-size: 15px;
-}
-
-/* iOS 15 Form Elements */
-.ios-input, .ios-select {
-    background: rgba(118, 118, 128, 0.12);
-    border: none;
-    border-radius: 12px;
-    padding: 14px 16px;
-    font-size: 16px;
-    color: #000;
-    transition: all 0.2s;
-    appearance: none;
-    -webkit-appearance: none;
-}
-
-.ios-input:focus, .ios-select:focus {
-    background: rgba(118, 118, 128, 0.18);
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
-}
-
-.ios-select {
-    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-    padding-right: 40px;
-}
-
-/* iOS 15 Status Buttons */
-.status-btn {
-    border-radius: 11px;
-    padding: 12px;
-    border: none;
-    font-weight: 600;
-    font-size: 15px;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-}
-
-.status-btn:active {
-    transform: scale(0.96);
-}
-
-/* iOS 15 Table */
-.ios-table {
-    border-collapse: separate;
-    border-spacing: 0;
-    width: 100%;
-}
-
-.ios-table thead {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.ios-table th {
-    background: rgba(242, 242, 247, 0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    color: var(--ios-gray-1);
-    font-weight: 600;
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    padding: 12px 16px;
-    border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
-}
-
-.ios-table td {
-    padding: 14px 16px;
-    border-bottom: 0.5px solid rgba(0, 0, 0, 0.05);
-    background: var(--ios-surface);
-}
-
-.ios-table tr:last-child td {
-    border-bottom: none;
-}
-
-/* iOS 15 Status Badges */
-.status-badge {
-    padding: 4px 10px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    min-width: 40px;
-    justify-content: center;
-}
-
-/* iOS 15 Toast */
-.ios-toast {
-    background: rgba(40, 40, 40, 0.95);
-    backdrop-filter: blur(50px) saturate(180%);
-    -webkit-backdrop-filter: blur(50px) saturate(180%);
-    color: white;
-    border-radius: 14px;
-    padding: 14px 18px;
-    box-shadow: 
-        0 10px 40px rgba(0, 0, 0, 0.15),
-        0 2px 10px rgba(0, 0, 0, 0.1);
-    animation: ios-toast-in 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    border: 0.5px solid rgba(255, 255, 255, 0.1);
-}
-
-@keyframes ios-toast-in {
-    from {
-        transform: translateY(100px) scale(0.9);
-        opacity: 0;
+  <style>
+    /* iOS 15 Simplified Style System */
+    :root {
+      --ios-bg: #F2F2F7;
+      --ios-surface: #FFFFFF;
+      --ios-primary: #007AFF;
+      --ios-secondary: #5856D6;
+      --ios-red: #FF3B30;
+      --ios-orange: #FF9500;
+      --ios-green: #34C759;
+      --ios-blue: #007AFF;
+      --ios-gray-1: #8E8E93;
+      --ios-gray-2: #AEAEB2;
+      --ios-gray-3: #C7C7CC;
+      --ios-gray-5: #E5E5EA;
+      --ios-gray-6: #F2F2F7;
     }
-    to {
-        transform: translateY(0) scale(1);
-        opacity: 1;
+
+    /* iOS Base */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', sans-serif;
+      background-color: var(--ios-bg);
+      color: #000000;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      margin: 0;
+      padding: 0;
     }
-}
 
-/* iOS 15 FAB */
-.fab {
-    position: fixed;
-    bottom: 25px;
-    right: 20px;
-    width: 56px;
-    height: 56px;
-    border-radius: 28px;
-    background: var(--ios-primary);
-    color: white;
-    border: none;
-    box-shadow: 
-        0 8px 24px rgba(0, 122, 255, 0.25),
-        0 4px 12px rgba(0, 122, 255, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    z-index: 1000;
-    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.fab:active {
-    transform: scale(0.92);
-    box-shadow: 
-        0 4px 12px rgba(0, 122, 255, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-}
-
-/* iOS 15 Mobile Menu */
-.ios-menu {
-    background: var(--ios-surface);
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    box-shadow: 0 -10px 60px rgba(0, 0, 0, 0.15);
-    border-top: 0.5px solid rgba(0, 0, 0, 0.1);
-}
-
-.menu-item {
-    padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    border-bottom: 0.5px solid rgba(0, 0, 0, 0.05);
-    transition: background 0.2s;
-}
-
-.menu-item:active {
-    background: var(--ios-gray-6);
-}
-
-.menu-item:last-child {
-    border-bottom: none;
-}
-
-/* iOS 15 Toggle Switch */
-.ios-switch {
-    width: 52px;
-    height: 32px;
-}
-
-.ios-slider {
-    background: rgba(118, 118, 128, 0.3);
-    border-radius: 16px;
-    border: none;
-}
-
-.ios-slider:before {
-    width: 28px;
-    height: 28px;
-    left: 2px;
-    bottom: 2px;
-    background: white;
-    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-input:checked + .ios-slider {
-    background: var(--ios-green);
-}
-
-/* iOS 15 Scrollbar */
-.ios-scrollbar {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-}
-
-.ios-scrollbar::-webkit-scrollbar {
-    display: none;
-}
-
-/* iOS 15 Day Cells */
-.day-cell {
-    min-width: 42px;
-    height: 42px;
-    border-radius: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    cursor: pointer;
-}
-
-.day-cell:active {
-    transform: scale(0.95);
-}
-
-.day-cell.day-empty {
-    background: var(--ios-gray-6);
-    color: var(--ios-gray-2);
-}
-
-.day-cell.day-present {
-    background: rgba(52, 199, 89, 0.15);
-    color: var(--ios-green);
-}
-
-.day-cell.day-permit {
-    background: rgba(255, 149, 0, 0.15);
-    color: var(--ios-orange);
-}
-
-.day-cell.day-sick {
-    background: rgba(255, 59, 48, 0.15);
-    color: var(--ios-red);
-}
-
-.day-cell.day-absent {
-    background: rgba(142, 142, 147, 0.15);
-    color: var(--ios-gray-1);
-}
-
-/* iOS 15 Header Gradient */
-.header-gradient {
-    background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* iOS 15 Loading State */
-.ios-loader {
-    width: 20px;
-    height: 20px;
-    border: 2.5px solid rgba(0, 122, 255, 0.1);
-    border-top: 2.5px solid var(--ios-primary);
-    border-radius: 50%;
-    animation: ios-spin 0.8s linear infinite;
-}
-
-@keyframes ios-spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-/* iOS 15 Search Bar */
-.search-container {
-    background: rgba(118, 118, 128, 0.12);
-    border-radius: 12px;
-    padding: 8px 12px;
-    transition: all 0.2s;
-}
-
-.search-container:focus-within {
-    background: rgba(118, 118, 128, 0.18);
-}
-
-.search-input {
-    background: transparent;
-    border: none;
-    outline: none;
-    width: 100%;
-    font-size: 16px;
-    color: #000;
-}
-
-.search-input::placeholder {
-    color: var(--ios-gray-2);
-}
-
-/* iOS 15 Section Headers */
-.section-header {
-    font-size: 13px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--ios-gray-1);
-    padding: 16px 0 8px 0;
-}
-
-/* iOS 15 Animation Classes */
-.ios-fade-in {
-    animation: ios-fade-in 0.3s ease-out;
-}
-
-@keyframes ios-fade-in {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.ios-scale-in {
-    animation: ios-scale-in 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-@keyframes ios-scale-in {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-/* iOS 15 Focus States */
-.focus-ring:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
-}
-
-/* iOS 15 Disabled State */
-.ios-disabled {
-    opacity: 0.5;
-    pointer-events: none;
-}
-
-/* iOS 15 Responsive Adjustments */
-@media (max-width: 640px) {
-    .glass-card {
-        border-radius: 14px;
-        margin: 8px 16px;
+    /* iOS Navbar - Simple Solid */
+    .ios-navbar {
+      background: var(--ios-surface);
+      border-bottom: 0.5px solid var(--ios-gray-5);
+      padding: 12px 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 50;
     }
-    
-    .ios-table th,
+
+    .navbar-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .app-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--ios-primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 16px;
+    }
+
+    .navbar-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: none;
+      background: var(--ios-gray-6);
+      color: var(--ios-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:active {
+      background: var(--ios-gray-5);
+      transform: scale(0.95);
+    }
+
+    /* iOS Cards - Solid */
+    .ios-card {
+      background: var(--ios-surface);
+      border-radius: 16px;
+      border: 0.5px solid var(--ios-gray-5);
+      overflow: hidden;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-item {
+      background: var(--ios-surface);
+      border-radius: 14px;
+      border: 0.5px solid var(--ios-gray-5);
+      padding: 20px;
+    }
+
+    .stat-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .stat-info h4 {
+      font-size: 13px;
+      color: var(--ios-gray-1);
+      margin: 0 0 4px 0;
+      font-weight: 500;
+    }
+
+    .stat-info p {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0;
+      color: #000;
+    }
+
+    .stat-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .icon-blue { background: rgba(0, 122, 255, 0.1); color: var(--ios-blue); }
+    .icon-green { background: rgba(52, 199, 89, 0.1); color: var(--ios-green); }
+    .icon-emerald { background: rgba(52, 199, 89, 0.1); color: var(--ios-green); }
+    .icon-red { background: rgba(255, 59, 48, 0.1); color: var(--ios-red); }
+
+    /* iOS Buttons - Solid */
+    .ios-btn {
+      background: var(--ios-primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 24px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .ios-btn:active {
+      opacity: 0.9;
+      transform: scale(0.98);
+    }
+
+    .ios-btn-secondary {
+      background: var(--ios-gray-6);
+      color: var(--ios-primary);
+    }
+
+    /* iOS Form Elements - Solid */
+    .ios-form-group {
+      margin-bottom: 20px;
+    }
+
+    .ios-label {
+      display: block;
+      font-size: 15px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #000;
+    }
+
+    .ios-select {
+      width: 100%;
+      padding: 14px 16px;
+      font-size: 16px;
+      background: var(--ios-gray-6);
+      border: 1.5px solid var(--ios-gray-5);
+      border-radius: 12px;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%238E8E93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 16px center;
+      cursor: pointer;
+    }
+
+    .ios-select:focus {
+      outline: none;
+      border-color: var(--ios-primary);
+    }
+
+    /* Status Buttons Grid */
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .status-btn {
+      padding: 16px 12px;
+      border: none;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .status-btn:active {
+      transform: scale(0.95);
+    }
+
+    .status-present { background: rgba(52, 199, 89, 0.1); color: var(--ios-green); }
+    .status-permit { background: rgba(255, 149, 0, 0.1); color: var(--ios-orange); }
+    .status-sick { background: rgba(255, 59, 48, 0.1); color: var(--ios-red); }
+    .status-absent { background: rgba(142, 142, 147, 0.1); color: var(--ios-gray-1); }
+
+    /* iOS Table - Solid */
+    .ios-table-container {
+      background: var(--ios-surface);
+      border-radius: 16px;
+      border: 0.5px solid var(--ios-gray-5);
+      overflow: hidden;
+      margin-top: 24px;
+    }
+
+    .ios-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .ios-table thead {
+      background: var(--ios-gray-6);
+    }
+
+    .ios-table th {
+      padding: 16px;
+      text-align: left;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ios-gray-1);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 0.5px solid var(--ios-gray-5);
+    }
+
     .ios-table td {
-        padding: 12px 14px;
+      padding: 16px;
+      border-bottom: 0.5px solid var(--ios-gray-5);
     }
-    
-    .fab {
-        bottom: 20px;
-        right: 16px;
-        width: 50px;
-        height: 50px;
+
+    .ios-table tbody tr:last-child td {
+      border-bottom: none;
     }
-}
-</style>
-</head>
-<body class="min-h-screen">
-  <!-- iOS Navbar -->
-  <div class="glass-navbar fixed top-0 left-0 right-0 z-50">
-    <div class="container mx-auto px-4 py-4">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center space-x-3">
-          <div class="w-10 h-10 bg-gradient-to-br from-[#007AFF] to-[#5856D6] rounded-xl flex items-center justify-center">
-            <i class="fas fa-calendar-check text-white"></i>
-          </div>
-          <div>
-            <h1 class="font-bold text-xl">Absensi Siswa</h1>
-            <p class="text-xs opacity-80">Presensi Digital</p>
-          </div>
-        </div>
-        <div class="flex items-center space-x-4">
-          <button onclick="loadData(true)" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition">
-            <i class="fas fa-sync-alt text-lg"></i>
-          </button>
-          <button onclick="exportData()" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/20 transition">
-            <i class="fas fa-download text-lg"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Main Content -->
-  <div class="container mx-auto px-4 pt-28 pb-24">
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-      <div class="glass-card p-5 rounded-2xl">
-        <p class="text-sm opacity-80 mb-1">Total Siswa</p>
-        <p id="totalSiswa" class="text-3xl font-bold">0</p>
-        <i class="fas fa-users text-2xl absolute top-4 right-4 opacity-30"></i>
-      </div>
-      <div class="glass-card p-5 rounded-2xl">
-        <p class="text-sm opacity-80 mb-1">Total Kelas</p>
-        <p id="totalKelas" class="text-3xl font-bold">0</p>
-        <i class="fas fa-graduation-cap text-2xl absolute top-4 right-4 opacity-30"></i>
-      </div>
-      <div class="glass-card p-5 rounded-2xl">
-        <p class="text-sm opacity-80 mb-1">Hadir Hari Ini</p>
-        <p id="hadirHariIni" class="text-3xl font-bold">0</p>
-        <i class="fas fa-check-circle text-2xl absolute top-4 right-4 opacity-30"></i>
-      </div>
-      <div class="glass-card p-5 rounded-2xl">
-        <p class="text-sm opacity-80 mb-1">Tidak Hadir</p>
-        <p id="tidakHadir" class="text-3xl font-bold">0</p>
-        <i class="fas fa-user-times text-2xl absolute top-4 right-4 opacity-30"></i>
-      </div>
-    </div>
-
-    <div class="grid lg:grid-cols-3 gap-6">
-      <!-- Form Section -->
-      <div class="lg:col-span-1">
-        <div class="glass-card rounded-2xl p-6">
-          <h2 class="text-xl font-bold mb-4">Update Presensi</h2>
-
-          <div class="space-y-5">
-            <div>
-              <label class="block text-sm font-medium mb-2">Pilih Kelas</label>
-              <select id="kelasFilter" class="ios-select"></select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-2">Pilih Siswa</label>
-              <select id="siswaFilter" class="ios-select"></select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-2">Tanggal</label>
-              <select id="col" class="ios-select"></select>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-3">Status Kehadiran</label>
-              <div class="segmented-control">
-                <button class="segmented-btn active" onclick="setStatus('MASUK')">Hadir</button>
-                <button class="segmented-btn" onclick="setStatus('P')">Izin</button>
-                <button class="segmented-btn" onclick="setStatus('S')">Sakit</button>
-                <button class="segmented-btn" onclick="setStatus('A')">Alpha</button>
-              </div>
-              <input type="hidden" id="value" value="MASUK">
-            </div>
-
-            <div class="flex gap-3 pt-4">
-              <button onclick="updateCell()" class="flex-1 ios-btn">Update</button>
-              <button onclick="resetForm()" class="ios-btn ios-btn-secondary px-6">Reset</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="glass-card rounded-2xl p-6 mt-6">
-          <h3 class="font-bold text-lg mb-4">Ringkasan</h3>
-          <div class="space-y-4 text-sm">
-            <div class="flex justify-between"><span class="opacity-80">Kelas</span><span id="aktifKelas">-</span></div>
-            <div class="flex justify-between"><span class="opacity-80">Siswa</span><span id="selectedSiswa">-</span></div>
-            <div class="flex justify-between"><span class="opacity-80">Tanggal</span><span id="selectedDate">-</span></div>
-            <div class="pt-4 border-t border-white/10 text-xs text-center opacity-70">
-              Terakhir diperbarui: <span id="lastUpdated">-</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Table Section -->
-      <div class="lg:col-span-2">
-        <div class="glass-card rounded-2xl p-6">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-            <div>
-              <h2 class="text-xl font-bold">Data Presensi</h2>
-              <p class="text-sm opacity-80"><span id="kelasDisplay">Semua Kelas</span> <span id="dataCount">• 0 data</span></p>
-            </div>
-            <input type="text" id="searchInput" placeholder="Cari siswa..." class="ios-input pl-10 pr-4 w-full sm:w-64" onkeyup="filterTable()">
-          </div>
-
-          <div class="overflow-x-auto ios-scrollbar rounded-xl border border-white/20">
-            <table id="sheetTable" class="w-full text-sm"></table>
-            <div id="emptyState" class="hidden p-12 text-center">
-              <div class="w-24 h-24 bg-white/20 rounded-full mx-auto mb-6 flex items-center justify-center">
-                <i class="fas fa-clipboard-list text-4xl opacity-50"></i>
-              </div>
-              <p class="text-lg font-medium mb-2">Tidak ada data</p>
-              <button onclick="loadData(true)" class="ios-btn mt-4">Muat Ulang</button>
-            </div>
-          </div>
-
-          <div class="flex justify-between items-center mt-6 text-sm">
-            <div class="flex items-center gap-4">
-              <button onclick="prevPage()" class="w-10 h-10 rounded-full hover:bg-white/20"><i class="fas fa-chevron-left"></i></button>
-              <span>Halaman <span id="currentPage" class="font-bold">1</span> dari <span id="totalPages" class="font-bold">1</span></span>
-              <button onclick="nextPage()" class="w-10 h-10 rounded-full hover:bg-white/20"><i class="fas fa-chevron-right"></i></button>
-            </div>
-            <p class="opacity-70">Klik sel untuk edit</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Toast -->
-  <div id="iosToast" class="ios-toast fixed bottom-8 left-1/2 -translate-x-1/2 translate-y-full transition-transform z-50 max-w-sm w-full">
-    <div class="flex items-center">
-      <i class="fas fa-check-circle text-2xl mr-3 text-[#34C759]"></i>
-      <div>
-        <p class="font-semibold">Berhasil!</p>
-        <p id="toastMessage" class="text-sm opacity-90">Data diperbarui</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- FAB (mobile only) -->
-  <button id="fabMenu" class="fab lg:hidden">
-    <i class="fas fa-bars text-xl"></i>
-  </button>
-
-  <!-- Mobile Menu -->
-  <div id="mobileMenu" class="fixed inset-0 bg-black/50 z-40 hidden" onclick="closeMobileMenu()">
-    <div class="absolute bottom-0 left-0 right-0 bg-[var(--card-bg)] rounded-t-3xl p-6 transform translate-y-full transition-transform" onclick="event.stopPropagation()">
-      <div class="flex justify-between items-center mb-6">
-        <h3 class="text-lg font-bold">Menu</h3>
-        <button onclick="closeMobileMenu()" class="w-10 h-10 rounded-full hover:bg-white/20"><i class="fas fa-times"></i></button>
-      </div>
-      <div class="space-y-3">
-        <button onclick="loadData(true); closeMobileMenu()" class="w-full text-left py-4 px-4 rounded-xl hover:bg-white/10 flex items-center"><i class="fas fa-sync-alt mr-4 w-6"></i> Refresh</button>
-        <button onclick="exportData(); closeMobileMenu()" class="w-full text-left py-4 px-4 rounded-xl hover:bg-white/10 flex items-center"><i class="fas fa-download mr-4 w-6"></i> Export</button>
-        <button onclick="resetForm(); closeMobileMenu()" class="w-full text-left py-4 px-4 rounded-xl hover:bg-white/10 flex items-center"><i class="fas fa-redo mr-4 w-6"></i> Reset Form</button>
-      </div>
-    </div>
-  </div>
-<script>
-const API_URL = "https://script.google.com/macros/s/AKfycbyqQOikUdA_eg8KsEGsU5HwPN5U0mNpiQ0EaXS7AWD9oXZ2le0AWZ7IqI5v080bLN6s/exec";
-
-let allData = [];
-let currentKelas = "";
-let currentSiswa = "";
-let showAllData = false;
-let rowMapping = {};
-let currentPage = 1;
-const itemsPerPage = 8;
-
-// Toggle form visibility
-document.getElementById('toggleForm').addEventListener('change', function(e) {
-  const formContainer = document.getElementById('formContainer');
-  if (e.target.checked) {
-    formContainer.style.display = 'block';
-    setTimeout(() => formContainer.style.opacity = '1', 10);
-  } else {
-    formContainer.style.opacity = '0';
-    setTimeout(() => formContainer.style.display = 'none', 200);
-  }
-});
-
-// Mobile menu handlers
-document.getElementById('fabMenu').addEventListener('click', openMobileMenu);
-
-function openMobileMenu() {
-  const menu = document.getElementById('mobileMenu');
-  const menuContent = menu.querySelector('div');
-  menu.classList.remove('hidden');
-  setTimeout(() => {
-    menuContent.classList.remove('translate-y-full');
-  }, 10);
-}
-
-function closeMobileMenu() {
-  const menu = document.getElementById('mobileMenu');
-  const menuContent = menu.querySelector('div');
-  menuContent.classList.add('translate-y-full');
-  setTimeout(() => {
-    menu.classList.add('hidden');
-  }, 300);
-}
-
-// Set status from buttons
-function setStatus(status) {
-  document.getElementById('value').value = status;
-  
-  // Highlight selected button
-  const buttons = document.querySelectorAll('#formContainer button');
-  buttons.forEach(btn => {
-    btn.classList.remove('ring-2', 'ring-offset-2');
-    if (btn.onclick && btn.onclick.toString().includes(`'${status}'`)) {
-      btn.classList.add('ring-2', 'ring-offset-2', 'ring-[#007AFF]');
+    /* Day Cells */
+    .days-container {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 8px 0;
+      -webkit-overflow-scrolling: touch;
     }
-  });
-}
 
-// Load data on startup
-window.onload = async function() {
-  await loadData(false);
-  
-  // Set today's date
-  const today = new Date().getDate();
-  document.getElementById('col').value = today;
-  document.getElementById('selectedDate').textContent = `Tanggal ${today}`;
-};
+    .day-cell {
+      min-width: 44px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
 
-// Load data
-async function loadData(showLoading = true) {
-  try {
-    if (showLoading) {
-      showLoadingState(true);
+    .day-number {
+      font-size: 11px;
+      color: var(--ios-gray-1);
     }
-    
-    const res = await fetch(API_URL);
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-    
-    const data = await res.json();
-    
-    // Reorder data
-    allData = data.map(row => {
-      const { kelas, nama, ...rest } = row;
-      return { 
-        nama, 
-        kelas, 
-        ...rest
-      };
-    });
-    
-    // Update stats
-    updateStats();
-    
-    // Update kelas filter
-    updateKelasFilter();
-    
-    // Update siswa filter
-    updateSiswaFilter();
-    
-    // Update kolom filter
-    updateKolomFilter();
-    
-    // Render tabel
-    renderFilteredTable();
-    
-    // Update last updated time
-    const now = new Date();
-    document.getElementById('lastUpdated').textContent = 
-      `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
-    showToast('Data berhasil dimuat ulang', 'success');
-    
-  } catch(e) {
-    console.error("Error loading data:", e);
-    showToast('Gagal memuat data', 'error');
-  } finally {
-    if (showLoading) {
-      showLoadingState(false);
-    }
-  }
-}
 
-// Update stats
-function updateStats() {
-  const totalSiswa = new Set(allData.map(d => d.nama)).size;
-  const totalKelas = new Set(allData.map(d => d.kelas).filter(k => k && k !== '-')).size;
-  
-  document.getElementById('totalSiswa').textContent = totalSiswa;
-  document.getElementById('totalKelas').textContent = totalKelas;
-  document.getElementById('aktifKelas').textContent = totalKelas;
-  
-  // Calculate today's attendance
-  const today = new Date().getDate();
-  let hadir = 0;
-  let tidakHadir = 0;
-  
-  allData.forEach(item => {
-    const status = item[today] || '';
-    if (status === 'MASUK' || status === '') {
-      hadir++;
-    } else if (status) {
-      tidakHadir++;
+    .day-status {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-  });
-  
-  document.getElementById('hadirHariIni').textContent = hadir;
-  document.getElementById('tidakHadir').textContent = tidakHadir;
-}
 
-// Update kelas filter
-function updateKelasFilter() {
-  const kelasSet = new Set();
-  allData.forEach(item => {
-    if (item.kelas && item.kelas !== "-" && item.kelas !== "") {
-      kelasSet.add(item.kelas);
+    .day-status:active {
+      transform: scale(0.9);
     }
-  });
-  
-  const select = document.getElementById("kelasFilter");
-  const currentValue = select.value;
-  
-  select.innerHTML = '<option value="">-- Semua Kelas --</option>';
-  
-  Array.from(kelasSet).sort().forEach(k => {
-    const opt = document.createElement("option");
-    opt.value = k;
-    opt.innerText = k;
-    select.appendChild(opt);
-  });
-  
-  if (currentValue && Array.from(kelasSet).includes(currentValue)) {
-    select.value = currentValue;
-  }
-}
 
-// Update siswa filter
-function updateSiswaFilter() {
-  const siswaSelect = document.getElementById("siswaFilter");
-  const currentValue = siswaSelect.value;
-  const currentNama = siswaSelect.options[siswaSelect.selectedIndex]?.dataset.nama || "";
-  
-  siswaSelect.innerHTML = '<option value="">-- Semua Siswa --</option>';
-  
-  let filteredSiswa = allData;
-  if (currentKelas) {
-    filteredSiswa = allData.filter(d => d.kelas === currentKelas);
-  }
-  
-  // Generate row mapping
-  rowMapping = {};
-  allData.forEach((item, index) => {
-    if (item.nama) {
-      rowMapping[item.nama] = index + 2;
+    .status-masuk { background: rgba(52, 199, 89, 0.1); color: var(--ios-green); }
+    .status-p { background: rgba(255, 149, 0, 0.1); color: var(--ios-orange); }
+    .status-s { background: rgba(255, 59, 48, 0.1); color: var(--ios-red); }
+    .status-a { background: rgba(142, 142, 147, 0.1); color: var(--ios-gray-1); }
+
+    /* iOS Toast */
+    .ios-toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(40, 40, 40, 0.95);
+      color: white;
+      padding: 14px 20px;
+      border-radius: 14px;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      z-index: 1000;
+      transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      border: 0.5px solid rgba(255, 255, 255, 0.1);
     }
-  });
-  
-  filteredSiswa.forEach(s => {
-    const opt = document.createElement("option");
-    const rowNum = rowMapping[s.nama] || 0;
-    opt.value = rowNum;
-    opt.innerText = s.nama;
-    opt.dataset.nama = s.nama;
-    siswaSelect.appendChild(opt);
-  });
-  
-  if (currentNama && rowMapping[currentNama]) {
-    for(let option of siswaSelect.options) {
-      if(option.dataset.nama === currentNama) {
-        siswaSelect.value = option.value;
-        currentSiswa = currentNama;
-        document.getElementById('selectedSiswa').textContent = currentNama;
-        break;
+
+    .ios-toast.show {
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* Main Layout */
+    .main-container {
+      max-width: 1200px;
+      margin: 80px auto 40px;
+      padding: 0 16px;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 24px;
+    }
+
+    /* Filter Badges */
+    .filter-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 16px 0;
+    }
+
+    .filter-badge {
+      background: rgba(0, 122, 255, 0.1);
+      color: var(--ios-primary);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-remove {
+      background: none;
+      border: none;
+      color: inherit;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    /* Table Controls */
+    .table-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      max-width: 300px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 16px 12px 44px;
+      background: var(--ios-gray-6);
+      border: 1.5px solid var(--ios-gray-5);
+      border-radius: 12px;
+      font-size: 16px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--ios-gray-1);
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 0.5px solid var(--ios-gray-5);
+    }
+
+    .pagination-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      border: none;
+      background: var(--ios-gray-6);
+      color: var(--ios-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .pagination-btn:active {
+      background: var(--ios-gray-5);
+    }
+
+    .pagination-info {
+      font-size: 14px;
+      color: var(--ios-gray-1);
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .status-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .navbar-content {
+        padding: 0 12px;
+      }
+      
+      .main-container {
+        margin: 72px auto 24px;
+        padding: 0 12px;
+      }
+      
+      .table-controls {
+        flex-direction: column;
+        gap: 12px;
+        align-items: stretch;
+      }
+      
+      .search-box {
+        max-width: 100%;
       }
     }
-  }
-}
 
-// Update kolom filter
-function updateKolomFilter() {
-  const select = document.getElementById("col");
-  const currentValue = select.value;
-  
-  select.innerHTML = '';
-  
-  for(let day = 1; day <= 31; day++) {
-    const opt = document.createElement("option");
-    opt.value = day;
-    opt.innerText = `Tanggal ${day}`;
-    select.appendChild(opt);
-  }
-  
-  if (currentValue) {
-    select.value = currentValue;
-  } else {
-    // Default to today
-    const today = new Date().getDate();
-    select.value = today;
-  }
-  
-  document.getElementById('selectedDate').textContent = `Tanggal ${select.value}`;
-}
-
-// Event handlers
-document.getElementById("kelasFilter").onchange = function() {
-  currentKelas = this.value;
-  currentSiswa = "";
-  
-  document.getElementById("kelasDisplay").innerText = currentKelas || "Semua Kelas";
-  document.getElementById("selectedSiswa").textContent = "-";
-  
-  updateSiswaFilter();
-  updateFilterBadges();
-  renderFilteredTable();
-  
-  closeMobileMenu();
-};
-
-document.getElementById("siswaFilter").onchange = function() {
-  const selectedOption = this.options[this.selectedIndex];
-  currentSiswa = selectedOption.dataset.nama || "";
-  
-  document.getElementById("selectedSiswa").textContent = currentSiswa || "-";
-  
-  updateFilterBadges();
-  renderFilteredTable();
-};
-
-document.getElementById("col").onchange = function() {
-  document.getElementById('selectedDate').textContent = `Tanggal ${this.value}`;
-};
-
-// Filter table by search
-function filterTable() {
-  const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-  renderFilteredTable(searchTerm);
-}
-
-// Update filter badges
-function updateFilterBadges() {
-  const badgesContainer = document.getElementById("filterBadges");
-  badgesContainer.innerHTML = "";
-  
-  if (currentKelas) {
-    const badge = document.createElement("div");
-    badge.className = "ios-badge";
-    badge.innerHTML = `
-      <i class="fas fa-graduation-cap"></i>
-      ${currentKelas}
-      <button onclick="clearFilter('kelas')" class="ml-2 hover:opacity-70">
-        <i class="fas fa-times text-xs"></i>
-      </button>
-    `;
-    badgesContainer.appendChild(badge);
-  }
-  
-  if (currentSiswa) {
-    const badge = document.createElement("div");
-    badge.className = "ios-badge";
-    badge.innerHTML = `
-      <i class="fas fa-user"></i>
-      ${currentSiswa}
-      <button onclick="clearFilter('siswa')" class="ml-2 hover:opacity-70">
-        <i class="fas fa-times text-xs"></i>
-      </button>
-    `;
-    badgesContainer.appendChild(badge);
-  }
-}
-
-// Clear filter
-function clearFilter(type) {
-  if (type === 'kelas') {
-    document.getElementById("kelasFilter").value = "";
-    currentKelas = "";
-    document.getElementById("kelasDisplay").innerText = "Semua Kelas";
-    document.getElementById("selectedSiswa").textContent = "-";
-    updateSiswaFilter();
-  } else if (type === 'siswa') {
-    document.getElementById("siswaFilter").value = "";
-    currentSiswa = "";
-    document.getElementById("selectedSiswa").textContent = "-";
-  }
-  
-  updateFilterBadges();
-  renderFilteredTable();
-}
-
-// Toggle view
-function toggleView() {
-  showAllData = !showAllData;
-  const btn = document.getElementById("toggleViewBtn");
-  btn.innerHTML = showAllData ? 
-    '<i class="fas fa-filter mr-2"></i><span class="hidden sm:inline">Filter</span>' :
-    '<i class="fas fa-eye mr-2"></i><span class="hidden sm:inline">Semua</span>';
-  
-  renderFilteredTable();
-}
-
-// Render filtered table
-function renderFilteredTable(searchTerm = "") {
-  let filteredData = allData;
-  
-  if (!showAllData) {
-    if (currentSiswa) {
-      filteredData = allData.filter(d => d.nama === currentSiswa);
-    } else if (currentKelas) {
-      filteredData = allData.filter(d => d.kelas === currentKelas);
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
     }
-  }
-  
-  // Apply search filter
-  if (searchTerm) {
-    filteredData = filteredData.filter(d => 
-      d.nama.toLowerCase().includes(searchTerm) || 
-      d.kelas.toLowerCase().includes(searchTerm)
-    );
-  }
-  
-  // Update data count
-  document.getElementById("dataCount").textContent = `• ${filteredData.length} data`;
-  
-  // Pagination
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  if (currentPage > totalPages && totalPages > 0) {
-    currentPage = totalPages;
-  }
-  
-  document.getElementById("totalPages").textContent = totalPages || 1;
-  document.getElementById("currentPage").textContent = currentPage;
-  
-  // Paginate data
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedData = filteredData.slice(startIndex, endIndex);
-  
-  // Render table
-  renderTable(paginatedData, filteredData.length);
-}
 
-// Navigation
-function prevPage() {
-  if (currentPage > 1) {
-    currentPage--;
-    renderFilteredTable();
-  }
-}
+    /* Loading State */
+    .ios-loader {
+      width: 20px;
+      height: 20px;
+      border: 2.5px solid rgba(0, 122, 255, 0.1);
+      border-top: 2.5px solid var(--ios-primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
 
-function nextPage() {
-  const totalPages = Math.ceil(
-    (currentSiswa ? allData.filter(d => d.nama === currentSiswa) :
-     currentKelas ? allData.filter(d => d.kelas === currentKelas) :
-     allData).length / itemsPerPage
-  );
-  
-  if (currentPage < totalPages) {
-    currentPage++;
-    renderFilteredTable();
-  }
-}
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-// Render table
-function renderTable(data, totalLength) {
-  const table = document.getElementById("sheetTable");
-  const emptyState = document.getElementById("emptyState");
-  
-  if(!data || data.length === 0) {
-    table.innerHTML = "";
-    emptyState.classList.remove("hidden");
-    return;
-  }
-  
-  emptyState.classList.add("hidden");
-  
-  // Create table header
-  let tableHTML = `
-    <thead>
-      <tr>
-        <th class="rounded-tl-xl">Nama</th>
-        <th>Kelas</th>
-        <th class="rounded-tr-xl">Tanggal 1-31</th>
-      </tr>
-    </thead>
-    <tbody>
-  `;
-  
-  // Create table rows
-  data.forEach((row, rowIndex) => {
-    tableHTML += `
-      <tr class="${rowIndex % 2 === 0 ? 'bg-white' : 'bg-[#F2F2F7]'}">
-        <td class="font-semibold">${row.nama || "-"}</td>
-        <td class="text-[#007AFF] font-medium">${row.kelas || "-"}</td>
-        <td>
-          <div class="flex overflow-x-auto ios-scrollbar gap-1 py-1">
-    `;
-    
-    // Add day cells
-    for(let day = 1; day <= 31; day++) {
-      const value = row[day.toString()] || "";
-      const displayValue = value === "" ? "MASUK" : value;
-      
-      let statusClass = "status-masuk";
-      if (displayValue === "P") statusClass = "status-p";
-      else if (displayValue === "S") statusClass = "status-s";
-      else if (displayValue === "I") statusClass = "status-i";
-      else if (displayValue === "A") statusClass = "status-a";
-      
-      tableHTML += `
-        <div class="flex flex-col items-center min-w-[44px]">
-          <span class="text-xs text-[#8E8E93] mb-1">${day}</span>
-          <div class="${statusClass} cursor-pointer hover:opacity-80 transition"
-               onclick="editCell('${row.nama}', ${day})">
-            ${displayValue === "MASUK" ? "✓" : displayValue}
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+    }
+
+    .empty-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--ios-gray-6);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      color: var(--ios-gray-3);
+      font-size: 24px;
+    }
+
+    /* Legend */
+    .status-legend {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+      padding: 16px;
+      background: var(--ios-gray-6);
+      border-radius: 12px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--ios-gray-1);
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 6px;
+    }
+
+    .dot-present { background: var(--ios-green); }
+    .dot-permit { background: var(--ios-orange); }
+    .dot-sick { background: var(--ios-red); }
+    .dot-absent { background: var(--ios-gray-1); }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .action-buttons .ios-btn {
+      flex: 1;
+    }
+
+    .action-buttons .ios-btn-secondary {
+      width: 56px;
+      flex: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- iOS Navbar -->
+  <nav class="ios-navbar">
+    <div class="navbar-content">
+      <div class="navbar-brand">
+        <div class="app-icon">
+          <i class="fas fa-calendar-check"></i>
+        </div>
+        <div>
+          <h1 style="font-size: 18px; font-weight: 700; margin: 0; color: #000;">Absensi Siswa</h1>
+          <p style="font-size: 12px; color: var(--ios-gray-1); margin: 2px 0 0 0;">Dashboard Presensi</p>
+        </div>
+      </div>
+      <div class="navbar-actions">
+        <button class="nav-btn" onclick="loadData(true)">
+          <i class="fas fa-sync-alt"></i>
+        </button>
+        <button class="nav-btn" onclick="exportData()">
+          <i class="fas fa-download"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-container">
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <div class="stat-item">
+        <div class="stat-content">
+          <div class="stat-info">
+            <h4>Total Siswa</h4>
+            <p id="totalSiswa">0</p>
+          </div>
+          <div class="stat-icon icon-blue">
+            <i class="fas fa-users"></i>
           </div>
         </div>
-      `;
-    }
-    
-    tableHTML += `
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-content">
+          <div class="stat-info">
+            <h4>Total Kelas</h4>
+            <p id="totalKelas">0</p>
           </div>
-        </td>
-      </tr>
-    `;
-  });
-  
-  tableHTML += "</tbody>";
-  table.innerHTML = tableHTML;
-}
+          <div class="stat-icon icon-green">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-content">
+          <div class="stat-info">
+            <h4>Hadir Hari Ini</h4>
+            <p id="hadirHariIni">0</p>
+          </div>
+          <div class="stat-icon icon-emerald">
+            <i class="fas fa-check-circle"></i>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-content">
+          <div class="stat-info">
+            <h4>Tidak Hadir</h4>
+            <p id="tidakHadir">0</p>
+          </div>
+          <div class="stat-icon icon-red">
+            <i class="fas fa-user-times"></i>
+          </div>
+        </div>
+      </div>
+    </div>
 
-// Edit cell on click
-function editCell(siswaName, tanggal) {
-  // Find student in dropdown
-  const siswaSelect = document.getElementById("siswaFilter");
-  for(let option of siswaSelect.options) {
-    if(option.dataset.nama === siswaName) {
-      siswaSelect.value = option.value;
-      currentSiswa = siswaName;
-      document.getElementById('selectedSiswa').textContent = siswaName;
-      break;
-    }
-  }
-  
-  // Set tanggal
-  document.getElementById("col").value = tanggal;
-  document.getElementById('selectedDate').textContent = `Tanggal ${tanggal}`;
-  
-  // Scroll to form on mobile
-  if (window.innerWidth < 1024) {
-    document.querySelector('#formContainer').scrollIntoView({ behavior: 'smooth' });
-  }
-  
-  updateFilterBadges();
-}
+    <div class="content-grid">
+      <!-- Left Column - Form -->
+      <div>
+        <div class="ios-card" style="padding: 24px; margin-bottom: 24px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 700; margin: 0 0 4px 0; color: #000;">
+                <i class="fas fa-edit" style="color: var(--ios-primary); margin-right: 8px;"></i>
+                Update Presensi
+              </h2>
+              <p style="font-size: 14px; color: var(--ios-gray-1); margin: 0;">Perbarui data kehadiran</p>
+            </div>
+            <label style="display: inline-block; width: 52px; height: 32px; position: relative;">
+              <input type="checkbox" id="toggleForm" checked 
+                     style="opacity: 0; width: 0; height: 0;">
+              <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--ios-gray-5); border-radius: 16px; transition: .4s;">
+                <span style="position: absolute; content: ''; height: 28px; width: 28px; left: 2px; bottom: 2px; background-color: white; border-radius: 50%; transition: .4s; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"></span>
+              </span>
+            </label>
+          </div>
 
-// Update cell
-async function updateCell() {
-  const siswaSelect = document.getElementById("siswaFilter");
-  const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
-  const _row = Number(siswaSelect.value);
-  const tanggal = Number(document.getElementById("col").value);
-  const value = document.getElementById("value").value.trim();
-  const siswaName = selectedOption?.dataset.nama || "";
+          <div id="formContainer">
+            <!-- Kelas Filter -->
+            <div class="ios-form-group">
+              <label class="ios-label">
+                <i class="fas fa-graduation-cap" style="margin-right: 8px; color: var(--ios-primary);"></i>
+                Pilih Kelas
+              </label>
+              <select id="kelasFilter" class="ios-select">
+                <option value="">-- Semua Kelas --</option>
+              </select>
+            </div>
 
-  if(!_row || !siswaName) {
-    showToast('Harap pilih siswa terlebih dahulu', 'error');
-    return;
-  }
-  
-  if(!tanggal) {
-    showToast('Harap pilih tanggal terlebih dahulu', 'error');
-    return;
-  }
-  
-  if(!value) {
-    showToast('Harap pilih status kehadiran', 'error');
-    return;
-  }
+            <!-- Siswa Filter -->
+            <div class="ios-form-group">
+              <label class="ios-label">
+                <i class="fas fa-user" style="margin-right: 8px; color: var(--ios-primary);"></i>
+                Pilih Siswa
+              </label>
+              <select id="siswaFilter" class="ios-select">
+                <option value="">-- Semua Siswa --</option>
+              </select>
+            </div>
 
-  const col = tanggal + 2;
+            <!-- Tanggal -->
+            <div class="ios-form-group">
+              <label class="ios-label">
+                <i class="fas fa-calendar-alt" style="margin-right: 8px; color: var(--ios-primary);"></i>
+                Pilih Tanggal
+              </label>
+              <select id="col" class="ios-select">
+                <option value="">-- Pilih Tanggal --</option>
+              </select>
+            </div>
 
-  const updateBtn = document.getElementById("updateBtn");
-  const updateText = document.getElementById("updateText");
-  const originalText = updateText.textContent;
-  
-  updateBtn.disabled = true;
-  updateText.textContent = "Mengirim...";
-  updateBtn.innerHTML = '<div class="ios-loader mr-2"></div> Mengirim...';
+            <!-- Status Kehadiran -->
+            <div class="ios-form-group">
+              <label class="ios-label">
+                <i class="fas fa-sticky-note" style="margin-right: 8px; color: var(--ios-primary);"></i>
+                Status Kehadiran
+              </label>
+              <div class="status-grid">
+                <button onclick="setStatus('MASUK')" class="status-btn status-present">
+                  <i class="fas fa-check"></i>
+                  Hadir
+                </button>
+                <button onclick="setStatus('P')" class="status-btn status-permit">
+                  <i class="fas fa-home"></i>
+                  Izin
+                </button>
+                <button onclick="setStatus('S')" class="status-btn status-sick">
+                  <i class="fas fa-heartbeat"></i>
+                  Sakit
+                </button>
+                <button onclick="setStatus('A')" class="status-btn status-absent">
+                  <i class="fas fa-times"></i>
+                  Alpha
+                </button>
+              </div>
+              <input type="hidden" id="value">
+            </div>
 
-  try {
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/plain" },
-      body: JSON.stringify({ _row, col, value })
+            <!-- Status Legend -->
+            <div class="status-legend">
+              <div class="legend-item">
+                <div class="legend-dot dot-present"></div>
+                <span>Hadir</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot dot-permit"></div>
+                <span>Izin</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot dot-sick"></div>
+                <span>Sakit</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-dot dot-absent"></div>
+                <span>Alpha</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+              <button onclick="updateCell()" id="updateBtn" class="ios-btn">
+                <i class="fas fa-paper-plane"></i>
+                <span id="updateText">Update</span>
+              </button>
+              <button onclick="resetForm()" class="ios-btn-secondary">
+                <i class="fas fa-redo"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Summary Card -->
+        <div class="ios-card" style="padding: 24px;">
+          <h3 style="font-size: 18px; font-weight: 700; margin: 0 0 20px 0; color: #000;">
+            <i class="fas fa-chart-pie" style="color: var(--ios-primary); margin-right: 8px;"></i>
+            Ringkasan
+          </h3>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-size: 14px; color: var(--ios-gray-1);">Kelas Aktif</span>
+              <span id="aktifKelas" style="font-weight: 600;">-</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-size: 14px; color: var(--ios-gray-1);">Siswa Terpilih</span>
+              <span id="selectedSiswa" style="font-weight: 600;">-</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="font-size: 14px; color: var(--ios-gray-1);">Tanggal</span>
+              <span id="selectedDate" style="font-weight: 600;">-</span>
+            </div>
+            <div style="padding-top: 16px; border-top: 0.5px solid var(--ios-gray-5); text-align: center;">
+              <p style="font-size: 12px; color: var(--ios-gray-1); margin: 0;">
+                <i class="fas fa-history" style="margin-right: 4px;"></i>
+                Terakhir diperbarui: <span id="lastUpdated">-</span>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Table -->
+      <div>
+        <div class="ios-card" style="padding: 24px;">
+          <!-- Table Header -->
+          <div class="table-controls">
+            <div>
+              <h2 style="font-size: 20px; font-weight: 700; margin: 0 0 4px 0; color: #000;">
+                <i class="fas fa-table" style="color: var(--ios-green); margin-right: 8px;"></i>
+                Data Presensi
+              </h2>
+              <div style="font-size: 14px; color: var(--ios-gray-1);">
+                <span id="kelasDisplay" style="font-weight: 600; color: var(--ios-primary);">Semua Kelas</span>
+                <span id="dataCount" style="margin-left: 8px;">• 0 data</span>
+              </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <button onclick="toggleView()" id="toggleViewBtn" class="ios-btn-secondary" style="padding: 12px 16px;">
+                <i class="fas fa-eye"></i>
+                <span style="margin-left: 6px; display: none;" class="desktop-only">Tampilkan Semua</span>
+              </button>
+              <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Cari siswa..." 
+                       class="search-input" onkeyup="filterTable()">
+              </div>
+            </div>
+          </div>
+
+          <!-- Filter Badges -->
+          <div id="filterBadges" class="filter-badges">
+            <!-- Badges will appear here -->
+          </div>
+
+          <!-- Table Container -->
+          <div class="ios-table-container">
+            <div style="overflow-x: auto; max-height: 500px;">
+              <table id="sheetTable" class="ios-table">
+                <!-- Table will be populated automatically -->
+              </table>
+              
+              <!-- Empty State -->
+              <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-icon">
+                  <i class="fas fa-clipboard-list"></i>
+                </div>
+                <p style="font-size: 16px; font-weight: 600; color: var(--ios-gray-1); margin: 0 0 8px 0;">Tidak ada data</p>
+                <p style="font-size: 14px; color: var(--ios-gray-2); margin: 0 0 20px 0;">Pilih kelas atau siswa untuk melihat data presensi</p>
+                <button onclick="loadData(true)" class="ios-btn" style="width: auto; padding: 12px 24px;">
+                  <i class="fas fa-sync-alt"></i>
+                  Muat Ulang Data
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <button onclick="prevPage()" class="pagination-btn">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="pagination-info">
+              Halaman <span id="currentPage" style="font-weight: 600;">1</span>
+              dari <span id="totalPages" style="font-weight: 600;">1</span>
+            </div>
+            <button onclick="nextPage()" class="pagination-btn">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- iOS Toast -->
+  <div id="iosToast" class="ios-toast">
+    <i class="fas fa-check-circle" style="font-size: 18px; color: var(--ios-green);"></i>
+    <div>
+      <p style="font-weight: 600; margin: 0; font-size: 15px;">Berhasil!</p>
+      <p id="toastMessage" style="margin: 2px 0 0 0; font-size: 14px; opacity: 0.9;">Data berhasil diperbarui</p>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbyqQOikUdA_eg8KsEGsU5HwPN5U0mNpiQ0EaXS7AWD9oXZ2le0AWZ7IqI5v080bLN6s/exec";
+
+    let allData = [];
+    let currentKelas = "";
+    let currentSiswa = "";
+    let showAllData = false;
+    let rowMapping = {};
+    let currentPage = 1;
+    const itemsPerPage = 8;
+
+    // Toggle form visibility
+    document.getElementById('toggleForm').addEventListener('change', function(e) {
+      const formContainer = document.getElementById('formContainer');
+      if (e.target.checked) {
+        formContainer.style.display = 'block';
+        setTimeout(() => formContainer.style.opacity = '1', 10);
+      } else {
+        formContainer.style.opacity = '0';
+        setTimeout(() => formContainer.style.display = 'none', 200);
+      }
     });
 
-    await res.text();
-    
-    // Update local data
-    const index = allData.findIndex(d => d.nama === siswaName);
-    if (index !== -1) {
-      allData[index][tanggal.toString()] = value;
+    // Set status from buttons
+    function setStatus(status) {
+      document.getElementById('value').value = status;
+      
+      // Highlight selected button
+      const buttons = document.querySelectorAll('.status-btn');
+      buttons.forEach(btn => {
+        btn.style.transform = 'scale(1)';
+        btn.style.boxShadow = 'none';
+        if (btn.onclick && btn.onclick.toString().includes(`'${status}'`)) {
+          btn.style.transform = 'scale(0.95)';
+          btn.style.boxShadow = '0 0 0 2px var(--ios-primary)';
+        }
+      });
     }
-    
-    // Reset form
-    resetForm();
-    
+
+    // Load data on startup
+    window.onload = async function() {
+      await loadData(false);
+      
+      // Set today's date
+      const today = new Date().getDate();
+      document.getElementById('col').value = today;
+      document.getElementById('selectedDate').textContent = `Tanggal ${today}`;
+      
+      // Show desktop text only on desktop
+      if (window.innerWidth >= 768) {
+        document.querySelectorAll('.desktop-only').forEach(el => {
+          el.style.display = 'inline';
+        });
+      }
+    };
+
+    // Load data
+    async function loadData(showLoading = true) {
+      try {
+        if (showLoading) {
+          showLoadingState(true);
+        }
+        
+        const res = await fetch(API_URL);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        
+        const data = await res.json();
+        
+        // Reorder data
+        allData = data.map(row => {
+          const { kelas, nama, ...rest } = row;
+          return { 
+            nama, 
+            kelas, 
+            ...rest
+          };
+        });
+        
+        // Update stats
+        updateStats();
+        
+        // Update kelas filter
+        updateKelasFilter();
+        
+        // Update siswa filter
+        updateSiswaFilter();
+        
+        // Update kolom filter
+        updateKolomFilter();
+        
+        // Render tabel
+        renderFilteredTable();
+        
+        // Update last updated time
+        const now = new Date();
+        document.getElementById('lastUpdated').textContent = 
+          `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+        
+        showToast('Data berhasil dimuat ulang', 'success');
+        
+      } catch(e) {
+        console.error("Error loading data:", e);
+        showToast('Gagal memuat data', 'error');
+      } finally {
+        if (showLoading) {
+          showLoadingState(false);
+        }
+      }
+    }
+
     // Update stats
-    updateStats();
-    
-    // Show success
-    showToast(`${siswaName} - Tanggal ${tanggal}: ${getStatusText(value)}`, 'success');
-    
-    // Refresh table
-    renderFilteredTable();
-    
-  } catch(e) {
-    console.error("Update error:", e);
-    showToast('Gagal mengirim data', 'error');
-  } finally {
-    updateBtn.disabled = false;
-    updateText.textContent = originalText;
-    updateBtn.innerHTML = '<i class="fas fa-paper-plane mr-2"></i>' + originalText;
-  }
-}
-
-// Get status text
-function getStatusText(code) {
-  const statusMap = {
-    'MASUK': 'Hadir',
-    'P': 'Izin',
-    'S': 'Sakit',
-    'I': 'Izin Kegiatan',
-    'A': 'Alpha'
-  };
-  return statusMap[code] || code;
-}
-
-// Reset form
-function resetForm() {
-  document.getElementById("value").value = "";
-  
-  // Clear button highlights
-  const buttons = document.querySelectorAll('#formContainer button');
-  buttons.forEach(btn => {
-    btn.classList.remove('ring-2', 'ring-offset-2', 'ring-[#007AFF]');
-  });
-  
-  showToast('Form berhasil direset', 'info');
-}
-
-// Export data
-function exportData() {
-  let dataToExport = allData;
-  
-  if (currentSiswa) {
-    dataToExport = allData.filter(d => d.nama === currentSiswa);
-  } else if (currentKelas) {
-    dataToExport = allData.filter(d => d.kelas === currentKelas);
-  }
-  
-  const dataStr = JSON.stringify(dataToExport, null, 2);
-  const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-  const exportFileDefaultName = `absensi-${currentKelas || 'semua'}-${new Date().toISOString().split('T')[0]}.json`;
-  
-  const linkElement = document.createElement('a');
-  linkElement.setAttribute('href', dataUri);
-  linkElement.setAttribute('download', exportFileDefaultName);
-  linkElement.click();
-  
-  showToast('Data berhasil diunduh', 'success');
-}
-
-// Show/hide loading
-function showLoadingState(show) {
-  const refreshBtn = document.querySelector('button:has(.fa-sync-alt)');
-  if (refreshBtn) {
-    if (show) {
-      refreshBtn.disabled = true;
-      refreshBtn.innerHTML = '<div class="ios-loader"></div>';
-    } else {
-      refreshBtn.disabled = false;
-      refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+    function updateStats() {
+      const totalSiswa = new Set(allData.map(d => d.nama)).size;
+      const totalKelas = new Set(allData.map(d => d.kelas).filter(k => k && k !== '-')).size;
+      
+      document.getElementById('totalSiswa').textContent = totalSiswa;
+      document.getElementById('totalKelas').textContent = totalKelas;
+      document.getElementById('aktifKelas').textContent = totalKelas;
+      
+      // Calculate today's attendance
+      const today = new Date().getDate();
+      let hadir = 0;
+      let tidakHadir = 0;
+      
+      allData.forEach(item => {
+        const status = item[today] || '';
+        if (status === 'MASUK' || status === '') {
+          hadir++;
+        } else if (status) {
+          tidakHadir++;
+        }
+      });
+      
+      document.getElementById('hadirHariIni').textContent = hadir;
+      document.getElementById('tidakHadir').textContent = tidakHadir;
     }
-  }
-}
 
-// Show toast
-function showToast(message, type = 'info') {
-  const toast = document.getElementById('iosToast');
-  const toastMessage = document.getElementById('toastMessage');
-  
-  // Set icon based on type
-  let icon = 'fas fa-check-circle';
-  if (type === 'error') icon = 'fas fa-exclamation-circle';
-  else if (type === 'info') icon = 'fas fa-info-circle';
-  else if (type === 'warning') icon = 'fas fa-exclamation-triangle';
-  
-  toast.querySelector('i').className = `${icon} text-xl mr-3 ${
-    type === 'success' ? 'text-[#34C759]' :
-    type === 'error' ? 'text-[#FF3B30]' :
-    type === 'warning' ? 'text-[#FF9500]' :
-    'text-[#5AC8FA]'
-  }`;
-  
-  toastMessage.textContent = message;
-  
-  // Show toast
-  toast.classList.remove('translate-y-full');
-  
-  // Auto hide
-  setTimeout(() => {
-    toast.classList.add('translate-y-full');
-  }, 3000);
-}
-</script>
+    // Update kelas filter
+    function updateKelasFilter() {
+      const kelasSet = new Set();
+      allData.forEach(item => {
+        if (item.kelas && item.kelas !== "-" && item.kelas !== "") {
+          kelasSet.add(item.kelas);
+        }
+      });
+      
+      const select = document.getElementById("kelasFilter");
+      const currentValue = select.value;
+      
+      select.innerHTML = '<option value="">-- Semua Kelas --</option>';
+      
+      Array.from(kelasSet).sort().forEach(k => {
+        const opt = document.createElement("option");
+        opt.value = k;
+        opt.innerText = k;
+        select.appendChild(opt);
+      });
+      
+      if (currentValue && Array.from(kelasSet).includes(currentValue)) {
+        select.value = currentValue;
+      }
+    }
+
+    // Update siswa filter
+    function updateSiswaFilter() {
+      const siswaSelect = document.getElementById("siswaFilter");
+      const currentValue = siswaSelect.value;
+      const currentNama = siswaSelect.options[siswaSelect.selectedIndex]?.dataset.nama || "";
+      
+      siswaSelect.innerHTML = '<option value="">-- Semua Siswa --</option>';
+      
+      let filteredSiswa = allData;
+      if (currentKelas) {
+        filteredSiswa = allData.filter(d => d.kelas === currentKelas);
+      }
+      
+      // Generate row mapping
+      rowMapping = {};
+      allData.forEach((item, index) => {
+        if (item.nama) {
+          rowMapping[item.nama] = index + 2;
+        }
+      });
+      
+      filteredSiswa.forEach(s => {
+        const opt = document.createElement("option");
+        const rowNum = rowMapping[s.nama] || 0;
+        opt.value = rowNum;
+        opt.innerText = s.nama;
+        opt.dataset.nama = s.nama;
+        siswaSelect.appendChild(opt);
+      });
+      
+      if (currentNama && rowMapping[currentNama]) {
+        for(let option of siswaSelect.options) {
+          if(option.dataset.nama === currentNama) {
+            siswaSelect.value = option.value;
+            currentSiswa = currentNama;
+            document.getElementById('selectedSiswa').textContent = currentNama;
+            break;
+          }
+        }
+      }
+    }
+
+    // Update kolom filter
+    function updateKolomFilter() {
+      const select = document.getElementById("col");
+      const currentValue = select.value;
+      
+      select.innerHTML = '';
+      
+      for(let day = 1; day <= 31; day++) {
+        const opt = document.createElement("option");
+        opt.value = day;
+        opt.innerText = `Tanggal ${day}`;
+        select.appendChild(opt);
+      }
+      
+      if (currentValue) {
+        select.value = currentValue;
+      } else {
+        // Default to today
+        const today = new Date().getDate();
+        select.value = today;
+      }
+      
+      document.getElementById('selectedDate').textContent = `Tanggal ${select.value}`;
+    }
+
+    // Event handlers
+    document.getElementById("kelasFilter").onchange = function() {
+      currentKelas = this.value;
+      currentSiswa = "";
+      
+      document.getElementById("kelasDisplay").innerText = currentKelas || "Semua Kelas";
+      document.getElementById("selectedSiswa").textContent = "-";
+      
+      updateSiswaFilter();
+      updateFilterBadges();
+      renderFilteredTable();
+    };
+
+    document.getElementById("siswaFilter").onchange = function() {
+      const selectedOption = this.options[this.selectedIndex];
+      currentSiswa = selectedOption.dataset.nama || "";
+      
+      document.getElementById("selectedSiswa").textContent = currentSiswa || "-";
+      
+      updateFilterBadges();
+      renderFilteredTable();
+    };
+
+    document.getElementById("col").onchange = function() {
+      document.getElementById('selectedDate').textContent = `Tanggal ${this.value}`;
+    };
+
+    // Filter table by search
+    function filterTable() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      renderFilteredTable(searchTerm);
+    }
+
+    // Update filter badges
+    function updateFilterBadges() {
+      const badgesContainer = document.getElementById("filterBadges");
+      badgesContainer.innerHTML = "";
+      
+      if (currentKelas) {
+        const badge = document.createElement("div");
+        badge.className = "filter-badge";
+        badge.innerHTML = `
+          <i class="fas fa-graduation-cap"></i>
+          ${currentKelas}
+          <button onclick="clearFilter('kelas')" class="badge-remove">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        badgesContainer.appendChild(badge);
+      }
+      
+      if (currentSiswa) {
+        const badge = document.createElement("div");
+        badge.className = "filter-badge";
+        badge.innerHTML = `
+          <i class="fas fa-user"></i>
+          ${currentSiswa}
+          <button onclick="clearFilter('siswa')" class="badge-remove">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        badgesContainer.appendChild(badge);
+      }
+    }
+
+    // Clear filter
+    function clearFilter(type) {
+      if (type === 'kelas') {
+        document.getElementById("kelasFilter").value = "";
+        currentKelas = "";
+        document.getElementById("kelasDisplay").innerText = "Semua Kelas";
+        document.getElementById("selectedSiswa").textContent = "-";
+        updateSiswaFilter();
+      } else if (type === 'siswa') {
+        document.getElementById("siswaFilter").value = "";
+        currentSiswa = "";
+        document.getElementById("selectedSiswa").textContent = "-";
+      }
+      
+      updateFilterBadges();
+      renderFilteredTable();
+    }
+
+    // Toggle view
+    function toggleView() {
+      showAllData = !showAllData;
+      const btn = document.getElementById("toggleViewBtn");
+      const icon = btn.querySelector('i');
+      const text = btn.querySelector('span');
+      
+      if (showAllData) {
+        icon.className = 'fas fa-filter';
+        if (text) text.textContent = 'Filter';
+      } else {
+        icon.className = 'fas fa-eye';
+        if (text) text.textContent = 'Semua';
+      }
+      
+      renderFilteredTable();
+    }
+
+    // Render filtered table
+    function renderFilteredTable(searchTerm = "") {
+      let filteredData = allData;
+      
+      if (!showAllData) {
+        if (currentSiswa) {
+          filteredData = allData.filter(d => d.nama === currentSiswa);
+        } else if (currentKelas) {
+          filteredData = allData.filter(d => d.kelas === currentKelas);
+        }
+      }
+      
+      // Apply search filter
+      if (searchTerm) {
+        filteredData = filteredData.filter(d => 
+          d.nama.toLowerCase().includes(searchTerm) || 
+          d.kelas.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      // Update data count
+      document.getElementById("dataCount").textContent = `• ${filteredData.length} data`;
+      
+      // Pagination
+      const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+      if (currentPage > totalPages && totalPages > 0) {
+        currentPage = totalPages;
+      }
+      
+      document.getElementById("totalPages").textContent = totalPages || 1;
+      document.getElementById("currentPage").textContent = currentPage;
+      
+      // Paginate data
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedData = filteredData.slice(startIndex, endIndex);
+      
+      // Render table
+      renderTable(paginatedData, filteredData.length);
+    }
+
+    // Navigation
+    function prevPage() {
+      if (currentPage > 1) {
+        currentPage--;
+        renderFilteredTable();
+      }
+    }
+
+    function nextPage() {
+      const totalPages = Math.ceil(
+        (currentSiswa ? allData.filter(d => d.nama === currentSiswa) :
+         currentKelas ? allData.filter(d => d.kelas === currentKelas) :
+         allData).length / itemsPerPage
+      );
+      
+      if (currentPage < totalPages) {
+        currentPage++;
+        renderFilteredTable();
+      }
+    }
+
+    // Render table
+    function renderTable(data, totalLength) {
+      const table = document.getElementById("sheetTable");
+      const emptyState = document.getElementById("emptyState");
+      
+      if(!data || data.length === 0) {
+        table.innerHTML = "";
+        emptyState.style.display = 'block';
+        return;
+      }
+      
+      emptyState.style.display = 'none';
+      
+      // Create table header
+      let tableHTML = `
+        <thead>
+          <tr>
+            <th>Nama</th>
+            <th>Kelas</th>
+            <th>Tanggal 1-31</th>
+          </tr>
+        </thead>
+        <tbody>
+      `;
+      
+      // Create table rows
+      data.forEach((row) => {
+        tableHTML += `
+          <tr>
+            <td style="font-weight: 600;">${row.nama || "-"}</td>
+            <td style="color: var(--ios-primary); font-weight: 500;">${row.kelas || "-"}</td>
+            <td>
+              <div class="days-container">
+        `;
+        
+        // Add day cells
+        for(let day = 1; day <= 31; day++) {
+          const value = row[day.toString()] || "";
+          const displayValue = value === "" ? "MASUK" : value;
+          
+          let statusClass = "status-masuk";
+          if (displayValue === "P") statusClass = "status-p";
+          else if (displayValue === "S") statusClass = "status-s";
+          else if (displayValue === "I") statusClass = "status-p"; // Using permit for Izin Kegiatan
+          else if (displayValue === "A") statusClass = "status-a";
+          
+          tableHTML += `
+            <div class="day-cell">
+              <div class="day-number">${day}</div>
+              <div class="day-status ${statusClass}" onclick="editCell('${row.nama}', ${day})">
+                ${displayValue === "MASUK" ? "✓" : displayValue.charAt(0)}
+              </div>
+            </div>
+          `;
+        }
+        
+        tableHTML += `
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+      
+      tableHTML += "</tbody>";
+      table.innerHTML = tableHTML;
+    }
+
+    // Edit cell on click
+    function editCell(siswaName, tanggal) {
+      // Find student in dropdown
+      const siswaSelect = document.getElementById("siswaFilter");
+      for(let option of siswaSelect.options) {
+        if(option.dataset.nama === siswaName) {
+          siswaSelect.value = option.value;
+          currentSiswa = siswaName;
+          document.getElementById('selectedSiswa').textContent = siswaName;
+          break;
+        }
+      }
+      
+      // Set tanggal
+      document.getElementById("col").value = tanggal;
+      document.getElementById('selectedDate').textContent = `Tanggal ${tanggal}`;
+      
+      // Scroll to form on mobile
+      if (window.innerWidth < 768) {
+        document.getElementById('formContainer').scrollIntoView({ behavior: 'smooth' });
+      }
+      
+      updateFilterBadges();
+    }
+
+    // Update cell
+    async function updateCell() {
+      const siswaSelect = document.getElementById("siswaFilter");
+      const selectedOption = siswaSelect.options[siswaSelect.selectedIndex];
+      const _row = Number(siswaSelect.value);
+      const tanggal = Number(document.getElementById("col").value);
+      const value = document.getElementById("value").value.trim();
+      const siswaName = selectedOption?.dataset.nama || "";
+
+      if(!_row || !siswaName) {
+        showToast('Harap pilih siswa terlebih dahulu', 'error');
+        return;
+      }
+      
+      if(!tanggal) {
+        showToast('Harap pilih tanggal terlebih dahulu', 'error');
+        return;
+      }
+      
+      if(!value) {
+        showToast('Harap pilih status kehadiran', 'error');
+        return;
+      }
+
+      const col = tanggal + 2;
+
+      const updateBtn = document.getElementById("updateBtn");
+      const updateText = document.getElementById("updateText");
+      const originalText = updateText.textContent;
+      
+      updateBtn.disabled = true;
+      updateText.textContent = "Mengirim...";
+      updateBtn.innerHTML = '<div class="ios-loader" style="display: inline-block; margin-right: 8px;"></div> Mengirim...';
+
+      try {
+        const res = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain" },
+          body: JSON.stringify({ _row, col, value })
+        });
+
+        await res.text();
+        
+        // Update local data
+        const index = allData.findIndex(d => d.nama === siswaName);
+        if (index !== -1) {
+          allData[index][tanggal.toString()] = value;
+        }
+        
+        // Reset form
+        resetForm();
+        
+        // Update stats
+        updateStats();
+        
+        // Show success
+        showToast(`${siswaName} - Tanggal ${tanggal}: ${getStatusText(value)}`, 'success');
+        
+        // Refresh table
+        renderFilteredTable();
+        
+      } catch(e) {
+        console.error("Update error:", e);
+        showToast('Gagal mengirim data', 'error');
+      } finally {
+        updateBtn.disabled = false;
+        updateText.textContent = originalText;
+        updateBtn.innerHTML = '<i class="fas fa-paper-plane" style="margin-right: 8px;"></i>' + originalText;
+      }
+    }
+
+    // Get status text
+    function getStatusText(code) {
+      const statusMap = {
+        'MASUK': 'Hadir',
+        'P': 'Izin',
+        'S': 'Sakit',
+        'I': 'Izin Kegiatan',
+        'A': 'Alpha'
+      };
+      return statusMap[code] || code;
+    }
+
+    // Reset form
+    function resetForm() {
+      document.getElementById("value").value = "";
+      
+      // Clear button highlights
+      const buttons = document.querySelectorAll('.status-btn');
+      buttons.forEach(btn => {
+        btn.style.transform = 'scale(1)';
+        btn.style.boxShadow = 'none';
+      });
+      
+      showToast('Form berhasil direset', 'info');
+    }
+
+    // Export data
+    function exportData() {
+      let dataToExport = allData;
+      
+      if (currentSiswa) {
+        dataToExport = allData.filter(d => d.nama === currentSiswa);
+      } else if (currentKelas) {
+        dataToExport = allData.filter(d => d.kelas === currentKelas);
+      }
+      
+      const dataStr = JSON.stringify(dataToExport, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      const exportFileDefaultName = `absensi-${currentKelas || 'semua'}-${new Date().toISOString().split('T')[0]}.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+      
+      showToast('Data berhasil diunduh', 'success');
+    }
+
+    // Show/hide loading
+    function showLoadingState(show) {
+      const refreshBtn = document.querySelector('button:has(.fa-sync-alt)');
+      if (refreshBtn) {
+        if (show) {
+          refreshBtn.disabled = true;
+          refreshBtn.innerHTML = '<div class="ios-loader"></div>';
+        } else {
+          refreshBtn.disabled = false;
+          refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
+        }
+      }
+    }
+
+    // Show toast
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('iosToast');
+      const toastMessage = document.getElementById('toastMessage');
+      const icon = toast.querySelector('i');
+      
+      // Set icon based on type
+      if (type === 'success') {
+        icon.className = 'fas fa-check-circle';
+        icon.style.color = 'var(--ios-green)';
+        toast.querySelector('p').textContent = 'Berhasil!';
+      } else if (type === 'error') {
+        icon.className = 'fas fa-exclamation-circle';
+        icon.style.color = 'var(--ios-red)';
+        toast.querySelector('p').textContent = 'Error!';
+      } else if (type === 'info') {
+        icon.className = 'fas fa-info-circle';
+        icon.style.color = 'var(--ios-blue)';
+        toast.querySelector('p').textContent = 'Info';
+      }
+      
+      toastMessage.textContent = message;
+      
+      // Show toast
+      toast.classList.add('show');
+      
+      // Auto hide
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Responsive adjustments
+    window.addEventListener('resize', function() {
+      if (window.innerWidth >= 768) {
+        document.querySelectorAll('.desktop-only').forEach(el => {
+          el.style.display = 'inline';
+        });
+      } else {
+        document.querySelectorAll('.desktop-only').forEach(el => {
+          el.style.display = 'none';
+        });
+      }
+    });
+  </script>
 </body>
 </html>
