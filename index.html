@@ -6,351 +6,160 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    /* Custom iOS-like styles */
-    :root {
-      --primary: #007AFF;
-      --secondary: #5856D6;
-      --success: #34C759;
-      --danger: #FF3B30;
-      --warning: #FF9500;
-      --info: #5AC8FA;
-      --light: #F2F2F7;
-      --dark: #1C1C1E;
-    }
+<style>
+  /* Custom iOS 15-like styles - DIOPTIMASI UNTUK ANDROID */
+  :root {
+    --primary: #007AFF;
+    --secondary: #5856D6;
+    --success: #34C759;
+    --danger: #FF3B30;
+    --warning: #FF9500;
+    --info: #5AC8FA;
+    --light: #F7F7F8;
+    --dark: #1C1C1E;
+  }
 
-    /* Smooth scrolling and iOS-like animations */
-    * {
-      -webkit-tap-highlight-color: transparent;
-    }
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: linear-gradient(135deg, #F5F7FA 0%, #E4EDF5 100%);
-      color: #1C1C1E;
-    }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: linear-gradient(135deg, #F5F7FA 0%, #E4EDF5 100%);
+    color: #1C1C1E;
+    margin: 0;
+    padding: 0;
+  }
 
-    /* Glassmorphism effect */
+  /* Glass card - RINGAN: tanpa blur berat */
+  .glass-card {
+    background: rgba(255, 255, 255, 0.75);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    backdrop-filter: saturate(180%) blur(4px); /* blur dikecilin banget, masih ada efek tapi ringan */
+    -webkit-backdrop-filter: saturate(180%) blur(4px);
+  }
+
+  /* Navbar glass - tetap pakai blur tipis */
+  .glass-navbar {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: saturate(180%) blur(8px);
+    -webkit-backdrop-filter: saturate(180%) blur(8px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  /* Button iOS 15 style - optimasi transisi */
+  .ios-btn {
+    background: linear-gradient(180deg, #007AFF 0%, #0066E0 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 14px 20px;
+    font-weight: 600;
+    font-size: 17px;
+    letter-spacing: -0.3px;
+    transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 4px 10px rgba(0, 122, 255, 0.2);
+    will-change: transform;
+  }
+
+  .ios-btn:active {
+    transform: scale(0.96);
+    opacity: 0.9;
+  }
+
+  .ios-btn-secondary {
+    background: #F2F2F7;
+    color: #007AFF;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+  }
+
+  /* Form elements */
+  .ios-select, .ios-input {
+    background: white;
+    border: 1px solid #C7C7CC;
+    border-radius: 12px;
+    padding: 14px 16px;
+    font-size: 17px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .ios-select:focus, .ios-input:focus {
+    outline: none;
+    border-color: #007AFF;
+    box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+  }
+
+  /* Table optimasi */
+  .ios-table tr {
+    transition: background 0.15s ease;
+  }
+
+  .ios-table tr:hover td {
+    background: rgba(0, 122, 255, 0.05);
+  }
+
+  /* Toast - ringan */
+  .ios-toast {
+    background: rgba(30, 30, 30, 0.95);
+    color: white;
+    border-radius: 14px;
+    padding: 16px 20px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform, opacity;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* FAB */
+  .fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    will-change: transform;
+    z-index: 1000;
+  }
+
+  .fab:active {
+    transform: scale(0.92);
+  }
+
+  /* Loading spinner tetap */
+  .ios-loader {
+    width: 20px;
+    height: 20px;
+    border: 2.5px solid rgba(0, 122, 255, 0.2);
+    border-top: 2.5px solid #007AFF;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Mobile optimasi */
+  @media (max-width: 640px) {
     .glass-card {
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.05),
-        0 2px 8px rgba(0, 0, 0, 0.03);
-    }
-
-    .glass-navbar {
-      background: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    /* iOS-like buttons */
-    .ios-btn {
-      background: linear-gradient(180deg, #007AFF 0%, #0056D6 100%);
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 14px 20px;
-      font-weight: 600;
-      font-size: 16px;
-      letter-spacing: -0.2px;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 
-        0 4px 12px rgba(0, 122, 255, 0.15),
-        0 2px 4px rgba(0, 122, 255, 0.1);
-    }
-
-    .ios-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 
-        0 6px 20px rgba(0, 122, 255, 0.2),
-        0 4px 8px rgba(0, 122, 255, 0.15);
-    }
-
-    .ios-btn:active {
-      transform: translateY(0);
-      box-shadow: 
-        0 2px 6px rgba(0, 122, 255, 0.1),
-        0 1px 2px rgba(0, 122, 255, 0.05);
-    }
-
-    .ios-btn-secondary {
-      background: linear-gradient(180deg, #F2F2F7 0%, #E5E5EA 100%);
-      color: #007AFF;
-      border: 1px solid rgba(0, 0, 0, 0.05);
-    }
-
-    /* iOS-like form elements */
-    .ios-select, .ios-input {
+      backdrop-filter: none; /* matiin blur di mobile biar ngebut */
+      -webkit-backdrop-filter: none;
       background: rgba(255, 255, 255, 0.9);
-      border: 1.5px solid #C7C7CC;
-      border-radius: 12px;
-      padding: 14px 16px;
-      font-size: 16px;
-      transition: all 0.2s ease;
     }
-
-    .ios-select:focus, .ios-input:focus {
-      outline: none;
-      border-color: #007AFF;
-      box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
-    }
-
-    /* iOS-like badges */
-    .ios-badge {
-      background: rgba(0, 122, 255, 0.1);
-      color: #007AFF;
-      border-radius: 20px;
-      padding: 6px 14px;
-      font-size: 13px;
-      font-weight: 500;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    /* Custom scrollbar iOS-like */
-    .ios-scrollbar {
-      scrollbar-width: thin;
-      scrollbar-color: #C7C7CC transparent;
-    }
-
-    .ios-scrollbar::-webkit-scrollbar {
-      width: 4px;
-      height: 4px;
-    }
-
-    .ios-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-      border-radius: 2px;
-    }
-
-    .ios-scrollbar::-webkit-scrollbar-thumb {
-      background: #C7C7CC;
-      border-radius: 2px;
-    }
-
-    .ios-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #8E8E93;
-    }
-
-    /* Loading animation */
-    .ios-loader {
-      width: 20px;
-      height: 20px;
-      border: 2.5px solid rgba(0, 122, 255, 0.1);
-      border-top: 2.5px solid #007AFF;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-
-    /* iOS-like table */
-    .ios-table {
-      border-collapse: separate;
-      border-spacing: 0;
-    }
-
-    .ios-table th {
-      background: #F2F2F7;
-      color: #8E8E93;
-      font-weight: 600;
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 12px 16px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
-
-    .ios-table td {
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-      transition: background 0.2s ease;
-    }
-
-    .ios-table tr:hover td {
-      background: rgba(0, 122, 255, 0.03);
-    }
-
-    /* Status colors iOS-like */
-    .status-masuk {
-      background: rgba(52, 199, 89, 0.1);
-      color: #34C759;
-      border-radius: 8px;
-      padding: 4px 8px;
-      font-weight: 600;
-    }
-
-    .status-p {
-      background: rgba(255, 149, 0, 0.1);
-      color: #FF9500;
-      border-radius: 8px;
-      padding: 4px 8px;
-      font-weight: 600;
-    }
-
-    .status-s {
-      background: rgba(255, 59, 48, 0.1);
-      color: #FF3B30;
-      border-radius: 8px;
-      padding: 4px 8px;
-      font-weight: 600;
-    }
-
-    .status-i {
-      background: rgba(90, 200, 250, 0.1);
-      color: #5AC8FA;
-      border-radius: 8px;
-      padding: 4px 8px;
-      font-weight: 600;
-    }
-
-    .status-a {
-      background: rgba(142, 142, 147, 0.1);
-      color: #8E8E93;
-      border-radius: 8px;
-      padding: 4px 8px;
-      font-weight: 600;
-    }
-
-    /* iOS-like toast */
-    .ios-toast {
-      background: rgba(40, 40, 40, 0.95);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      color: white;
-      border-radius: 14px;
-      padding: 16px 20px;
-      box-shadow: 
-        0 12px 32px rgba(0, 0, 0, 0.15),
-        0 4px 12px rgba(0, 0, 0, 0.1);
-      animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    @keyframes slideUp {
-      from {
-        transform: translateY(100px);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(0);
-        opacity: 1;
-      }
-    }
-
-    /* Mobile optimizations */
-    @media (max-width: 640px) {
-      .mobile-full {
-        width: 100% !important;
-      }
-      
-      select, input {
-        font-size: 16px !important;
-      }
-      
-      .ios-table {
-        font-size: 14px;
-      }
-      
-      .ios-table th,
-      .ios-table td {
-        padding: 10px 12px;
-      }
-    }
-
-    /* iOS-like switch */
-    .ios-switch {
-      position: relative;
-      display: inline-block;
-      width: 52px;
-      height: 32px;
-    }
-
-    .ios-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .ios-slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #E5E5EA;
-      transition: .4s;
-      border-radius: 34px;
-    }
-
-    .ios-slider:before {
-      position: absolute;
-      content: "";
-      height: 28px;
-      width: 28px;
-      left: 2px;
-      bottom: 2px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    }
-
-    input:checked + .ios-slider {
-      background-color: #34C759;
-    }
-
-    input:checked + .ios-slider:before {
-      transform: translateX(20px);
-    }
-
-    /* Floating action button iOS-like */
-    .fab {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-      width: 56px;
-      height: 56px;
-      border-radius: 28px;
-      background: linear-gradient(135deg, #007AFF 0%, #5856D6 100%);
-      color: white;
-      border: none;
-      box-shadow: 
-        0 8px 24px rgba(0, 122, 255, 0.25),
-        0 4px 12px rgba(0, 122, 255, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 1000;
-    }
-
-    .fab:hover {
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 
-        0 12px 32px rgba(0, 122, 255, 0.3),
-        0 6px 16px rgba(0, 122, 255, 0.25);
-    }
-
-    .fab:active {
-      transform: translateY(0) scale(1);
-      box-shadow: 
-        0 6px 20px rgba(0, 122, 255, 0.2),
-        0 3px 8px rgba(0, 122, 255, 0.15);
-    }
-  </style>
+  }
+      </style>
 </head>
 <body class="min-h-screen">
 <!-- iOS-like Navbar -->
